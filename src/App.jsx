@@ -1,7 +1,9 @@
 function App() {
   return (
     <>
-      <div>AI short Video AI</div>
+      <div className="text-red-500 text-4xl font-bold">
+        AI Short video creator
+      </div>
     </>
   );
 }
