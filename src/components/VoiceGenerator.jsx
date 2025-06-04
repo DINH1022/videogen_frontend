@@ -71,7 +71,7 @@ function TabPanel({ children, value, index, ...other }) {
   );
 }
 
-export default function VoiceGenerator({ workspace_id }) {
+export default function VoiceGenerator({}) {
   const [provider, setProvider] = useState("gtts");
   const [voice, setVoice] = useState("default");
   const [speed, setSpeed] = useState(1);
@@ -121,14 +121,8 @@ export default function VoiceGenerator({ workspace_id }) {
       }
     };
 
-    if (workspace_id) {
-      fetchAudioData();
-    }
-  }, [workspace_id]);
-
-  const handlePlay = () => {
-    setIsPlaying(!isPlaying);
-  };
+    fetchAudioData();
+  }, []);
 
   const handleCreateAudio = async () => {
     if (!scriptId) {
@@ -190,11 +184,6 @@ export default function VoiceGenerator({ workspace_id }) {
   const handleUploadVoiceFile = async () => {
     if (!selectedVoiceFile) {
       alert("Vui lòng chọn tệp âm thanh và tạo kịch bản trước");
-      return;
-    }
-
-    if (!workspace_id) {
-      alert("Không tìm thấy workspace ID");
       return;
     }
 
