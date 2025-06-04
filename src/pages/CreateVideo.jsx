@@ -55,6 +55,7 @@ import {
 import Navigation from "../components/Navigation";
 import ScriptGenerator from "../components/ScriptGenerator";
 import VoiceGenerator from "../components/VoiceGenerator";
+import ImageGenerator from "../components/ImageGenerator";
 // Mock data for voice options
 // Steps in the video creation workflow
 const steps = [
@@ -71,78 +72,14 @@ export default function VideoCreator() {
   const [isLoading, setIsLoading] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [selectedTrend, setSelectedTrend] = useState(null);
-  const [generatedScript, setGeneratedScript] = useState("");
   const [selectedVoice, setSelectedVoice] = useState("");
-  const [audioPreview, setAudioPreview] = useState(null);
   const [selectedBackground, setSelectedBackground] = useState(null);
-  const [subtitleStyle, setSubtitleStyle] = useState({
-    fontSize: 16,
-    color: "#ffffff",
-    background: "rgba(0, 0, 0, 0.5)",
-    position: "bottom",
-  });
 
   // Preview video state
   const [previewReady, setPreviewReady] = useState(false);
-  const [finalVideoUrl, setFinalVideoUrl] = useState(null);
-  const [openPreview, setOpenPreview] = useState(false);
 
-  // Handle next step in workflow
-  const handleNext = () => {
-    setIsLoading(true);
-    // Simulate processing time
-    setTimeout(() => {
-      setIsLoading(false);
-      if (activeStep === 0) {
-        // Generate fake script after selecting topic
-        setGeneratedScript(`# ${
-          keyword || (selectedTrend ? selectedTrend.name : "Chủ đề mới")
-        }
-
-## Giới thiệu
-Chào mọi người! Hôm nay chúng ta sẽ tìm hiểu về ${
-          keyword || (selectedTrend ? selectedTrend.name : "chủ đề thú vị này")
-        }.
-
-## Nội dung chính
-Đây là một xu hướng đang được nhiều người quan tâm vì những lợi ích thiết thực mà nó mang lại trong cuộc sống hàng ngày.
-
-## Các điểm chính
-- Điểm quan trọng thứ nhất về chủ đề này
-- Lợi ích thứ hai mà bạn có thể nhận được
-- Thông tin thú vị thứ ba mà không phải ai cũng biết
-
-## Kết luận
-Hy vọng qua video ngắn này, bạn đã có thêm kiến thức mới. Đừng quên like và share nếu bạn thấy hữu ích nhé!`);
-      } else if (activeStep === 2) {
-        // Simulate generating audio
-        setAudioPreview("demo_audio.mp3");
-      } else if (activeStep === 5) {
-        // Final video preview
-        setPreviewReady(true);
-        setFinalVideoUrl("/api/placeholder/480/854");
-      }
-      setActiveStep((prevStep) => prevStep + 1);
-    }, 1500);
-  };
-
-  // Handle going back a step
   const handleBack = () => {
     setActiveStep((prevStep) => prevStep - 1);
-  };
-
-  // Handle generating audio preview
-  const handleGenerateAudio = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setAudioPreview("demo_audio.mp3");
-    }, 1500);
-  };
-
-  // Handle opening video preview
-  const handleOpenPreview = () => {
-    setOpenPreview(true);
   };
 
   // Render different content based on current step
@@ -150,7 +87,8 @@ Hy vọng qua video ngắn này, bạn đã có thêm kiến thức mới. Đừ
     switch (step) {
       case 0:
         // return <ScriptGenerator />;
-        return <VoiceGenerator />;
+        // return <VoiceGenerator />;
+        return <ImageGenerator />;
 
       case 1:
         return (
@@ -295,7 +233,6 @@ Hy vọng qua video ngắn này, bạn đã có thêm kiến thức mới. Đừ
             ) : (
               <Button
                 variant="contained"
-                onClick={handleNext}
                 disabled={
                   isLoading ||
                   (activeStep === 0 && !keyword && !selectedTrend) ||

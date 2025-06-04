@@ -77,7 +77,6 @@ export default function VoiceGenerator({}) {
   const [speed, setSpeed] = useState(1);
   const [pitch, setPitch] = useState(1);
   const [intensity, setIntensity] = useState(0.5);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [showAudioPreview, setShowAudioPreview] = useState(false);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
@@ -191,7 +190,6 @@ export default function VoiceGenerator({}) {
     setUploadVoiceError(null);
     setUploadProgress(0);
 
-    // Simulate upload progress
     const progressInterval = setInterval(() => {
       setUploadProgress((prev) => {
         if (prev >= 90) {
