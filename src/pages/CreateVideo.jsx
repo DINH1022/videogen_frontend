@@ -54,67 +54,8 @@ import {
 } from "@mui/icons-material";
 import Navigation from "../components/Navigation";
 import ScriptGenerator from "../components/ScriptGenerator";
-
+import VoiceGenerator from "../components/VoiceGenerator";
 // Mock data for voice options
-const voiceOptions = [
-  { id: 1, name: "Nam giọng Bắc", gender: "male", sample: "sample1.mp3" },
-  { id: 2, name: "Nữ giọng Bắc", gender: "female", sample: "sample2.mp3" },
-  { id: 3, name: "Nam giọng Nam", gender: "male", sample: "sample3.mp3" },
-  { id: 4, name: "Nữ giọng Nam", gender: "female", sample: "sample4.mp3" },
-];
-
-// Mock data for background options
-const backgroundOptions = [
-  {
-    id: 1,
-    name: "Công nghệ 1",
-    url: "https://cdn.oneesports.gg/cdn-data/2024/11/LeagueOfLegends_Worlds2024_MediaDay_T1_Sitting.jpg",
-    category: "Công nghệ",
-  },
-  {
-    id: 2,
-    name: "Công nghệ 2",
-    url: "https://cdn.oneesports.gg/cdn-data/2024/11/LeagueOfLegends_Worlds2024_MediaDay_T1_Sitting.jpg",
-    category: "Công nghệ",
-  },
-  {
-    id: 3,
-    name: "Giáo dục 1",
-    url: "https://cdn.oneesports.gg/cdn-data/2024/11/LeagueOfLegends_Worlds2024_MediaDay_T1_Sitting.jpg",
-    category: "Giáo dục",
-  },
-  {
-    id: 4,
-    name: "Thiên nhiên 1",
-    url: "https://cdn.oneesports.gg/cdn-data/2024/11/LeagueOfLegends_Worlds2024_MediaDay_T1_Sitting.jpg",
-    category: "Thiên nhiên",
-  },
-  {
-    id: 5,
-    name: "Thành phố 1",
-    url: "https://cdn.oneesports.gg/cdn-data/2024/11/LeagueOfLegends_Worlds2024_MediaDay_T1_Sitting.jpg",
-    category: "Đô thị",
-  },
-  {
-    id: 6,
-    name: "Trừu tượng 1",
-    url: "https://cdn.oneesports.gg/cdn-data/2024/11/LeagueOfLegends_Worlds2024_MediaDay_T1_Sitting.jpg",
-    category: "Trừu tượng",
-  },
-  {
-    id: 7,
-    name: "Trừu tượng 1",
-    url: "https://cdn.oneesports.gg/cdn-data/2024/11/LeagueOfLegends_Worlds2024_MediaDay_T1_Sitting.jpg",
-    category: "Trừu tượng",
-  },
-  {
-    id: 8,
-    name: "Trừu tượng 1",
-    url: "https://cdn.oneesports.gg/cdn-data/2024/11/LeagueOfLegends_Worlds2024_MediaDay_T1_Sitting.jpg",
-    category: "Trừu tượng",
-  },
-];
-
 // Steps in the video creation workflow
 const steps = [
   { label: "Kịch bản", icon: <TrendingUp /> },
@@ -208,7 +149,8 @@ Hy vọng qua video ngắn này, bạn đã có thêm kiến thức mới. Đừ
   const getStepContent = (step) => {
     switch (step) {
       case 0:
-        return <ScriptGenerator />;
+        // return <ScriptGenerator />;
+        return <VoiceGenerator />;
 
       case 1:
         return (
