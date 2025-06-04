@@ -1,10 +1,43 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import HomePage from "./pages/HomePage.jsx";
+import LoginForm from "./components/Login.jsx";
+import RegisterForm from "./components/Register.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import CreateVideo from "./pages/CreateVideo.jsx";
+import { ToastContainer } from "react-toastify";
+const theme = {
+  palette: {
+    primary: {
+      main: "#3f51b5", // Indigo
+    },
+    secondary: {
+      main: "#5c6bc0", // Light indigo
+    },
+  },
+  typography: {
+    fontFamily: ["Roboto", "Arial", "sans-serif"].join(","),
+  },
+  shape: {
+    borderRadius: 8,
+  },
+};
 function App() {
   return (
-    <>
-      <div className="text-red-500 text-4xl font-bold">
-        AI Short video creator
-      </div>
-    </>
+    <ThemeProvider theme={createTheme(theme)}>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<HomePage />}></Route>
+            <Route path="/login" element={<LoginForm />}></Route>
+            <Route path="/register" element={<RegisterForm />}></Route>
+            <Route path="/dashboard" element={<Dashboard />}></Route>
+            <Route path="/create-video" element={<CreateVideo />}></Route>
+          </Routes>
+        </div>
+        <ToastContainer />
+      </Router>
+    </ThemeProvider>
   );
 }
 
