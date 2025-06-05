@@ -7,27 +7,15 @@ import {
   Button,
   Typography,
   Paper,
-  TextField,
   Card,
   CardMedia,
   CardContent,
   Grid,
-  Divider,
-  Chip,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Stack,
   IconButton,
   Tooltip,
   Container,
   CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Slider,
   Avatar,
   Fab,
   AppBar,
@@ -41,21 +29,15 @@ import {
   Subtitles,
   PlayArrow,
   CheckCircleOutline,
-  Download,
-  Edit,
   Save,
-  Refresh,
-  InsertEmoticon,
   MusicNote,
-  TextFields,
-  Close,
-  Add,
   HelpOutline,
 } from "@mui/icons-material";
 import Navigation from "../components/Navigation";
 import ScriptGenerator from "../components/ScriptGenerator";
 import VoiceGenerator from "../components/VoiceGenerator";
 import ImageGenerator from "../components/ImageGenerator";
+import VideoEditor from "../components/EditVideo";
 // Mock data for voice options
 // Steps in the video creation workflow
 const steps = [
@@ -88,7 +70,8 @@ export default function VideoCreator() {
       case 0:
         // return <ScriptGenerator />;
         // return <VoiceGenerator />;
-        return <ImageGenerator />;
+        // return <ImageGenerator />;
+        return <VideoEditor />;
 
       case 1:
         return (
