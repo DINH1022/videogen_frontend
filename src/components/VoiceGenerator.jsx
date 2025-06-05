@@ -298,7 +298,7 @@ export default function VoiceGenerator({}) {
   );
 
   return (
-    <Box sx={{ maxWidth: 1000, mx: "auto", p: 3 }}>
+    <Box sx={{ maxWidth: "lg" }}>
       {loading && (
         <Fade in={loading}>
           <Card sx={{ mb: 3, textAlign: "center", py: 4, bgcolor: "grey.50" }}>
@@ -327,8 +327,7 @@ export default function VoiceGenerator({}) {
 
       <Card
         sx={{
-          boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
-          borderRadius: 3,
+          borderRadius: 2,
           overflow: "hidden",
           border: "1px solid rgba(0,0,0,0.06)",
         }}

@@ -1,272 +1,261 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
-  Stepper,
-  Step,
-  StepLabel,
-  Button,
-  Typography,
-  Paper,
-  Card,
-  CardMedia,
-  CardContent,
-  Grid,
-  Stack,
-  IconButton,
-  Tooltip,
   Container,
-  CircularProgress,
-  Avatar,
-  Fab,
-  AppBar,
-  Toolbar,
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+  Button,
+  Grid,
+  Paper,
+  IconButton,
+  Divider,
 } from "@mui/material";
-import {
-  TrendingUp,
-  AutoAwesome,
-  RecordVoiceOver,
-  ImageSearch,
-  Subtitles,
-  PlayArrow,
-  CheckCircleOutline,
-  Save,
-  MusicNote,
-  HelpOutline,
-} from "@mui/icons-material";
-import Navigation from "../components/Navigation";
+import { ArrowBack, ArrowForward, Folder, Save } from "@mui/icons-material";
+import { styled } from "@mui/material/styles";
+
 import ScriptGenerator from "../components/ScriptGenerator";
 import VoiceGenerator from "../components/VoiceGenerator";
-import ImageGenerator from "../components/ImageGenerator";
-import Edit from "../pages/Edit";
-// Mock data for voice options
-// Steps in the video creation workflow
-const steps = [
-  { label: "Kịch bản", icon: <TrendingUp /> },
-  { label: "Sinh kịch bản từ AI", icon: <AutoAwesome /> },
-  { label: "Tạo giọng đọc", icon: <RecordVoiceOver /> },
-  { label: "Chọn hình nền", icon: <ImageSearch /> },
-  { label: "Chèn phụ đề", icon: <Subtitles /> },
-  { label: "Xem trước và tải video", icon: <PlayArrow /> },
-];
+// Styled components for gradient background
+const GradientCard = styled(Card)(({ theme }) => ({
+  background: "linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%)",
+  border: "1px solid #bbdefb",
+  marginBottom: theme.spacing(3),
+}));
 
-export default function VideoCreator() {
-  const [activeStep, setActiveStep] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [keyword, setKeyword] = useState("");
-  const [selectedTrend, setSelectedTrend] = useState(null);
-  const [selectedVoice, setSelectedVoice] = useState("");
-  const [selectedBackground, setSelectedBackground] = useState(null);
+const StyledButton = styled(Button)(({ theme }) => ({
+  fontWeight: 500,
+  textTransform: "none",
+  borderRadius: theme.spacing(1),
+}));
 
-  // Preview video state
-  const [previewReady, setPreviewReady] = useState(false);
+const CreateVideo = () => {
+  const navigate = useNavigate();
+  const [activeStep, setActiveStep] = useState("content");
+  const { id: workspace_id } = useParams();
 
-  const handleBack = () => {
-    setActiveStep((prevStep) => prevStep - 1);
-  };
+  const scriptRef = useRef(null);
+  const voiceRef = useRef(null);
 
-  // Render different content based on current step
-  const getStepContent = (step) => {
-    switch (step) {
-      case 0:
-        // return <ScriptGenerator />;
-        // return <VoiceGenerator />;
-        // return <ImageGenerator />;
-        // return <VideoEditor />;
-        return <Edit />;
-
-      case 1:
-        return (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Kịch bản được tạo bởi AI
-            </Typography>
-          </Box>
-        );
-
-      case 2:
-        return (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Chọn giọng đọc
-            </Typography>
-          </Box>
-        );
-
-      case 3:
-        return (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Chọn hình nền cho video
-            </Typography>
-          </Box>
-        );
-
-      case 4:
-        return (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Tùy chỉnh phụ đề
-            </Typography>
-          </Box>
-        );
-
-      case 5:
-        return (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Xem trước và tải video
-            </Typography>
-          </Box>
-        );
-
-      default:
-        return "Bước không xác định";
+  const scrollToSection = (ref) => {
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
   return (
-    <>
-      <Navigation />
-      <Container maxWidth="xl" sx={{ py: 4, mt: "40px", bgcolor: "#f5f5f5" }}>
-        <AppBar
-          position="static"
-          color="transparent"
-          elevation={0}
-          sx={{ mb: 4 }}
-        >
-          <Toolbar>
-            <Typography
-              variant="h5"
-              component="div"
-              sx={{ flexGrow: 1, fontWeight: "bold" }}
-            >
-              <MusicNote sx={{ mr: 1, verticalAlign: "middle" }} />
-              AI Short Video Creator
-            </Typography>
-
-            <Stack direction="row" spacing={2}>
-              <Button startIcon={<Save />}>Lưu dự án</Button>
-              <Tooltip title="Trợ giúp">
-                <IconButton>
-                  <HelpOutline />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-          </Toolbar>
-        </AppBar>
-
-        <Paper elevation={3} sx={{ px: 4, py: 3, mb: 4 }}>
-          <Stepper activeStep={activeStep} alternativeLabel>
-            {steps.map((step, index) => (
-              <Step key={index}>
-                <StepLabel
-                  StepIconComponent={() => (
-                    <Avatar
-                      sx={{
-                        bgcolor:
-                          activeStep === index
-                            ? "primary.main"
-                            : activeStep > index
-                            ? "success.main"
-                            : "grey.300",
-                        width: 40,
-                        height: 40,
-                      }}
-                    >
-                      {step.icon}
-                    </Avatar>
-                  )}
+    <Box sx={{ minHeight: "100vh", bgcolor: "#fafafa" }}>
+      {activeStep === "content" && (
+        <Container maxWidth="lg" sx={{ py: 3, px: { xs: 2, md: 3, lg: 3 } }}>
+          {/* Header Card */}
+          <GradientCard>
+            <CardHeader
+              sx={{ pb: 1 }}
+              title={
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
                 >
-                  {step.label}
-                </StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-        </Paper>
-
-        <Paper elevation={3} sx={{ p: 4 }}>
-          {getStepContent(activeStep)}
-
-          {isLoading && (
-            <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-              <CircularProgress />
-            </Box>
-          )}
-
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-            <Button
-              variant="outlined"
-              disabled={activeStep === 0 || isLoading}
-              onClick={handleBack}
-            >
-              Quay lại
-            </Button>
-
-            {activeStep === steps.length - 1 ? (
-              <Button
-                variant="contained"
-                color="success"
-                startIcon={<CheckCircleOutline />}
-                onClick={() => {
-                  // Handle completion
-                }}
-                disabled={isLoading || !previewReady}
-              >
-                Hoàn thành
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                disabled={
-                  isLoading ||
-                  (activeStep === 0 && !keyword && !selectedTrend) ||
-                  (activeStep === 2 && !selectedVoice) ||
-                  (activeStep === 3 && !selectedBackground)
-                }
-              >
-                {activeStep === steps.length - 2 ? "Tạo video" : "Tiếp theo"}
-              </Button>
-            )}
-          </Box>
-        </Paper>
-
-        {/* Video History Section */}
-        {activeStep === steps.length - 1 && previewReady && (
-          <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Video đã tạo gần đây
-            </Typography>
-
-            <Grid container spacing={2}>
-              {[1, 2, 3].map((item) => (
-                <Grid item xs={12} sm={6} md={4} key={item}>
-                  <Card>
-                    <CardMedia
-                      component="img"
-                      height="240"
-                      image={`/api/placeholder/240/420`}
-                      alt={`Video ${item}`}
-                    />
-                    <CardContent>
-                      <Typography variant="subtitle1" gutterBottom>
-                        {item === 1 ? keyword : `Video mẫu ${item}`}
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <IconButton
+                      onClick={() => navigate("/homepage")}
+                      sx={{ mr: 1, p: 0.5 }}
+                      size="small"
+                    >
+                      <ArrowBack />
+                    </IconButton>
+                    <Box>
+                      <Typography
+                        variant="h5"
+                        component="h1"
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          fontWeight: 600,
+                        }}
+                      >
+                        <Folder sx={{ color: "#9c27b0" }} />
+                        Tạo Video Mới
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {new Date().toLocaleDateString()}
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 0.5 }}
+                      >
+                        Tạo kịch bản và cấu hình giọng nói cho video của bạn
                       </Typography>
-                    </CardContent>
-                  </Card>
+                    </Box>
+                  </Box>
+                </Box>
+              }
+            />
+            <CardContent>
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid item xs={6}>
+                  <StyledButton
+                    variant="outlined"
+                    fullWidth
+                    onClick={() => scrollToSection(scriptRef)}
+                    sx={{
+                      color: "#1976d2",
+                      borderColor: "#1976d2",
+                      "&:hover": {
+                        borderColor: "#1565c0",
+                        bgcolor: "rgba(25, 118, 210, 0.04)",
+                      },
+                    }}
+                  >
+                    Kịch bản
+                  </StyledButton>
                 </Grid>
-              ))}
-            </Grid>
-          </Paper>
-        )}
+                <Grid item xs={6}>
+                  <StyledButton
+                    variant="outlined"
+                    fullWidth
+                    onClick={() => scrollToSection(voiceRef)}
+                    sx={{
+                      color: "#1976d2",
+                      borderColor: "#1976d2",
+                      "&:hover": {
+                        borderColor: "#1565c0",
+                        bgcolor: "rgba(25, 118, 210, 0.04)",
+                      },
+                    }}
+                  >
+                    Giọng nói
+                  </StyledButton>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </GradientCard>
 
-        {/* Fab button for help */}
-        <Fab color="primary" sx={{ position: "fixed", bottom: 20, right: 20 }}>
-          <HelpOutline />
-        </Fab>
-      </Container>
-    </>
+          {/* Content Section */}
+          <Box sx={{ mb: 4 }}>
+            {/* Script Section */}
+            <Box ref={scriptRef}>
+              <Card sx={{ boxShadow: 2 }}>
+                <CardHeader
+                  title={
+                    <Typography
+                      variant="h6"
+                      component="h2"
+                      fontWeight={600}
+                      ml={2}
+                    >
+                      Tạo kịch bản
+                    </Typography>
+                  }
+                  subheader={
+                    <Typography variant="body2" color="text.secondary" ml={2}>
+                      Nhập chủ đề khoa học hoặc chọn từ danh sách gợi ý
+                    </Typography>
+                  }
+                />
+                <CardContent>
+                  {/* Replace with your ScriptGenerator component */}
+                  <Box
+                    sx={{
+                      borderRadius: 1,
+                      textAlign: "center",
+                    }}
+                  >
+                    <Typography color="text.secondary">
+                      <ScriptGenerator />
+                    </Typography>
+                  </Box>
+                  {/* <ScriptGenerator workspace_id={workspace_id ?? ""} /> */}
+                </CardContent>
+              </Card>
+            </Box>
+
+            {/* Voice Section */}
+            <Box ref={voiceRef} sx={{ mt: 4 }}>
+              <Card sx={{ boxShadow: 2 }}>
+                <CardHeader
+                  title={
+                    <Typography
+                      variant="h6"
+                      component="h2"
+                      fontWeight={600}
+                      ml={2}
+                    >
+                      Cấu hình giọng nói
+                    </Typography>
+                  }
+                  subheader={
+                    <Typography variant="body2" color="text.secondary" ml={2}>
+                      Lựa chọn và tùy chỉnh giọng nói cho video của bạn
+                    </Typography>
+                  }
+                />
+                <CardContent>
+                  {/* Replace with your VoiceConfig component */}
+                  <Box
+                    sx={{
+                      px: 2,
+                    }}
+                  >
+                    <Typography color="text.secondary">
+                      <VoiceGenerator />
+                    </Typography>
+                  </Box>
+                  {/* <VoiceConfig workspace_id={workspace_id ?? ""} /> */}
+                </CardContent>
+              </Card>
+            </Box>
+
+            {/* Continue Button */}
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={() => setActiveStep("generate")}
+                endIcon={<ArrowForward />}
+                sx={{
+                  bgcolor: "#1976d2",
+                  "&:hover": {
+                    bgcolor: "#1565c0",
+                  },
+                  px: 3,
+                  py: 1.5,
+                  textTransform: "none",
+                  fontWeight: 500,
+                }}
+              >
+                Tiếp tục
+              </Button>
+            </Box>
+          </Box>
+        </Container>
+      )}
+
+      {activeStep === "generate" && (
+        <Container
+          maxWidth="xl"
+          sx={{
+            py: 3,
+            px: { xs: 2, md: 3, lg: 4, xl: 5 },
+            maxWidth: "1200px",
+            bgcolor: "white",
+          }}
+        >
+          {/* Replace with your Resource component */}
+          <Paper sx={{ p: 4, textAlign: "center", bgcolor: "#f5f5f5" }}>
+            <Typography variant="h6" color="text.secondary">
+              Resource Component Here
+            </Typography>
+          </Paper>
+          {/* <Resource workspace_id={workspace_id} /> */}
+        </Container>
+      )}
+    </Box>
   );
-}
+};
+
+export default CreateVideo;

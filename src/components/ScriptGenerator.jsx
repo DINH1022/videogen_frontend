@@ -197,7 +197,7 @@ const ScriptGenerator = () => {
   };
 
   return (
-    <Box>
+    <Box sx={{ px: 2 }}>
       {/* Search Section */}
       <Card
         sx={{
@@ -348,39 +348,6 @@ const ScriptGenerator = () => {
               {loading ? "Đang tìm..." : "Tìm kiếm"}
             </Button>
           </Box>
-
-          {/* Decorative elements */}
-          <Box
-            sx={{
-              position: "absolute",
-              top: -10,
-              right: -10,
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-              opacity: 0.3,
-              animation: "float 3s ease-in-out infinite",
-              "@keyframes float": {
-                "0%, 100%": { transform: "translateY(0px)" },
-                "50%": { transform: "translateY(-10px)" },
-              },
-            }}
-          />
-
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: -5,
-              left: -5,
-              width: 30,
-              height: 30,
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              opacity: 0.2,
-              animation: "float 4s ease-in-out infinite reverse",
-            }}
-          />
         </CardContent>
       </Card>
 
@@ -716,45 +683,42 @@ const ScriptGenerator = () => {
               </Box>
             </Box>
           </CardContent>
-          <Box
-            sx={{ width: "100%", display: "flex", justifyContent: "center" }}
-          >
-            <Button
-              fullWidth
-              variant="contained"
-              startIcon={
-                generating ? (
-                  <CircularProgress size={20} color="inherit" />
-                ) : (
-                  <PlayArrow />
-                )
-              }
-              onClick={handleGenerateFullScript}
-              disabled={
-                !selectedScript ||
-                !language ||
-                !style ||
-                editingScript ||
-                generating
-              }
-              sx={{
-                py: 1.5,
-                margin: 3,
-                textAlign: "center",
-                background: "linear-gradient(45deg, #FF6B6B 30%, #4ECDC4 90%)",
-                "&:hover": {
-                  background:
-                    "linear-gradient(45deg, #FF5252 30%, #26A69A 90%)",
-                },
-                "&:disabled": {
-                  background: "#e0e0e0",
-                },
-              }}
-            >
-              {generating ? "Đang tạo..." : "Tạo kịch bản hoàn chỉnh"}
-            </Button>
-          </Box>
         </Card>
+        <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
+          <Button
+            fullWidth
+            variant="contained"
+            startIcon={
+              generating ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                <PlayArrow />
+              )
+            }
+            onClick={handleGenerateFullScript}
+            disabled={
+              !selectedScript ||
+              !language ||
+              !style ||
+              editingScript ||
+              generating
+            }
+            sx={{
+              py: 1.5,
+              mt: 4,
+              textAlign: "center",
+              background: "linear-gradient(45deg, #FF6B6B 30%, #4ECDC4 90%)",
+              "&:hover": {
+                background: "linear-gradient(45deg, #FF5252 30%, #26A69A 90%)",
+              },
+              "&:disabled": {
+                background: "#e0e0e0",
+              },
+            }}
+          >
+            {generating ? "Đang tạo..." : "Tạo kịch bản hoàn chỉnh"}
+          </Button>
+        </Box>
       </Grid>
 
       {/* Full Script Display Section */}
@@ -785,7 +749,7 @@ const ScriptGenerator = () => {
                 "& .MuiInputBase-input": {
                   fontSize: "16px",
                   lineHeight: 1.6,
-                  minHeight: "400px",
+                  minHeight: "200px",
                   fontFamily: "'Roboto', sans-serif",
                 },
               }}
