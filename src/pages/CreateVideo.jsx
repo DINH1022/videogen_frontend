@@ -37,7 +37,7 @@ import Navigation from "../components/Navigation";
 import ScriptGenerator from "../components/ScriptGenerator";
 import VoiceGenerator from "../components/VoiceGenerator";
 import ImageGenerator from "../components/ImageGenerator";
-import VideoEditor from "../components/EditVideo";
+import Edit from "../pages/Edit";
 // Mock data for voice options
 // Steps in the video creation workflow
 const steps = [
@@ -71,7 +71,8 @@ export default function VideoCreator() {
         // return <ScriptGenerator />;
         // return <VoiceGenerator />;
         // return <ImageGenerator />;
-        return <VideoEditor />;
+        // return <VideoEditor />;
+        return <Edit />;
 
       case 1:
         return (
@@ -126,7 +127,7 @@ export default function VideoCreator() {
   return (
     <>
       <Navigation />
-      <Container maxWidth="lg" sx={{ py: 4, mt: "40px", bgcolor: "#f5f5f5" }}>
+      <Container maxWidth="xl" sx={{ py: 4, mt: "40px", bgcolor: "#f5f5f5" }}>
         <AppBar
           position="static"
           color="transparent"
