@@ -173,9 +173,6 @@ const VideoCard = ({ video, isPublishedTab }) => {
           }}
         />
 
-        {/* Platform Badge - Clean design */}
-
-        {/* Share button - Clean minimal design */}
         {isPublishedTab && video.published.length > 0 ? (
           <Box sx={{ position: "absolute", top: 12, right: 12 }}>
             {video.published.map((platform) => {
@@ -433,7 +430,6 @@ const VideoCard = ({ video, isPublishedTab }) => {
   );
 };
 
-// Main Dashboard Component
 const VideoDashboard = () => {
   const [activeTab, setActiveTab] = useState(0);
 
@@ -495,7 +491,6 @@ const VideoDashboard = () => {
         Video Dashboard
       </Typography>
 
-      {/* Tabs - Clean design */}
       <Box sx={{ borderBottom: 1, borderColor: "#e5e7eb", mb: 4 }}>
         <Tabs
           value={activeTab}
