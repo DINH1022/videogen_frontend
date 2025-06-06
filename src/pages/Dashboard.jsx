@@ -174,8 +174,10 @@ const VideoCard = ({ video, isPublishedTab }) => {
         />
 
         {/* Platform Badge - Clean design */}
-        {isPublishedTab && video.published.length > 0 && (
-          <Box sx={{ position: "absolute", top: 12, left: 12 }}>
+
+        {/* Share button - Clean minimal design */}
+        {isPublishedTab && video.published.length > 0 ? (
+          <Box sx={{ position: "absolute", top: 12, right: 12 }}>
             {video.published.map((platform) => {
               const config = getPlatformChip(platform);
               return (
@@ -199,32 +201,30 @@ const VideoCard = ({ video, isPublishedTab }) => {
               );
             })}
           </Box>
+        ) : (
+          <IconButton
+            sx={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              backgroundColor: "rgba(255,255,255,0.95)",
+              backdropFilter: "blur(8px)",
+              opacity: isHovered ? 1 : 0,
+              visibility: isHovered ? "visible" : "hidden",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                backgroundColor: "rgba(255,255,255,1)",
+                transform: "scale(1.1)",
+              },
+              width: 36,
+              height: 36,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            }}
+            size="small"
+          >
+            <ShareIcon sx={{ fontSize: 18, color: "#374151" }} />
+          </IconButton>
         )}
-
-        {/* Share button - Clean minimal design */}
-
-        <IconButton
-          sx={{
-            position: "absolute",
-            top: 12,
-            right: 12,
-            backgroundColor: "rgba(255,255,255,0.95)",
-            backdropFilter: "blur(8px)",
-            opacity: isHovered ? 1 : 0,
-            visibility: isHovered ? "visible" : "hidden",
-            transition: "all 0.3s ease",
-            "&:hover": {
-              backgroundColor: "rgba(255,255,255,1)",
-              transform: "scale(1.1)",
-            },
-            width: 36,
-            height: 36,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-          }}
-          size="small"
-        >
-          <ShareIcon sx={{ fontSize: 18, color: "#374151" }} />
-        </IconButton>
 
         {/* Processing overlay - Cleaner design */}
         {video.state === "processing" && (
