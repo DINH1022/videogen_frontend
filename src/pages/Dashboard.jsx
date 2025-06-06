@@ -8,9 +8,13 @@ import {
   Chip,
   Container,
   Stack,
+  Button,
+  Divider,
 } from "@mui/material";
 
 import VideoCard from "../components/VideoCard";
+import WorkspaceCard from "../components/WorkspaceCard";
+
 // Dữ liệu mẫu với video đang xử lý
 const sampleVideos = [
   {
@@ -83,8 +87,6 @@ const sampleVideos = [
     dateCreate: "8 thg 5, 2025",
     views: "0 lượt xem",
     progress: 30,
-    thumbnail:
-      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=300&h=200&fit=crop",
   },
   {
     id: 8,
@@ -95,6 +97,38 @@ const sampleVideos = [
     views: "0 lượt xem",
     thumbnail:
       "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=200&fit=crop",
+  },
+];
+
+// Dữ liệu mẫu cho workspaces
+const sampleWorkspaces = [
+  {
+    id: 1,
+    name: "Dự án Nội dung Giáo dục",
+    description:
+      "Tạo video giáo dục về khoa học tự nhiên, bao gồm các chủ đề về động vật, thực vật và môi trường sống.",
+    dateCreate: "15 thg 4, 2025",
+  },
+  {
+    id: 2,
+    name: "Marketing Sản phẩm 2025",
+    description:
+      "Workspace dành cho việc tạo content marketing cho các sản phẩm mới trong năm 2025. Bao gồm video quảng cáo và content social media.",
+    dateCreate: "22 thg 4, 2025",
+  },
+  {
+    id: 3,
+    name: "Hướng dẫn Thực hành",
+    description:
+      "Tập hợp các video hướng dẫn và tutorial cho người dùng mới bắt đầu.",
+    dateCreate: "5 thg 5, 2025",
+  },
+  {
+    id: 4,
+    name: "Nội dung Giải trí",
+    description:
+      "Workspace cho các video giải trí, funny clips và nội dung nhẹ nhàng để thu hút audience.",
+    dateCreate: "10 thg 5, 2025",
   },
 ];
 
@@ -118,6 +152,16 @@ const VideoDashboard = () => {
       default:
         return sampleVideos;
     }
+  };
+
+  const handleViewResources = (workspace) => {
+    console.log("Xem tài nguyên cho workspace:", workspace);
+    // Implement logic để xem tài nguyên
+  };
+
+  const handleCreateNewWorkspace = () => {
+    console.log("Tạo workspace mới");
+    // Implement logic để tạo workspace mới
   };
 
   const tabs = [
@@ -230,7 +274,7 @@ const VideoDashboard = () => {
         ))}
       </Grid>
 
-      {/* Empty state */}
+      {/* Empty state cho videos */}
       {getFilteredVideos().length === 0 && (
         <Box
           sx={{
@@ -243,6 +287,7 @@ const VideoDashboard = () => {
             backgroundColor: "#fff",
             borderRadius: 3,
             border: "1px solid #e5e7eb",
+            mb: 6,
           }}
         >
           <Typography
@@ -266,6 +311,97 @@ const VideoDashboard = () => {
           </Typography>
         </Box>
       )}
+
+      {/* Divider */}
+      <Divider sx={{ my: 6, borderColor: "#e5e7eb" }} />
+
+      {/* Workspace Section */}
+      <Typography
+        variant="h5"
+        sx={{
+          mb: 4,
+          fontWeight: 600,
+          color: "#1f2937",
+          fontSize: "1.5rem",
+        }}
+      >
+        Workspace
+      </Typography>
+
+      {/* Workspace Grid */}
+      {/* Main Container với khung trắng */}
+      <Box
+        sx={{
+          backgroundColor: "white",
+          borderRadius: 2,
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          padding: 3,
+          margin: 2,
+          minHeight: "600px",
+          position: "relative",
+        }}
+      >
+        {/* Header với buttons ở góc trên phải */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            marginBottom: 3,
+            gap: 2,
+          }}
+        >
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={handleViewResources}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 500,
+            }}
+          >
+            Xem tài nguyên
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCreateNewWorkspace}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 500,
+            }}
+          >
+            Tạo workspace mới
+          </Button>
+        </Box>
+
+        {/* Workspace Grid */}
+        <Grid container spacing={3} sx={{ justifyContent: "flex-start" }}>
+          {sampleWorkspaces.map((workspace) => (
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              lg={3}
+              xl={3}
+              key={workspace.id}
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <WorkspaceCard
+                workspace={workspace}
+                onViewResources={handleViewResources}
+                onCreateNew={handleCreateNewWorkspace}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
     </Container>
   );
 };
