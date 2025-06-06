@@ -32,7 +32,7 @@ function App() {
             <Route path="/login" element={<LoginForm />}></Route>
             <Route path="/register" element={<RegisterForm />}></Route>
             <Route path="/dashboard" element={<Dashboard />}></Route>
-            <Route path="/create-video" element={<CreateVideo />}></Route>
+            <Route path="/workspace/:id" element={<CreateVideo />}></Route>
           </Routes>
         </div>
         <ToastContainer />

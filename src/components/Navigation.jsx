@@ -124,10 +124,10 @@ const Navigation = () => {
   const getAppBarBackground = () => {
     if (isHomePage) {
       return scrolled
-        ? "linear-gradient(135deg, rgba(213, 216, 228, 0.95) 0%, rgba(241, 173, 151, 0.95) 100%)"
+        ? "linear-gradient(135deg, rgba(213, 216, 228, 0.95) 0%, rgba(185, 171, 166, 0.95) 100%)"
         : "rgba(0, 0, 0, 0.1)";
     }
-    return "linear-gradient(135deg, rgba(213, 216, 228, 0.95) 0%, rgba(244, 245, 198, 0.95) 100%)";
+    return "linear-gradient(135deg, rgba(213, 216, 228, 0.95) 0%, rgba(241, 173, 151, 0.95) 100%)";
   };
 
   const drawer = (
