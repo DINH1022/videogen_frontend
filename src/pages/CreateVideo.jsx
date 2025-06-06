@@ -18,6 +18,7 @@ import { styled } from "@mui/material/styles";
 
 import ScriptGenerator from "../components/ScriptGenerator";
 import VoiceGenerator from "../components/VoiceGenerator";
+import Navigation from "../components/Navigation";
 // Styled components for gradient background
 const GradientCard = styled(Card)(({ theme }) => ({
   background: "linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%)",
@@ -47,9 +48,12 @@ const CreateVideo = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#fafafa" }}>
+      <Navigation />
       {activeStep === "content" && (
-        <Container maxWidth="lg" sx={{ py: 3, px: { xs: 2, md: 3, lg: 3 } }}>
-          {/* Header Card */}
+        <Container
+          maxWidth="lg"
+          sx={{ py: 3, px: { xs: 2, md: 3, lg: 3 }, mt: 10 }}
+        >
           <GradientCard>
             <CardHeader
               sx={{ pb: 1 }}
@@ -135,9 +139,7 @@ const CreateVideo = () => {
             </CardContent>
           </GradientCard>
 
-          {/* Content Section */}
           <Box sx={{ mb: 4 }}>
-            {/* Script Section */}
             <Box ref={scriptRef}>
               <Card sx={{ boxShadow: 2 }}>
                 <CardHeader
@@ -158,7 +160,6 @@ const CreateVideo = () => {
                   }
                 />
                 <CardContent>
-                  {/* Replace with your ScriptGenerator component */}
                   <Box
                     sx={{
                       borderRadius: 1,
@@ -174,7 +175,6 @@ const CreateVideo = () => {
               </Card>
             </Box>
 
-            {/* Voice Section */}
             <Box ref={voiceRef} sx={{ mt: 4 }}>
               <Card sx={{ boxShadow: 2 }}>
                 <CardHeader
@@ -195,7 +195,6 @@ const CreateVideo = () => {
                   }
                 />
                 <CardContent>
-                  {/* Replace with your VoiceConfig component */}
                   <Box
                     sx={{
                       px: 2,
@@ -210,7 +209,6 @@ const CreateVideo = () => {
               </Card>
             </Box>
 
-            {/* Continue Button */}
             <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}>
               <Button
                 variant="contained"
@@ -245,7 +243,6 @@ const CreateVideo = () => {
             bgcolor: "white",
           }}
         >
-          {/* Replace with your Resource component */}
           <Paper sx={{ p: 4, textAlign: "center", bgcolor: "#f5f5f5" }}>
             <Typography variant="h6" color="text.secondary">
               Resource Component Here
