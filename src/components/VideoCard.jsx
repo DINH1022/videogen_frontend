@@ -51,7 +51,7 @@ const VideoCard = ({ video, isPublishedTab }) => {
   return (
     <Card
       sx={{
-        width: 350,
+        width: 344,
         height: 320,
         display: "flex",
         flexDirection: "column",

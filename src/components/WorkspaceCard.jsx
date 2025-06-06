@@ -13,7 +13,7 @@ const WorkspaceCard = ({ workspace, onViewResources, onCreateNew }) => {
   return (
     <Card
       sx={{
-        width: 445,
+        width: 458,
         height: 200,
 
         display: "flex",
@@ -29,7 +29,6 @@ const WorkspaceCard = ({ workspace, onViewResources, onCreateNew }) => {
       }}
     >
       <CardContent sx={{ flexGrow: 1, p: 3 }}>
-        {/* Header với icon */}
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <Box
             sx={{
