@@ -315,21 +315,7 @@ const VideoDashboard = () => {
       {/* Divider */}
       <Divider sx={{ my: 6, borderColor: "#e5e7eb" }} />
 
-      {/* Workspace Section */}
-      <Typography
-        variant="h5"
-        sx={{
-          mb: 4,
-          fontWeight: 600,
-          color: "#1f2937",
-          fontSize: "1.5rem",
-        }}
-      >
-        Workspace
-      </Typography>
-
       {/* Workspace Grid */}
-      {/* Main Container với khung trắng */}
       <Box
         sx={{
           backgroundColor: "white",
@@ -345,36 +331,56 @@ const VideoDashboard = () => {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
             alignItems: "center",
             marginBottom: 3,
-            gap: 2,
           }}
         >
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={handleViewResources}
+          <Typography
+            variant="h5"
             sx={{
-              borderRadius: 2,
-              textTransform: "none",
-              fontWeight: 500,
+              mb: 4,
+              fontWeight: 600,
+              color: "#1f2937",
+              fontSize: "1.5rem",
             }}
           >
-            Xem tài nguyên
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCreateNewWorkspace}
+            Workspace
+          </Typography>
+          <Box
             sx={{
-              borderRadius: 2,
-              textTransform: "none",
-              fontWeight: 500,
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              marginBottom: 3,
+              gap: 2,
             }}
           >
-            Tạo workspace mới
-          </Button>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleViewResources}
+              sx={{
+                borderRadius: 2,
+                textTransform: "none",
+                fontWeight: 500,
+              }}
+            >
+              Xem tài nguyên
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleCreateNewWorkspace}
+              sx={{
+                borderRadius: 2,
+                textTransform: "none",
+                fontWeight: 500,
+              }}
+            >
+              Tạo workspace mới
+            </Button>
+          </Box>
         </Box>
 
         {/* Workspace Grid */}
