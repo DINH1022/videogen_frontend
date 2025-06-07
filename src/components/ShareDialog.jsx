@@ -736,8 +736,7 @@ const VideoShareDialog = ({ open, onClose }) => {
                 color: "white",
                 fontWeight: 600,
                 px: 3,
-
-                borderRadius: 3,
+                borderRadius: 2,
                 boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)",
                 transition: "all 0.3s ease",
                 "&:hover": {
@@ -762,8 +761,7 @@ const VideoShareDialog = ({ open, onClose }) => {
                 color: "white",
                 fontWeight: 600,
                 px: 2,
-
-                borderRadius: 3,
+                borderRadius: 2,
                 boxShadow: "0 4px 15px rgba(245, 87, 108, 0.4)",
                 transition: "all 0.3s ease",
                 "&:hover": {
