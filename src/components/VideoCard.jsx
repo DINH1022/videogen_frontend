@@ -22,11 +22,11 @@ import {
   CalendarToday,
   LinkOutlined,
 } from "@mui/icons-material";
-
+import VideoShareDialog from "./ShareDialog";
 // Component Video Card
 const VideoCard = ({ video, isPublishedTab }) => {
   const [isHovered, setIsHovered] = useState(false);
-
+  const [openDialogShare, setOpenDialogShare] = useState(false);
   const getPlatformChip = (platform) => {
     const configs = {
       facebook: {
@@ -47,7 +47,9 @@ const VideoCard = ({ video, isPublishedTab }) => {
     };
     return configs[platform];
   };
-
+  const handleShareButton = () => {
+    return setOpenDialogShare(true);
+  };
   return (
     <Card
       sx={{
@@ -106,6 +108,7 @@ const VideoCard = ({ video, isPublishedTab }) => {
           </Box>
         ) : (
           <IconButton
+            onClick={handleShareButton}
             sx={{
               position: "absolute",
               top: 12,
@@ -189,8 +192,6 @@ const VideoCard = ({ video, isPublishedTab }) => {
             </Box>
           </Box>
         )}
-
-        {/* Status chip - Clean minimal design */}
       </Box>
 
       <CardContent
@@ -332,6 +333,10 @@ const VideoCard = ({ video, isPublishedTab }) => {
           </Button>
         )}
       </CardContent>
+      <VideoShareDialog
+        open={openDialogShare}
+        onClose={() => setOpenDialogShare(false)}
+      />
     </Card>
   );
 };

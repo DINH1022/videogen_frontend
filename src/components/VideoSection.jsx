@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Typography, Tabs, Tab, Grid, Chip, Stack } from "@mui/material";
 import VideoCard from "./VideoCard";
-
+import VideoShareDialog from "./ShareDialog";
 // Dữ liệu mẫu với video đang xử lý
 const sampleVideos = [
   {
