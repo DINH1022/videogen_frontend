@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { ArrowBack, ArrowForward, Folder, Save } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
-
+import Resource from "../components/Resource";
 import ScriptGenerator from "../components/ScriptGenerator";
 import VoiceGenerator from "../components/VoiceGenerator";
 import Navigation from "../components/Navigation";
@@ -237,17 +237,14 @@ const CreateVideo = () => {
         <Container
           maxWidth="xl"
           sx={{
-            py: 3,
-            px: { xs: 2, md: 3, lg: 4, xl: 5 },
             maxWidth: "1200px",
+            textAlign: "center",
             bgcolor: "white",
+            mt: 10,
           }}
         >
-          <Paper sx={{ p: 4, textAlign: "center", bgcolor: "#f5f5f5" }}>
-            <Typography variant="h6" color="text.secondary">
-              Resource Component Here
-            </Typography>
-          </Paper>
+          <Resource />
+
           {/* <Resource workspace_id={workspace_id} /> */}
         </Container>
       )}
