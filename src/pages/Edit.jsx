@@ -654,6 +654,7 @@ import {
 } from "@mui/icons-material";
 import { useLocation } from "react-router-dom";
 import ExportDialog from "../components/ExportDialog";
+
 // Fallback sample resources (only used if no data is passed)
 const fallbackImages = [
   "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop",
@@ -837,7 +838,7 @@ export default function CesdkMuiEditor() {
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [editorReady, setEditorReady] = useState(false);
   const location = useLocation();
-  console.log("location: ", location.state);
+
   // Extract parameters from navigation state
   const workspaceId = location.state?.workspaceId ?? null;
   const resourceList = location.state?.resourceList ?? [];
@@ -849,15 +850,14 @@ export default function CesdkMuiEditor() {
     resourceCount: resourceList.length,
     timingCount: timing.length,
     hasAudio: !!audioUrl,
+    timingData: timing, // Debug timing structure
   });
 
-  // IMPROVED FIX: Sử dụng useRef để lưu instance và prevent duplicate
   const cesdkInstanceRef = useRef(null);
   const [isInitializing, setIsInitializing] = useState(false);
   const initializationAttempted = useRef(false);
 
   useEffect(() => {
-    // MAIN FIX: Kiểm tra tất cả conditions để prevent duplicate initialization
     if (
       cesdkInstanceRef.current ||
       isInitializing ||
@@ -868,14 +868,12 @@ export default function CesdkMuiEditor() {
     }
 
     const loadCesdk = async () => {
-      // CRITICAL: Mark initialization as attempted immediately
       initializationAttempted.current = true;
       setIsInitializing(true);
 
       try {
         console.log("Starting CE.SDK initialization...");
 
-        // Double check container is still available
         if (!containerRef.current) {
           console.error(
             "Container ref became unavailable during initialization"
@@ -887,7 +885,6 @@ export default function CesdkMuiEditor() {
           "https://cdn.img.ly/packages/imgly/cesdk-js/1.52.0/index.js"
         ).then((mod) => mod.default || mod);
 
-        //  Final check before creating instance
         if (cesdkInstanceRef.current) {
           console.log("Instance already exists, aborting initialization");
           return;
@@ -896,7 +893,7 @@ export default function CesdkMuiEditor() {
         const config = {
           license:
             "sTjOpvmvcA8xu3AxiP31kgtQzRmoQjTCDlIdOEeoCjNL-XPM89OtHv4ZaadOWluJ",
-          userId: workspaceId || "USER_ID", // Use workspaceId if available
+          userId: workspaceId || "USER_ID",
           theme: "light",
           baseURL: "https://cdn.img.ly/packages/imgly/cesdk-js/1.52.0/assets",
           ui: {
@@ -942,14 +939,12 @@ export default function CesdkMuiEditor() {
           },
         };
 
-        // Create instance and immediately store in ref
         console.log("Creating CE.SDK instance...");
         const instance = await CreativeEditorSDK.create(
           containerRef.current,
           config
         );
 
-        // CRITICAL: Store instance immediately after creation
         cesdkInstanceRef.current = instance;
         console.log("CE.SDK instance created and stored");
 
@@ -965,7 +960,7 @@ export default function CesdkMuiEditor() {
         const engine = instance.engine;
         const page = engine.scene.getCurrentPage();
 
-        // Set up default scene
+        // Set up scene dimensions
         engine.block.setWidth(page, 1280);
         engine.block.setHeight(page, 720);
 
@@ -974,42 +969,48 @@ export default function CesdkMuiEditor() {
         engine.block.appendChild(page, track);
         engine.block.fillParent(track);
 
-        // Use passed resourceList instead of sample images
         const imagesToUse =
           resourceList.length > 0 ? resourceList : fallbackImages;
 
-        // Process timing data - ensure it's an array of numbers
+        // FIXED TIMING CALCULATION
         const processedTimings =
           timing.length > 0
             ? timing.map((t) => {
-                // Handle different timing formats
-                if (typeof t === "number") return t;
                 if (typeof t === "object" && t !== null) {
-                  // If timing is an object, try to extract duration property
+                  // Calculate duration from startTime and endTime
+                  if (t.startTime !== undefined && t.endTime !== undefined) {
+                    return t.endTime - t.startTime;
+                  }
+                  // Fallback for other object structures
                   return t.duration || t.time || t.value || 3;
                 }
+                if (typeof t === "number") return t;
                 if (typeof t === "string") {
                   const parsed = parseFloat(t);
                   return isNaN(parsed) ? 3 : parsed;
                 }
-                return 3; // Default fallback
+                return 3;
               })
-            : imagesToUse.map(() => 3); // Default 3 seconds if no timing
+            : imagesToUse.map(() => 3);
 
-        console.log("Adding images to timeline:", {
-          imageCount: imagesToUse.length,
-          timingCount: processedTimings.length,
-          timingsPreview: processedTimings.slice(0, 3),
-          originalTimingType: timing.length > 0 ? typeof timing[0] : "none",
+        console.log("FIXED Timing calculation:", {
+          originalTiming: timing.slice(0, 2), // Show first 2 for debug
+          processedTimings: processedTimings,
+          totalDuration: processedTimings.reduce((sum, t) => sum + t, 0),
         });
 
-        // Add images from resourceList to main editor
+        // FIXED IMAGE SIZING
+        const pageWidth = engine.block.getWidth(page);
+        const pageHeight = engine.block.getHeight(page);
+
+        console.log("Page dimensions:", { pageWidth, pageHeight });
+
         for (let i = 0; i < imagesToUse.length; i++) {
           const url = imagesToUse[i];
-          const duration = processedTimings[i] || 3; // Use processed timing or default to 3 seconds
+          const duration = processedTimings[i] || 3;
 
           console.log(
-            `Adding image ${i + 1}: duration=${duration}, url=${url.substring(
+            `Adding image ${i + 1}: duration=${duration}s, url=${url.substring(
               0,
               50
             )}...`
@@ -1018,11 +1019,22 @@ export default function CesdkMuiEditor() {
           const block = engine.block.create("graphic");
           engine.block.setShape(block, engine.block.createShape("rect"));
 
+          // SET BLOCK SIZE TO MATCH PAGE
+          engine.block.setWidth(block, pageWidth);
+          engine.block.setHeight(block, pageHeight);
+          engine.block.setPositionX(block, 0);
+          engine.block.setPositionY(block, 0);
+
           const fill = engine.block.createFill("image");
           engine.block.setString(fill, "fill/image/imageFileURI", url);
+
+          // REMOVED THE PROBLEMATIC fillMode LINE
+          // engine.block.setEnum(fill, "fill/image/fillMode", "cover");
+
           engine.block.setFill(block, fill);
           engine.block.setDuration(block, duration);
 
+          // Animations
           const zoomAnimation = engine.block.createAnimation("zoom");
           const fadeOutAnimation = engine.block.createAnimation("fade");
           engine.block.setDuration(zoomAnimation, 1.2);
@@ -1048,7 +1060,6 @@ export default function CesdkMuiEditor() {
             );
             engine.block.setFill(audioBlock, audioFill);
 
-            // Calculate total duration from all image timings
             const totalDuration = processedTimings.reduce(
               (sum, time) => sum + time,
               0
@@ -1093,12 +1104,11 @@ export default function CesdkMuiEditor() {
           cesdkInstanceRef.current = null;
           setMainEngine(null);
           setEditorReady(false);
-          // Reset initialization flag for potential re-mount
           initializationAttempted.current = false;
         }
       }
     };
-  }, []); // Empty dependency array - only run once
+  }, []);
 
   const handleExport = async (quality, format, fps, updateProgress) => {
     if (!mainEngine) return;
@@ -1110,27 +1120,17 @@ export default function CesdkMuiEditor() {
       hasAudio: !!audioUrl,
     });
 
-    // Simulate export process
     for (let i = 0; i <= 100; i += 10) {
       updateProgress(i);
       await new Promise((resolve) => setTimeout(resolve, 200));
     }
-
-    // Here you would implement actual video export
-    // using mainEngine.block.exportVideo()
   };
 
   const drawerWidth = 350;
 
   return (
     <Box sx={{ display: "flex", maxHeight: "100vh" }}>
-      {/* Main Editor Area */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-        }}
-      >
+      <Box component="main" sx={{ flexGrow: 1 }}>
         <Box
           ref={containerRef}
           sx={{
@@ -1171,7 +1171,6 @@ export default function CesdkMuiEditor() {
         )}
       </Box>
 
-      {/* Side Drawer */}
       <Box
         sx={{
           width: drawerWidth,
@@ -1216,7 +1215,6 @@ export default function CesdkMuiEditor() {
         </Box>
       </Box>
 
-      {/* Export Dialog */}
       <ExportDialog
         open={exportDialogOpen}
         onClose={() => setExportDialogOpen(false)}

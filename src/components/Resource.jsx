@@ -46,16 +46,16 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
 
         // Mock data - 5 sample images
         const mockImages = [
-          "https://picsum.photos/800/600?random=1",
-          "https://picsum.photos/800/600?random=2",
-          "https://picsum.photos/800/600?random=3",
-          "https://picsum.photos/800/600?random=4",
-          "https://picsum.photos/800/600?random=5",
+          "https://th.bing.com/th/id/OIP.y7t2x8MCNy1gBCGd7UAqkAHaEK?rs=1&pid=ImgDetMain",
+          "https://th.bing.com/th/id/OIP.W2cHfeMBthAIh26hFV_sswHaFj?w=1681&h=1261&rs=1&pid=ImgDetMain",
+          "https://th.bing.com/th/id/R.1b53fdf36f8bd376916821e3cce7528d?rik=5BBNceKgjdNNuw&pid=ImgRaw&r=0",
+          "https://th.bing.com/th/id/OIP.DRstJ2S75KhAniwDSRFh8AHaFj?w=1920&h=1440&rs=1&pid=ImgDetMain",
+          "https://th.bing.com/th/id/OIP.wpiMpWT8tPG7uu2cZW8xDwAAAA?w=474&h=315&rs=1&pid=ImgDetMain",
         ];
 
         // Mock audio URL
         const mockAudioUrl =
-          "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav";
+          "https://res.cloudinary.com/dpystprxq/video/upload/v1749478605/ttsmaker-file-2025-6-9-21-15-49_pfhyut.mp3";
 
         setImages(mockImages);
         setAudioUrl(mockAudioUrl);
