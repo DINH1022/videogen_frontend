@@ -1009,13 +1009,6 @@ export default function CesdkMuiEditor() {
           const url = imagesToUse[i];
           const duration = processedTimings[i] || 3;
 
-          console.log(
-            `Adding image ${i + 1}: duration=${duration}s, url=${url.substring(
-              0,
-              50
-            )}...`
-          );
-
           const block = engine.block.create("graphic");
           engine.block.setShape(block, engine.block.createShape("rect"));
 
@@ -1028,51 +1021,107 @@ export default function CesdkMuiEditor() {
           const fill = engine.block.createFill("image");
           engine.block.setString(fill, "fill/image/imageFileURI", url);
 
-          // REMOVED THE PROBLEMATIC fillMode LINE
-          // engine.block.setEnum(fill, "fill/image/fillMode", "cover");
+          // Set fill mode to cover for better image display
+          try {
+            engine.block.setEnum(fill, "fill/image/fillMode", "Cover");
+          } catch (fillModeError) {
+            console.warn("Could not set fill mode:", fillModeError);
+          }
 
           engine.block.setFill(block, fill);
           engine.block.setDuration(block, duration);
 
           // Animations
-          const zoomAnimation = engine.block.createAnimation("zoom");
-          const fadeOutAnimation = engine.block.createAnimation("fade");
-          engine.block.setDuration(zoomAnimation, 1.2);
-          engine.block.setInAnimation(block, zoomAnimation);
-          engine.block.setOutAnimation(block, fadeOutAnimation);
+          try {
+            const zoomAnimation = engine.block.createAnimation("zoom");
+            const fadeOutAnimation = engine.block.createAnimation("fade");
+            engine.block.setDuration(zoomAnimation, 1.2);
+            engine.block.setInAnimation(block, zoomAnimation);
+            engine.block.setOutAnimation(block, fadeOutAnimation);
+          } catch (animError) {
+            console.warn("Could not add animations:", animError);
+          }
 
           engine.block.appendChild(track, block);
         }
 
-        // Add audio if provided
+        // FIXED AUDIO IMPLEMENTATION
         if (audioUrl) {
           console.log("Adding background audio:", audioUrl);
           try {
+            // Create audio track
             const audioTrack = engine.block.create("track");
             engine.block.appendChild(page, audioTrack);
+            engine.block.fillParent(audioTrack);
 
+            // Create audio block
             const audioBlock = engine.block.create("audio");
-            const audioFill = engine.block.createFill("audio");
-            engine.block.setString(
-              audioFill,
-              "fill/audio/audioFileURI",
-              audioUrl
-            );
-            engine.block.setFill(audioBlock, audioFill);
 
+            // Set audio source directly using the asset API
             const totalDuration = processedTimings.reduce(
               (sum, time) => sum + time,
               0
             );
-            engine.block.setDuration(audioBlock, totalDuration);
 
+            // Try different methods to set audio source
+            try {
+              // Method 1: Direct URI setting (most common)
+              engine.block.setString(audioBlock, "audio/fileURI", audioUrl);
+            } catch (e1) {
+              try {
+                // Method 2: Using asset system
+                engine.asset.addAsset("ly.img.audio", audioUrl);
+                engine.block.setString(audioBlock, "audio/fileURI", audioUrl);
+              } catch (e2) {
+                try {
+                  // Method 3: Create fill and apply
+                  const audioFill = engine.block.createFill("color");
+                  engine.block.setFill(audioBlock, audioFill);
+                  engine.block.setString(audioBlock, "audio/fileURI", audioUrl);
+                } catch (e3) {
+                  console.error("All audio methods failed:", { e1, e2, e3 });
+                  throw new Error("Could not set audio source");
+                }
+              }
+            }
+
+            // Set duration and other properties
+            engine.block.setDuration(audioBlock, totalDuration);
+            engine.block.setPositionX(audioBlock, 0);
+            engine.block.setPositionY(audioBlock, 0);
+
+            // Set volume (optional)
+            try {
+              engine.block.setFloat(audioBlock, "audio/volume", 1.0);
+            } catch (volumeError) {
+              console.warn("Could not set audio volume:", volumeError);
+            }
+
+            // Add to track
             engine.block.appendChild(audioTrack, audioBlock);
-            console.log(
-              "Audio added successfully with duration:",
-              totalDuration
-            );
+
+            console.log("Audio added successfully:", {
+              audioUrl,
+              duration: totalDuration,
+              blockId: audioBlock,
+            });
           } catch (audioError) {
             console.error("Error adding audio:", audioError);
+
+            // Fallback: Try adding audio through asset library
+            try {
+              console.log("Attempting fallback audio method...");
+              const audioAsset = await engine.asset.addAsset(
+                "ly.img.audio",
+                audioUrl
+              );
+              console.log("Audio asset added:", audioAsset);
+            } catch (fallbackError) {
+              console.error(
+                "Fallback audio method also failed:",
+                fallbackError
+              );
+            }
           }
         }
 
