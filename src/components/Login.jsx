@@ -77,7 +77,6 @@ const LoginComponent = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate all fields before submission
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password);
 
@@ -86,10 +85,8 @@ const LoginComponent = () => {
       password: passwordError,
     });
 
-    // Only proceed if there are no errors
     if (!emailError && !passwordError) {
       console.log({ email, password });
-      // Submit form logic here
     }
   };
 
@@ -103,7 +100,6 @@ const LoginComponent = () => {
         background: "linear-gradient(135deg, #070332 0%, #780080 100%)",
       }}
     >
-      {/* Left Side - Brand and video preview */}
       <Box
         sx={{
           display: { xs: "none", md: "flex" },

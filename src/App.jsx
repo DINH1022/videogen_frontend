@@ -5,6 +5,7 @@ import LoginForm from "./components/Login.jsx";
 import RegisterForm from "./components/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import CreateVideo from "./pages/CreateVideo.jsx";
+import Editor from "./pages/Edit.jsx";
 import { ToastContainer } from "react-toastify";
 const theme = {
   palette: {
@@ -33,6 +34,7 @@ function App() {
             <Route path="/register" element={<RegisterForm />}></Route>
             <Route path="/dashboard" element={<Dashboard />}></Route>
             <Route path="/workspace/:id" element={<CreateVideo />}></Route>
+            <Route path="/workspace/:id/editor" element={<Editor />}></Route>
           </Routes>
         </div>
         <ToastContainer />

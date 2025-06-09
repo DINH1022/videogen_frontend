@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom"; // Add this import
 import {
   Container,
   Card,
@@ -22,7 +23,9 @@ import {
   Image as ImageIcon,
 } from "@mui/icons-material";
 
-const Resource = ({ workspace_id = "sample-workspace" }) => {
+const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
+  const navigate = useNavigate(); // Add this hook
+
   const audioRef = useRef(null);
   const [images, setImages] = useState([]);
   const [audioUrl, setAudioUrl] = useState("");
@@ -91,11 +94,14 @@ const Resource = ({ workspace_id = "sample-workspace" }) => {
   };
 
   const handleGenerateVideo = () => {
-    console.log("Generate video with:", {
-      images,
-      imageTimings,
-      audioUrl,
-      audioDuration,
+    // Navigate to editor with state similar to your example
+    navigate(`/workspace/${workspace_id}/editor`, {
+      state: {
+        resourceList: images, // Pass the images array as resourceList
+        timing: imageTimings, // Pass the calculated timings
+        audioUrl: audioUrl, // Pass the audio URL
+        workspaceId: workspace_id, // Pass the workspace ID
+      },
     });
   };
 
