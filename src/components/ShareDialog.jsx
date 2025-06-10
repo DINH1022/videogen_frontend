@@ -14,8 +14,6 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel,
-  Paper,
   CircularProgress,
 } from "@mui/material";
 import {
@@ -38,7 +36,6 @@ const TikTokIcon = () => (
   </svg>
 );
 
-// Auto Caption Dialog Component
 const AutoCaptionDialog = ({ open, onClose }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCaption, setGeneratedCaption] = useState(null);
@@ -188,8 +185,7 @@ const VideoShareDialog = ({
   onClose,
   videoSrc = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
 }) => {
-  const [activeTab, setActiveTab] = useState(2); // Start with Facebook tab
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
   const [selectedChannel, setSelectedChannel] = useState("Kênh Hàm Học");
   const [captionDialogOpen, setCaptionDialogOpen] = useState(false);
   const videoRef = useRef(null);
@@ -197,9 +193,8 @@ const VideoShareDialog = ({
     youtube: { title: "", description: "" },
     tiktok: { title: "", description: "" },
     facebook: {
-      title: "NÚI LỬA: SỰ HÌNH THÀNH, HOẠT ĐỘNG VÀ ẢNH HƯỞNG ĐẾN TRÁI ĐẤT",
-      description:
-        "Núi lửa: Cấu trúc địa chất hùng vĩ, hình thành từ áp lực nội tại Trái Đất.\nNghiên cứu phun trào để hiểu rõ hơn về hành tinh chúng ta.\n#NuiLuaHocThuat",
+      title: "",
+      description: "",
     },
   });
 
@@ -359,7 +354,6 @@ const VideoShareDialog = ({
             </Box>
           </Box>
 
-          {/* Right side - Platform tabs and forms */}
           <Box
             sx={{
               width: "55%",

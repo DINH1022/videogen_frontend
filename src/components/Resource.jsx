@@ -272,7 +272,7 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
                       sx={{
                         display: "flex",
                         alignItems: "stretch",
-                        gap: 5,
+                        gap: 7,
                         width: "100%",
                         flexDirection: { xs: "column", lg: "row" },
                       }}
