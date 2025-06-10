@@ -183,7 +183,11 @@ const AutoCaptionDialog = ({ open, onClose }) => {
   );
 };
 
-const VideoShareDialog = ({ open, onClose }) => {
+const VideoShareDialog = ({
+  open,
+  onClose,
+  videoSrc = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+}) => {
   const [activeTab, setActiveTab] = useState(2); // Start with Facebook tab
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState("Kênh Hàm Học");
@@ -359,10 +363,7 @@ const VideoShareDialog = ({ open, onClose }) => {
                     objectFit: "cover",
                   }}
                 >
-                  <source
-                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                    type="video/mp4"
-                  />
+                  <source src={videoSrc} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
               </Box>
