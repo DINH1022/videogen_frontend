@@ -207,17 +207,6 @@ const VideoShareDialog = ({
     setActiveTab(newValue);
   };
 
-  const handlePlayPause = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
   const handleCaptionGenerated = (caption) => {
     setCaptionDialogOpen(false);
     if (caption) {
@@ -256,7 +245,7 @@ const VideoShareDialog = ({
           sx: {
             borderRadius: 1,
             width: "60vw",
-            height: "85vh",
+            height: "90vh",
             maxWidth: "1200px",
             maxHeight: "800px",
             display: "flex",
@@ -499,7 +488,7 @@ const VideoShareDialog = ({
                       "&:hover": { backgroundColor: "#CC0000" },
                       textTransform: "none",
                       py: 1.5,
-                      mt: 1,
+                      mt: 0.5,
                     }}
                   >
                     Chia sẻ lên YouTube
@@ -596,7 +585,7 @@ const VideoShareDialog = ({
                       "&:hover": { backgroundColor: "#333" },
                       textTransform: "none",
                       py: 1.5,
-                      mt: 1,
+                      mt: 0.5,
                     }}
                   >
                     Chia sẻ lên TikTok
@@ -679,7 +668,7 @@ const VideoShareDialog = ({
                       "&:hover": { backgroundColor: "#166FE5" },
                       textTransform: "none",
                       py: 1.5,
-                      mt: 1,
+                      mt: 0.5,
                     }}
                   >
                     Chia sẻ lên facebook
@@ -696,10 +685,10 @@ const VideoShareDialog = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            p: 2.5,
+            p: 1.5,
             borderRadius: 2,
             mx: 3,
-            mb: 3,
+            mb: 2,
             border: "1px solid #e0e0e0",
 
             boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
