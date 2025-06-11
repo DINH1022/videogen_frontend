@@ -39,6 +39,7 @@ import {
   Settings as SettingsIcon,
   NotificationsNone as NotificationIcon,
   BarChart as BarChartIcon,
+  Info as InfoIcon,
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -111,6 +112,7 @@ const Navigation = () => {
   };
 
   const navItems = [
+    { text: "Giới thiệu", icon: <InfoIcon />, path: "/about" },
     { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
     { text: "Thống kê", icon: <BarChartIcon />, path: "/statistics" },
     {
