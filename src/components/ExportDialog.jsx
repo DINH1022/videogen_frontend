@@ -431,9 +431,10 @@ export default function ExportDialog({
         progressCallback,
         videoOptions
       );
-
+      console.log("tesst: ", videoBlob);
       // Create preview URL
       const videoUrl = URL.createObjectURL(videoBlob);
+      console.log("tesst2: ", videoUrl);
       setExportedVideoUrl(videoUrl);
       setShowPreview(true);
 
