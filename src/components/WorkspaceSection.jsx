@@ -35,6 +35,7 @@ const sampleWorkspaces = [
 ];
 
 const WorkspaceSection = () => {
+  const navigate = useNavigate();
   const handleViewResources = (workspace) => {
     console.log("Xem tài nguyên cho workspace:", workspace);
   };
@@ -56,7 +57,7 @@ const WorkspaceSection = () => {
       >
         <Button
           variant="outlined"
-          onClick={handleViewResources}
+          onClick={() => navigate("/workspace-resources")}
           sx={{
             borderRadius: 2,
             textTransform: "none",
