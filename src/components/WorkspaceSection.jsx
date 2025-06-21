@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, Grid, Button } from "@mui/material";
 import WorkspaceCard from "./WorkspaceCard";
-
+import { useNavigate } from "react-router-dom";
 // Dữ liệu mẫu cho workspaces
 const sampleWorkspaces = [
   {
