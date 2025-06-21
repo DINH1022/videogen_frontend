@@ -44,7 +44,7 @@ export const requestRegister = async (userData, dispatch, navigate) => {
   dispatch(registerStart());
   try {
     const response = await registerUser(userData);
-    if (response.success) {
+    if (response.status === 200) {
       dispatch(registerSuccess());
       Swal.fire({
         icon: "success",

@@ -76,5 +76,5 @@ export const {
   logoutFailed,
   logoutStart,
   logoutSuccess,
-} = counterSlice.actions;
+} = authSlice.actions;
 export default authSlice.reducer;

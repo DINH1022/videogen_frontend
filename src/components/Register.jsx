@@ -20,9 +20,12 @@ import GoogleIcon from "@mui/icons-material/Google";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { registerUser } from "../services/auth";
+import { requestRegister } from "../redux/requestAuth";
 const RegisterComponent = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -156,11 +159,7 @@ const RegisterComponent = () => {
         password,
         confirm_password: confirmPassword,
       };
-      const response = await registerUser(userData);
-      if (response) {
-        console.log("User registered successfully:", response);
-        navigate("/login");
-      }
+      await requestRegister(userData, dispatch, navigate);
     }
   };
 

@@ -19,9 +19,11 @@ import GoogleIcon from "@mui/icons-material/Google";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { requestLogin } from "../redux/requestAuth.js";
 const LoginComponent = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -43,8 +45,8 @@ const LoginComponent = () => {
   const validatePassword = (password) => {
     if (!password) {
       return "Password is required";
-    } else if (password.length < 6) {
-      return "Password must be at least 6 characters";
+    } else if (password.length < 5) {
+      return "Password must be at least 5 characters";
     }
     return "";
   };
@@ -74,7 +76,7 @@ const LoginComponent = () => {
     event.preventDefault();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const emailError = validateEmail(email);
@@ -86,7 +88,8 @@ const LoginComponent = () => {
     });
 
     if (!emailError && !passwordError) {
-      console.log({ email, password });
+      const userData = { email, password };
+      await requestLogin(userData, dispatch, navigate);
     }
   };
 
