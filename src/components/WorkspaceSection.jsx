@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box, Typography, Grid, Button } from "@mui/material";
 import WorkspaceCard from "./WorkspaceCard";
 import { useNavigate } from "react-router-dom";
+import CreateWorkspaceDialog from "./CreateWorkspaceDialog";
 // Dữ liệu mẫu cho workspaces
 const sampleWorkspaces = [
   {
@@ -36,6 +37,7 @@ const sampleWorkspaces = [
 
 const WorkspaceSection = () => {
   const navigate = useNavigate();
+  const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
   const handleViewResources = (workspace) => {
     console.log("Xem tài nguyên cho workspace:", workspace);
   };
@@ -76,7 +78,7 @@ const WorkspaceSection = () => {
         </Button>
         <Button
           variant="contained"
-          onClick={handleCreateNewWorkspace}
+          onClick={() => setCreateWorkspaceOpen(true)}
           sx={{
             background:
               "linear-gradient(135deg,rgb(211, 158, 208) 0%,rgb(237, 214, 108) 100%)",
@@ -119,6 +121,10 @@ const WorkspaceSection = () => {
           </Grid>
         ))}
       </Grid>
+      <CreateWorkspaceDialog
+        open={createWorkspaceOpen}
+        setOpen={setCreateWorkspaceOpen}
+      />
     </Box>
   );
 };
