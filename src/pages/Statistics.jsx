@@ -9,7 +9,6 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel,
   Button,
   Grid,
   Paper,
@@ -21,7 +20,6 @@ import {
   TableRow,
   Avatar,
   Chip,
-  IconButton,
   ButtonGroup,
   Divider,
   Stack,
@@ -29,13 +27,10 @@ import {
 import {
   YouTube,
   Login,
-  Refresh,
   PlayArrow,
   Visibility,
   ThumbUp,
   Comment,
-  Person,
-  TrendingUp,
   BarChart,
   TableChart,
   VideoLibrary,
@@ -56,9 +51,6 @@ import {
   Legend,
   LineChart,
   Line,
-  AreaChart,
-  Area,
-  ComposedChart,
 } from "recharts";
 import { useMemo } from "react";
 import Navigation from "../components/Navigation";
