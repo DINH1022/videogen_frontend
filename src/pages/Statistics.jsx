@@ -1,0 +1,1053 @@
+import React, { useState } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Tabs,
+  Tab,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Avatar,
+  Chip,
+  IconButton,
+  ButtonGroup,
+  Divider,
+  Stack,
+} from "@mui/material";
+import {
+  YouTube,
+  Login,
+  Refresh,
+  PlayArrow,
+  Visibility,
+  ThumbUp,
+  Comment,
+  Person,
+  TrendingUp,
+  BarChart,
+  TableChart,
+  VideoLibrary,
+  Update,
+  Analytics,
+} from "@mui/icons-material";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  BarChart as RechartsBarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
+
+// TikTok icon component
+const TikTokIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43V7.56a8.16 8.16 0 0 0 4.77 1.52v-3.39z" />
+  </svg>
+);
+
+const Dashboard = () => {
+  const [selectedPlatform, setSelectedPlatform] = useState("youtube");
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [activeTab, setActiveTab] = useState(0);
+  const [videoFilter, setVideoFilter] = useState("latest");
+
+  // Sample data based on the structure you provided
+  const sampleData = [
+    {
+      title: "Video không có tiêu đề",
+      url: "https://youtube.com/watch?v=1",
+      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      numOfViews: 1250,
+      numOfLikes: 89,
+      numOfComments: 12,
+      publishedAt: "2025-05-03T10:30:00Z",
+    },
+    {
+      title: "Demo chức năng của Chat Application MeTalk",
+      url: "https://youtube.com/watch?v=2",
+      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      numOfViews: 2840,
+      numOfLikes: 156,
+      numOfComments: 23,
+      publishedAt: "2024-12-17T14:20:00Z",
+    },
+    {
+      title: "THE MATCHING GAME HCMUS",
+      url: "https://youtube.com/watch?v=3",
+      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      numOfViews: 8900,
+      numOfLikes: 445,
+      numOfComments: 67,
+      publishedAt: "2023-04-15T09:15:00Z",
+    },
+    {
+      title: "STREET FOOD FOR SWEET TOOTH",
+      url: "https://youtube.com/watch?v=4",
+      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      numOfViews: 15600,
+      numOfLikes: 892,
+      numOfComments: 134,
+      publishedAt: "2021-02-27T16:45:00Z",
+    },
+    {
+      title: "Student Management App - v3",
+      url: "https://youtube.com/watch?v=5",
+      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      numOfViews: 5200,
+      numOfLikes: 298,
+      numOfComments: 45,
+      publishedAt: "2024-08-10T11:30:00Z",
+    },
+  ];
+
+  const totalViews = sampleData.reduce(
+    (sum, video) => sum + video.numOfViews,
+    0
+  );
+  const totalLikes = sampleData.reduce(
+    (sum, video) => sum + video.numOfLikes,
+    0
+  );
+  const totalComments = sampleData.reduce(
+    (sum, video) => sum + video.numOfComments,
+    0
+  );
+
+  // Prepare data for pie chart (top 5 videos + others)
+  const pieData = sampleData.slice(0, 5).map((video, index) => ({
+    name:
+      video.title.length > 20
+        ? video.title.substring(0, 20) + "..."
+        : video.title,
+    value: video.numOfViews,
+    color: ["#8B5FBF", "#6B8DD6", "#8FBC8F", "#DDA0DD", "#87CEEB"][index],
+  }));
+
+  // Prepare data for bar chart - Video performance over time
+  const barData = sampleData
+    .sort((a, b) => new Date(a.publishedAt) - new Date(b.publishedAt))
+    .map((video) => ({
+      name:
+        video.title.length > 15
+          ? video.title.substring(0, 15) + "..."
+          : video.title,
+      views: video.numOfViews,
+      likes: video.numOfLikes,
+      comments: video.numOfComments,
+      date: new Date(video.publishedAt).getFullYear(),
+    }));
+
+  const COLORS = ["#8B5FBF", "#6B8DD6", "#8FBC8F", "#DDA0DD", "#87CEEB"];
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("vi-VN");
+  };
+
+  const formatNumber = (num) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+    if (num >= 1000) return (num / 1000).toFixed(1) + "K";
+    return num.toString();
+  };
+
+  const getSortedVideos = () => {
+    const sorted = [...sampleData];
+    switch (videoFilter) {
+      case "popular":
+        return sorted.sort((a, b) => b.numOfViews - a.numOfViews);
+      case "oldest":
+        return sorted.sort(
+          (a, b) => new Date(a.publishedAt) - new Date(b.publishedAt)
+        );
+      default: // latest
+        return sorted.sort(
+          (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)
+        );
+    }
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        }}
+      >
+        <Card
+          sx={{
+            p: 4,
+            maxWidth: 400,
+            textAlign: "center",
+            borderRadius: 4,
+            boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+          }}
+        >
+          <CardContent>
+            <Analytics sx={{ fontSize: 48, color: "#8B5FBF", mb: 2 }} />
+            <Typography
+              variant="h4"
+              gutterBottom
+              sx={{ color: "#2c3e50", fontWeight: 600 }}
+            >
+              Đăng nhập để xem thống kê
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+              Kết nối với tài khoản{" "}
+              {selectedPlatform === "youtube" ? "YouTube" : "TikTok"} của bạn
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<Login />}
+              onClick={() => setIsLoggedIn(true)}
+              sx={{
+                backgroundColor:
+                  selectedPlatform === "youtube" ? "#8B5FBF" : "#6B8DD6",
+                borderRadius: 3,
+                py: 1.5,
+                px: 4,
+                "&:hover": {
+                  backgroundColor:
+                    selectedPlatform === "youtube" ? "#7A4FA8" : "#5A7BC4",
+                },
+              }}
+            >
+              Đăng nhập
+            </Button>
+          </CardContent>
+        </Card>
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ minHeight: "100vh", backgroundColor: "#f8fafc", p: 3 }}>
+      {/* Enhanced Header */}
+      {/* <Paper
+        elevation={0}
+        sx={{
+          p: 4,
+          mb: 4,
+          borderRadius: 4,
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          color: "white",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+        }}
+      >
+        <Grid container alignItems="center" spacing={3}>
+          <Grid item xs={12} md={8}>
+            <Stack direction="row" alignItems="center" spacing={3}>
+              <Box
+                sx={{
+                  p: 2,
+                  backgroundColor: "rgba(255,255,255,0.15)",
+                  borderRadius: 3,
+                  backdropFilter: "blur(10px)",
+                }}
+              >
+                <Analytics sx={{ fontSize: 40 }} />
+              </Box>
+              <Box>
+                <Typography
+                  variant="h3"
+                  component="h1"
+                  sx={{
+                    fontWeight: 700,
+                    mb: 1,
+                    background: "linear-gradient(45deg, #fff, #e3f2fd)",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  Thống kê Dashboard
+                </Typography>
+                <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 400 }}>
+                  Phân tích hiệu suất video trên các nền tảng
+                </Typography>
+              </Box>
+            </Stack>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Stack direction="row" spacing={2} justifyContent="flex-end">
+              <FormControl sx={{ minWidth: 160 }}>
+                <Select
+                  value={selectedPlatform}
+                  onChange={(e) => setSelectedPlatform(e.target.value)}
+                  sx={{
+                    backgroundColor: "rgba(255,255,255,0.15)",
+                    color: "white",
+                    borderRadius: 2,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "rgba(255,255,255,0.3)",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "rgba(255,255,255,0.5)",
+                    },
+                    "& .MuiSvgIcon-root": {
+                      color: "white",
+                    },
+                  }}
+                >
+                  <MenuItem value="youtube">
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <YouTube sx={{ color: "#FF0000" }} />
+                      <Typography>YouTube</Typography>
+                    </Stack>
+                  </MenuItem>
+                  <MenuItem value="tiktok">
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <TikTokIcon />
+                      <Typography>TikTok</Typography>
+                    </Stack>
+                  </MenuItem>
+                </Select>
+              </FormControl>
+              <Button
+                variant="outlined"
+                startIcon={<Update />}
+                sx={{
+                  borderColor: "rgba(255,255,255,0.3)",
+                  color: "white",
+                  borderRadius: 2,
+                  "&:hover": {
+                    borderColor: "rgba(255,255,255,0.5)",
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                  },
+                }}
+                onClick={() => window.location.reload()}
+              >
+                Làm mới
+              </Button>
+            </Stack>
+          </Grid>
+        </Grid>
+      </Paper> */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 4,
+          mb: 4,
+          borderRadius: 4,
+          background: "linear-gradient(135deg, #8B9AFF 0%, #A8B5FF 100%)",
+          color: "white",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+        }}
+      >
+        {/* Header Section */}
+        <Box sx={{ mb: 3 }}>
+          <Stack direction="row" alignItems="center" spacing={3} sx={{ mb: 2 }}>
+            <Box
+              sx={{
+                p: 2,
+                backgroundColor: "rgba(255,255,255,0.15)",
+                borderRadius: 3,
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <Analytics sx={{ fontSize: 40 }} />
+            </Box>
+            <Box>
+              <Typography
+                variant="h3"
+                component="h2"
+                sx={{
+                  fontWeight: 700,
+                  background: "linear-gradient(45deg, #fff, #e3f2fd)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                Thống kê theo nền tảng
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
+
+        {/* Controls Section */}
+        <Box>
+          <Typography variant="body1" sx={{ mb: 2, opacity: 0.9 }}>
+            Chọn nền tảng
+          </Typography>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            spacing={2}
+          >
+            <FormControl sx={{ minWidth: 160 }}>
+              <Select
+                value={selectedPlatform}
+                onChange={(e) => setSelectedPlatform(e.target.value)}
+                sx={{
+                  backgroundColor: "rgba(255,255,255,0.15)",
+                  color: "white",
+                  borderRadius: 2,
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "rgba(255,255,255,0.3)",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "rgba(255,255,255,0.5)",
+                  },
+                  "& .MuiSvgIcon-root": {
+                    color: "white",
+                  },
+                }}
+              >
+                <MenuItem value="youtube">
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <YouTube sx={{ color: "#FF0000" }} />
+                    <Typography>YouTube</Typography>
+                  </Stack>
+                </MenuItem>
+                <MenuItem value="tiktok">
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <TikTokIcon />
+                    <Typography>TikTok</Typography>
+                  </Stack>
+                </MenuItem>
+              </Select>
+            </FormControl>
+
+            <Button
+              variant="outlined"
+              startIcon={<Update />}
+              sx={{
+                borderColor: "rgba(255,255,255,0.3)",
+                color: "white",
+                borderRadius: 2,
+                "&:hover": {
+                  borderColor: "rgba(255,255,255,0.5)",
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                },
+              }}
+              onClick={() => window.location.reload()}
+            >
+              Làm mới
+            </Button>
+          </Stack>
+        </Box>
+      </Paper>
+      {/* Stats Cards with softer colors */}
+      <Grid container spacing={2} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={3} sx={{ width: "24%" }}>
+          <Card
+            sx={{
+              background: "linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%)",
+              borderRadius: 2,
+              border: "1px solid rgba(156, 39, 176, 0.1)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                transform: "translateY(-4px)",
+                boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+              },
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+                sx={{ mb: 0 }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#6c757d", fontWeight: 500 }}
+                >
+                  Tổng Video
+                </Typography>
+                <Box
+                  sx={{
+                    p: 1,
+                    backgroundColor: "#8B5FBF",
+                    borderRadius: 2,
+                    color: "white",
+                  }}
+                >
+                  <VideoLibrary sx={{ fontSize: 24 }} />
+                </Box>
+              </Stack>
+              <Typography
+                variant="h3"
+                sx={{ fontWeight: 700, color: "#2c3e50" }}
+              >
+                {sampleData.length}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3} sx={{ width: "24%" }}>
+          <Card
+            sx={{
+              background: "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
+              borderRadius: 2,
+              border: "1px solid rgba(33, 150, 243, 0.1)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                transform: "translateY(-4px)",
+                boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+              },
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#6c757d", fontWeight: 500 }}
+                >
+                  Tổng Lượt Xem
+                </Typography>
+                <Box
+                  sx={{
+                    p: 1,
+                    backgroundColor: "#6B8DD6",
+                    borderRadius: 2,
+                    color: "white",
+                  }}
+                >
+                  <Visibility sx={{ fontSize: 24 }} />
+                </Box>
+              </Stack>
+              <Typography
+                variant="h3"
+                sx={{ fontWeight: 700, color: "#2c3e50" }}
+              >
+                {formatNumber(totalViews)}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3} width={"24%"}>
+          <Card
+            sx={{
+              background: "linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%)",
+              borderRadius: 2,
+              border: "1px solid rgba(156, 39, 176, 0.1)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                transform: "translateY(-4px)",
+                boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+              },
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#6c757d", fontWeight: 500 }}
+                >
+                  Tổng Lượt Thích
+                </Typography>
+                <Box
+                  sx={{
+                    p: 1,
+                    backgroundColor: "#DDA0DD",
+                    borderRadius: 2,
+                    color: "white",
+                  }}
+                >
+                  <ThumbUp sx={{ fontSize: 24 }} />
+                </Box>
+              </Stack>
+              <Typography
+                variant="h3"
+                sx={{ fontWeight: 700, color: "#2c3e50", mb: 0.5 }}
+              >
+                {formatNumber(totalLikes)}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3} width={"24%"}>
+          <Card
+            sx={{
+              background: "linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)",
+              borderRadius: 2,
+              border: "1px solid rgba(76, 175, 80, 0.1)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                transform: "translateY(-4px)",
+                boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+              },
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#6c757d", fontWeight: 500 }}
+                >
+                  Tổng Bình Luận
+                </Typography>
+                <Box
+                  sx={{
+                    p: 1,
+                    backgroundColor: "#8FBC8F",
+                    borderRadius: 2,
+                    color: "white",
+                  }}
+                >
+                  <Comment sx={{ fontSize: 24 }} />
+                </Box>
+              </Stack>
+              <Typography
+                variant="h3"
+                sx={{ fontWeight: 700, color: "#2c3e50", mb: 0.5 }}
+              >
+                {formatNumber(totalComments)}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Main Content */}
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: 2,
+          overflow: "hidden",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          border: "1px solid rgba(0,0,0,0.05)",
+        }}
+      >
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: "divider",
+            backgroundColor: "#fafbfc",
+          }}
+        >
+          <Tabs
+            value={activeTab}
+            onChange={(e, newValue) => setActiveTab(newValue)}
+            variant="fullWidth"
+            sx={{
+              "& .MuiTab-root": {
+                minHeight: 72,
+                fontSize: "1rem",
+                fontWeight: 600,
+                textTransform: "none",
+                color: "#6c757d",
+                "&.Mui-selected": {
+                  color: "#8B5FBF",
+                },
+              },
+              "& .MuiTabs-indicator": {
+                backgroundColor: "#8B5FBF",
+                height: 3,
+                borderRadius: "3px 3px 0 0",
+              },
+            }}
+          >
+            <Tab
+              icon={<BarChart />}
+              label="Biểu đồ"
+              iconPosition="start"
+              sx={{ gap: 1 }}
+            />
+            <Tab
+              icon={<TableChart />}
+              label="Bảng dữ liệu"
+              iconPosition="start"
+              sx={{ gap: 1 }}
+            />
+            <Tab
+              icon={<VideoLibrary />}
+              label="Thẻ Videos"
+              iconPosition="start"
+              sx={{ gap: 1 }}
+            />
+          </Tabs>
+        </Box>
+
+        {/* Charts Tab */}
+        {activeTab === 0 && (
+          <Box sx={{ p: 4, backgroundColor: "#ffffff" }}>
+            <Grid container spacing={5}>
+              <Grid item xs={12} lg={6} width={"48.5%"}>
+                <Card
+                  sx={{
+                    borderRadius: 3,
+                    height: 500,
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+                    border: "1px solid rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <CardContent sx={{ height: "100%", p: 3 }}>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{
+                        fontWeight: 600,
+                        mb: 3,
+                        color: "#2c3e50",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      📊 Phân phối lượt xem theo video
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={400}>
+                      <PieChart>
+                        <Pie
+                          data={pieData}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={120}
+                          dataKey="value"
+                          label={({ name, percent }) =>
+                            `${name} ${(percent * 100).toFixed(0)}%`
+                          }
+                        >
+                          {pieData.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value) => formatNumber(value)} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} lg={6} width={"48.5%"}>
+                <Card
+                  sx={{
+                    borderRadius: 3,
+                    height: 500,
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+                    border: "1px solid rgba(0,0,0,0.05)",
+                  }}
+                >
+                  <CardContent sx={{ height: "100%", p: 3 }}>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{
+                        fontWeight: 600,
+                        mb: 3,
+                        color: "#2c3e50",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      📈 Hiệu suất video theo thời gian
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={400}>
+                      <RechartsBarChart data={barData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                        <XAxis
+                          dataKey="name"
+                          angle={-45}
+                          textAnchor="end"
+                          height={80}
+                          fontSize={12}
+                        />
+                        <YAxis tickFormatter={formatNumber} fontSize={12} />
+                        <Tooltip
+                          formatter={(value, name) => [
+                            formatNumber(value),
+                            name === "views"
+                              ? "Lượt xem"
+                              : name === "likes"
+                              ? "Lượt thích"
+                              : "Bình luận",
+                          ]}
+                        />
+                        <Legend />
+                        <Bar
+                          dataKey="views"
+                          fill="#8B5FBF"
+                          name="Lượt xem"
+                          radius={[2, 2, 0, 0]}
+                        />
+                        <Bar
+                          dataKey="likes"
+                          fill="#6B8DD6"
+                          name="Lượt thích"
+                          radius={[2, 2, 0, 0]}
+                        />
+                        <Bar
+                          dataKey="comments"
+                          fill="#8FBC8F"
+                          name="Bình luận"
+                          radius={[2, 2, 0, 0]}
+                        />
+                      </RechartsBarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+
+        {/* Table Tab */}
+        {activeTab === 1 && (
+          <Box sx={{ p: 4 }}>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ fontWeight: "bold", mb: 3 }}
+            >
+              📋 Bảng dữ liệu chi tiết
+            </Typography>
+            <TableContainer
+              component={Paper}
+              sx={{ borderRadius: 2, boxShadow: 3 }}
+            >
+              <Table>
+                <TableHead sx={{ backgroundColor: "#f8f9fa" }}>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>
+                      Video
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>
+                      Ngày đăng
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>
+                      Lượt xem
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>
+                      Lượt thích
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>
+                      Bình luận
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>
+                      Hành động
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sampleData.map((video, index) => (
+                    <TableRow
+                      key={index}
+                      hover
+                      sx={{ "&:hover": { backgroundColor: "#f8f9fa" } }}
+                    >
+                      <TableCell>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                        >
+                          <Avatar
+                            src={video.thumbnail}
+                            variant="rounded"
+                            sx={{ width: 60, height: 45 }}
+                          />
+                          <Box>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ fontWeight: "bold" }}
+                            >
+                              {video.title}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </TableCell>
+                      <TableCell>{formatDate(video.publishedAt)}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={formatNumber(video.numOfViews)}
+                          color="primary"
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={formatNumber(video.numOfLikes)}
+                          color="primary"
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={formatNumber(video.numOfComments)}
+                          color="primary"
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<PlayArrow />}
+                          onClick={() => window.open(video.url, "_blank")}
+                          sx={{ borderRadius: 1 }}
+                        >
+                          Xem
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        )}
+
+        {/* Videos Tab */}
+        {activeTab === 2 && (
+          <Box sx={{ p: 4 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 4,
+              }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                🎬 Thẻ Videos
+              </Typography>
+              <ButtonGroup variant="outlined" sx={{ borderRadius: 2 }}>
+                <Button
+                  variant={videoFilter === "latest" ? "contained" : "outlined"}
+                  onClick={() => setVideoFilter("latest")}
+                >
+                  Mới nhất
+                </Button>
+                <Button
+                  variant={videoFilter === "popular" ? "contained" : "outlined"}
+                  onClick={() => setVideoFilter("popular")}
+                >
+                  Phổ biến
+                </Button>
+                <Button
+                  variant={videoFilter === "oldest" ? "contained" : "outlined"}
+                  onClick={() => setVideoFilter("oldest")}
+                >
+                  Cũ nhất
+                </Button>
+              </ButtonGroup>
+            </Box>
+
+            <Grid container spacing={2}>
+              {getSortedVideos().map((video, index) => (
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={3}
+                  key={index}
+                  width={"24%"}
+                >
+                  <Card
+                    sx={{
+                      borderRadius: "8px",
+                      border: "none",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        transform: "translateY(-8px)",
+                        boxShadow: 6,
+                      },
+                    }}
+                  >
+                    <Box sx={{ position: "relative" }}>
+                      <Avatar
+                        src={video.thumbnail}
+                        variant="rounded"
+                        sx={{
+                          width: "100%",
+                          height: 180,
+                          borderRadius: "8px 8px 0 0",
+                        }}
+                      />
+                      <Chip
+                        label="2:47"
+                        size="small"
+                        sx={{
+                          position: "absolute",
+                          bottom: 8,
+                          right: 8,
+                          backgroundColor: "rgba(0,0,0,0.8)",
+                          color: "white",
+                          fontWeight: "bold",
+                        }}
+                      />
+                    </Box>
+                    <CardContent sx={{ p: 1.5 }}>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          fontWeight: "bold",
+                          fontSize: "14px",
+                          mb: 1,
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {video.title}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: "block" }}
+                      >
+                        {formatNumber(video.numOfViews)} lượt xem •{" "}
+                        {formatDate(video.publishedAt)}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
+      </Paper>
+    </Box>
+  );
+};
+
+export default Dashboard;

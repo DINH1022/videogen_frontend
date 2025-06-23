@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import CreateVideo from "./pages/CreateVideo.jsx";
 import Editor from "./pages/Edit.jsx";
 import WorkspaceComponent from "./pages/WorkspaceResources.jsx";
+import Statistics from "./pages/Statistics.jsx";
 import { ToastContainer } from "react-toastify";
 const theme = {
   palette: {
@@ -36,6 +37,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />}></Route>
             <Route path="/workspace/:id" element={<CreateVideo />}></Route>
             <Route path="/workspace/:id/editor" element={<Editor />}></Route>
+            <Route path="/statistics" element={<Statistics />}></Route>
             <Route
               path="/workspace-resources"
               element={<WorkspaceComponent />}
