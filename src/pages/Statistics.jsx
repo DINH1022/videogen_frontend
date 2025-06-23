@@ -54,6 +54,11 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  ComposedChart,
 } from "recharts";
 import { useMemo } from "react";
 import Navigation from "../components/Navigation";
@@ -64,7 +69,7 @@ const TikTokIcon = () => (
   </svg>
 );
 
-const Dashboard = () => {
+const Statistics = () => {
   const [selectedPlatform, setSelectedPlatform] = useState("youtube");
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
@@ -415,6 +420,18 @@ const Dashboard = () => {
           </Stack>
         </Box>
       </Paper>
+      <Box>
+        <Typography
+          sx={{
+            fontSize: "1.8rem",
+            fontWeight: 700,
+            color: "#222222",
+            mb: 3,
+          }}
+        >
+          Số liệu tổng thể
+        </Typography>
+      </Box>
       {/* Stats Cards with softer colors */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3} sx={{ width: "24%" }}>
@@ -606,7 +623,18 @@ const Dashboard = () => {
           </Card>
         </Grid>
       </Grid>
-
+      <Box>
+        <Typography
+          sx={{
+            fontSize: "1.8rem",
+            fontWeight: 700,
+            color: "#222222",
+            mb: 3,
+          }}
+        >
+          Thông số chi tiết
+        </Typography>
+      </Box>
       {/* Main Content */}
       <Paper
         elevation={0}
@@ -615,6 +643,7 @@ const Dashboard = () => {
           overflow: "hidden",
           boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
           border: "1px solid rgba(0,0,0,0.05)",
+          mb: 4,
         }}
       >
         <Box
@@ -654,13 +683,13 @@ const Dashboard = () => {
             />
             <Tab
               icon={<TableChart />}
-              label="Bảng dữ liệu"
+              label="Thống kê"
               iconPosition="start"
               sx={{ gap: 1 }}
             />
             <Tab
               icon={<VideoLibrary />}
-              label="Thẻ Videos"
+              label="Videos"
               iconPosition="start"
               sx={{ gap: 1 }}
             />
@@ -674,7 +703,7 @@ const Dashboard = () => {
               <Grid item xs={12} lg={6} width={"48.5%"}>
                 <Card
                   sx={{
-                    borderRadius: 3,
+                    borderRadius: 1,
                     height: 500,
                     boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
                     border: "1px solid rgba(0,0,0,0.05)",
@@ -699,9 +728,9 @@ const Dashboard = () => {
                       <PieChart>
                         <Pie
                           data={processedPieData}
-                          cx="37%" // Dịch chuyển chart sang trái để tạo thêm chỗ cho legend
+                          cx="37%"
                           cy="50%"
-                          outerRadius={120} // Giảm kích thước để có chỗ cho legend
+                          outerRadius={120}
                           dataKey="value"
                           label={({ percent }) =>
                             `${(percent * 100).toFixed(1)}%`
@@ -795,7 +824,7 @@ const Dashboard = () => {
               <Grid item xs={12} lg={6} width={"48.5%"}>
                 <Card
                   sx={{
-                    borderRadius: 3,
+                    borderRadius: 1,
                     height: 500,
                     boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
                     border: "1px solid rgba(0,0,0,0.05)",
@@ -814,10 +843,10 @@ const Dashboard = () => {
                         gap: 1,
                       }}
                     >
-                      📈 Hiệu suất video theo thời gian
+                      📈 Hiệu suất tương tác của người dùng
                     </Typography>
                     <ResponsiveContainer width="100%" height={400}>
-                      <RechartsBarChart data={barData}>
+                      <LineChart data={barData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                         <XAxis
                           dataKey="name"
@@ -834,29 +863,66 @@ const Dashboard = () => {
                               ? "Lượt xem"
                               : name === "likes"
                               ? "Lượt thích"
-                              : "Bình luận",
+                              : name === "comments"
+                              ? "Bình luận"
+                              : name,
                           ]}
+                          labelFormatter={(label) => {
+                            // Tìm video có tên rút gọn tương ứng để lấy tên đầy đủ
+                            const video = sampleData.find((v) => {
+                              const shortName =
+                                v.title.length > 15
+                                  ? v.title.substring(0, 15) + "..."
+                                  : v.title;
+                              return shortName === label;
+                            });
+                            return video ? video.title : label;
+                          }}
+                          contentStyle={{
+                            backgroundColor: "white",
+                            border: "1px solid #ccc",
+                            borderRadius: "8px",
+                            padding: "12px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                            maxWidth: "300px",
+                            wordWrap: "break-word",
+                          }}
+                          labelStyle={{
+                            fontWeight: "bold",
+                            color: "#2c3e50",
+                            marginBottom: "8px",
+                            fontSize: "14px",
+                            whiteSpace: "normal",
+                            wordBreak: "break-word",
+                            lineHeight: "1.4",
+                          }}
                         />
                         <Legend />
-                        <Bar
+                        <Line
+                          type="monotone"
                           dataKey="views"
-                          fill="#8B5FBF"
+                          stroke="#8B5FBF"
+                          strokeWidth={3}
+                          dot={{ fill: "#8B5FBF", strokeWidth: 2, r: 6 }}
                           name="Lượt xem"
-                          radius={[2, 2, 0, 0]}
                         />
-                        <Bar
+                        <Line
+                          type="monotone"
                           dataKey="likes"
-                          fill="#6B8DD6"
+                          stroke="#6B8DD6"
+                          strokeWidth={3}
+                          dot={{ fill: "#6B8DD6", strokeWidth: 2, r: 6 }}
                           name="Lượt thích"
-                          radius={[2, 2, 0, 0]}
                         />
-                        <Bar
+                        <Line
+                          type="monotone"
                           dataKey="comments"
-                          fill="#8FBC8F"
+                          stroke="#8FBC8F"
+                          strokeWidth={3}
+                          dot={{ fill: "#8FBC8F", strokeWidth: 2, r: 6 }}
                           name="Bình luận"
-                          radius={[2, 2, 0, 0]}
                         />
-                      </RechartsBarChart>
+                      </LineChart>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
@@ -1086,4 +1152,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Statistics;
