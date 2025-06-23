@@ -55,7 +55,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-
+import Navigation from "../components/Navigation";
 // TikTok icon component
 const TikTokIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -243,112 +243,14 @@ const Dashboard = () => {
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", backgroundColor: "#f8fafc", p: 3 }}>
+    <Box sx={{ minHeight: "100vh", backgroundColor: "#f8fafc", p: 4 }}>
       {/* Enhanced Header */}
-      {/* <Paper
-        elevation={0}
-        sx={{
-          p: 4,
-          mb: 4,
-          borderRadius: 4,
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          color: "white",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
-        }}
-      >
-        <Grid container alignItems="center" spacing={3}>
-          <Grid item xs={12} md={8}>
-            <Stack direction="row" alignItems="center" spacing={3}>
-              <Box
-                sx={{
-                  p: 2,
-                  backgroundColor: "rgba(255,255,255,0.15)",
-                  borderRadius: 3,
-                  backdropFilter: "blur(10px)",
-                }}
-              >
-                <Analytics sx={{ fontSize: 40 }} />
-              </Box>
-              <Box>
-                <Typography
-                  variant="h3"
-                  component="h1"
-                  sx={{
-                    fontWeight: 700,
-                    mb: 1,
-                    background: "linear-gradient(45deg, #fff, #e3f2fd)",
-                    backgroundClip: "text",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  Thống kê Dashboard
-                </Typography>
-                <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 400 }}>
-                  Phân tích hiệu suất video trên các nền tảng
-                </Typography>
-              </Box>
-            </Stack>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Stack direction="row" spacing={2} justifyContent="flex-end">
-              <FormControl sx={{ minWidth: 160 }}>
-                <Select
-                  value={selectedPlatform}
-                  onChange={(e) => setSelectedPlatform(e.target.value)}
-                  sx={{
-                    backgroundColor: "rgba(255,255,255,0.15)",
-                    color: "white",
-                    borderRadius: 2,
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgba(255,255,255,0.3)",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgba(255,255,255,0.5)",
-                    },
-                    "& .MuiSvgIcon-root": {
-                      color: "white",
-                    },
-                  }}
-                >
-                  <MenuItem value="youtube">
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <YouTube sx={{ color: "#FF0000" }} />
-                      <Typography>YouTube</Typography>
-                    </Stack>
-                  </MenuItem>
-                  <MenuItem value="tiktok">
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <TikTokIcon />
-                      <Typography>TikTok</Typography>
-                    </Stack>
-                  </MenuItem>
-                </Select>
-              </FormControl>
-              <Button
-                variant="outlined"
-                startIcon={<Update />}
-                sx={{
-                  borderColor: "rgba(255,255,255,0.3)",
-                  color: "white",
-                  borderRadius: 2,
-                  "&:hover": {
-                    borderColor: "rgba(255,255,255,0.5)",
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                  },
-                }}
-                onClick={() => window.location.reload()}
-              >
-                Làm mới
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Paper> */}
+      <Navigation />
       <Paper
         elevation={0}
         sx={{
           p: 4,
+          mt: 8,
           mb: 4,
           borderRadius: 4,
           background: "linear-gradient(135deg, #8B9AFF 0%, #A8B5FF 100%)",
