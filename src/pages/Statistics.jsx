@@ -55,6 +55,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { useMemo } from "react";
 import Navigation from "../components/Navigation";
 // TikTok icon component
 const TikTokIcon = () => (
@@ -68,6 +69,7 @@ const Dashboard = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [videoFilter, setVideoFilter] = useState("latest");
+  // Xử lý data để chỉ hiển thị top 5 và gộp phần còn lại thành "Khác"
 
   // Sample data based on the structure you provided
   const sampleData = [
@@ -81,7 +83,7 @@ const Dashboard = () => {
       publishedAt: "2025-05-03T10:30:00Z",
     },
     {
-      title: "Demo chức năng của Chat Application MeTalk",
+      title: "Demo chức năng của Chat Application  MeTalk",
       url: "https://youtube.com/watch?v=2",
       thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
       numOfViews: 2840,
@@ -108,11 +110,30 @@ const Dashboard = () => {
       publishedAt: "2021-02-27T16:45:00Z",
     },
     {
-      title: "Student Management App - v3",
+      title: "Studentsdf sdf - v3",
       url: "https://youtube.com/watch?v=5",
       thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
-      numOfViews: 5200,
-      numOfLikes: 298,
+      numOfViews: 520,
+      numOfLikes: 28,
+      numOfComments: 45,
+      publishedAt: "2024-08-10T11:30:00Z",
+    },
+
+    {
+      title: "STREETT TOOTH",
+      url: "https://youtube.com/watch?v=4",
+      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      numOfViews: 100,
+      numOfLikes: 82,
+      numOfComments: 14,
+      publishedAt: "2021-02-27T16:45:00Z",
+    },
+    {
+      title: "Student App dfs sdf sdf dsf - v3",
+      url: "https://youtube.com/watch?v=5",
+      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      numOfViews: 50,
+      numOfLikes: 29,
       numOfComments: 45,
       publishedAt: "2024-08-10T11:30:00Z",
     },
@@ -132,15 +153,56 @@ const Dashboard = () => {
   );
 
   // Prepare data for pie chart (top 5 videos + others)
-  const pieData = sampleData.slice(0, 5).map((video, index) => ({
-    name:
-      video.title.length > 20
-        ? video.title.substring(0, 20) + "..."
-        : video.title,
-    value: video.numOfViews,
-    color: ["#8B5FBF", "#6B8DD6", "#8FBC8F", "#DDA0DD", "#87CEEB"][index],
-  }));
+  const pieData = useMemo(() => {
+    if (!sampleData || sampleData.length === 0) return [];
 
+    return sampleData.map((video, index) => ({
+      name:
+        video.title.length > 25
+          ? video.title.substring(0, 25) + "..."
+          : video.title, // Rút ngắn tên để tránh tràn
+      fullName: video.title, // Giữ tên đầy đủ cho tooltip
+      value: video.numOfViews,
+      color: [
+        "#8B5FBF",
+        "#6B8DD6",
+        "#8FBC8F",
+        "#DDA0DD",
+        "#87CEEB",
+        "#FFB6C1",
+        "#FFA07A",
+        "#98FB98",
+        "#F0E68C",
+        "#DEB887",
+      ][index % 10],
+    }));
+  }, [sampleData]);
+  const processedPieData = useMemo(() => {
+    if (!pieData || pieData.length === 0) return [];
+    if (pieData.length <= 5) return pieData;
+
+    // Sắp xếp theo value giảm dần
+    const sortedData = [...pieData].sort((a, b) => b.value - a.value);
+
+    // Lấy top 5
+    const top5 = sortedData.slice(0, 5);
+
+    // Tính tổng của phần còn lại
+    const othersTotal = sortedData
+      .slice(5)
+      .reduce((sum, item) => sum + item.value, 0);
+
+    // Thêm mục "Khác" nếu có
+    if (othersTotal > 0) {
+      top5.push({
+        name: "Khác",
+        value: othersTotal,
+        color: "#C0C0C0", // Màu xám cho mục "Khác"
+      });
+    }
+
+    return top5;
+  }, [pieData]);
   // Prepare data for bar chart - Video performance over time
   const barData = sampleData
     .sort((a, b) => new Date(a.publishedAt) - new Date(b.publishedAt))
@@ -616,6 +678,7 @@ const Dashboard = () => {
                     height: 500,
                     boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
                     border: "1px solid rgba(0,0,0,0.05)",
+                    overflow: "hidden", // Ngăn tràn nội dung
                   }}
                 >
                   <CardContent sx={{ height: "100%", p: 3 }}>
@@ -624,7 +687,6 @@ const Dashboard = () => {
                       gutterBottom
                       sx={{
                         fontWeight: 600,
-                        mb: 3,
                         color: "#2c3e50",
                         display: "flex",
                         alignItems: "center",
@@ -636,28 +698,100 @@ const Dashboard = () => {
                     <ResponsiveContainer width="100%" height={400}>
                       <PieChart>
                         <Pie
-                          data={pieData}
-                          cx="50%"
+                          data={processedPieData}
+                          cx="37%" // Dịch chuyển chart sang trái để tạo thêm chỗ cho legend
                           cy="50%"
-                          outerRadius={120}
+                          outerRadius={120} // Giảm kích thước để có chỗ cho legend
                           dataKey="value"
-                          label={({ name, percent }) =>
-                            `${name} ${(percent * 100).toFixed(0)}%`
+                          label={({ percent }) =>
+                            `${(percent * 100).toFixed(1)}%`
                           }
+                          labelLine={false}
                         >
-                          {pieData.map((entry, index) => (
+                          {processedPieData?.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
+                              fill={
+                                entry.color || COLORS[index % COLORS.length]
+                              }
                             />
                           ))}
                         </Pie>
-                        <Tooltip formatter={(value) => formatNumber(value)} />
+                        <Tooltip
+                          formatter={(value, name, props) => [
+                            formatNumber(value),
+                            "Lượt xem",
+                          ]}
+                          labelFormatter={(label) => `Video: ${label}`}
+                          // Sử dụng tên đầy đủ trong tooltip nếu có
+                          content={({ active, payload, label }) => {
+                            if (active && payload && payload.length) {
+                              const data = payload[0].payload;
+                              return (
+                                <Paper
+                                  elevation={3}
+                                  sx={{
+                                    p: 1.5,
+                                    borderRadius: 1,
+                                    border: "1px solid #ccc",
+                                  }}
+                                >
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      fontWeight: "bold",
+                                      m: 0,
+                                    }}
+                                  >
+                                    {data.fullName || data.name}
+                                  </Typography>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      color: "#666",
+                                      m: 0,
+                                    }}
+                                  >
+                                    Lượt xem: {formatNumber(data.value)}
+                                  </Typography>
+                                </Paper>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Legend
+                          verticalAlign="middle"
+                          align="right"
+                          layout="vertical"
+                          iconType="circle"
+                          wrapperStyle={{
+                            paddingLeft: "20px",
+                            fontSize: "20px",
+                            lineHeight: "20px",
+                            width: "250px",
+                            overflow: "visible",
+                          }}
+                          formatter={(value) => (
+                            <Box
+                              component="span"
+                              sx={{
+                                display: "inline-block",
+                                maxWidth: "220px",
+                                fontSize: "11px",
+                              }}
+                              title={value}
+                            >
+                              {value}
+                            </Box>
+                          )}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
               </Grid>
+
               <Grid item xs={12} lg={6} width={"48.5%"}>
                 <Card
                   sx={{
