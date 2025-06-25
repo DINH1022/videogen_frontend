@@ -709,7 +709,6 @@ const Navigation = () => {
         cancelAnimationFrame(rafId.current);
       }
 
-      // ✅ Xử lý border cho cả home và non-home pages
       if (window.scrollY === 0) {
         navigateRef.current.style.borderBottom = "none";
         if (!isHomePage) {
@@ -725,7 +724,8 @@ const Navigation = () => {
         }
         if (isHomePage && window.scrollY > 4000) {
           navigateRef.current.style.background = "white";
-          navigateRef.current.style.borderBottom = "none";
+          navigateRef.current.style.borderBottom =
+            "2px solid rgba(40, 36, 36, 0.2)";
         }
       }
 
