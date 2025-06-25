@@ -5,6 +5,7 @@ import { styled } from "@mui/system";
 const GradientBackground = styled(Box)({
   background: "linear-gradient(to right, #fcd5f7, #cfd9ff)",
   minHeight: "30vh",
+  height: "5000px",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",

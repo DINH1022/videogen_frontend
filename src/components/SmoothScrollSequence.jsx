@@ -417,8 +417,9 @@ const SmoothScrollSequence = ({
           display: flex;
           align-items: center;
           gap: 60px;
-          animation: scroll-logos 30s linear infinite;
+          animation: scroll-logos 100s linear infinite;
           white-space: nowrap;
+          width: max-content;
         }
 
         .ssq-company-logo {
@@ -426,11 +427,12 @@ const SmoothScrollSequence = ({
           font-weight: 600;
           color: rgba(45, 55, 72, 0.7);
           flex-shrink: 0;
+          margin-right: 60px;
         }
 
         @keyframes scroll-logos {
           0% {
-            transform: translateX(100%);
+            transform: translateX(0);
           }
           100% {
             transform: translateX(-100%);
@@ -595,27 +597,59 @@ const SmoothScrollSequence = ({
         {/* Text Overlay */}
         <div className="ssq-text-overlay" ref={textOverlayRef}>
           <h1 className="ssq-main-headline">
-            The single platform to iterate,
+            The all-in-one platform to script,
             <br />
-            evaluate, deploy, and monitor LLMs
+            generate, and share AI-powered short videos
           </h1>
 
-          <div className="ssq-trusted-by">TRUSTED BY</div>
+          <div className="ssq-trusted-by">DEVELOPED BY</div>
 
           <div className="ssq-company-logos-container">
             <div className="ssq-company-logos">
-              <div className="ssq-company-logo">Guft</div>
-              <div className="ssq-company-logo">salesforce</div>
-              <div className="ssq-company-logo">15five</div>
-              <div className="ssq-company-logo">DOORDASH</div>
-              <div className="ssq-company-logo">CARVANA</div>
-              <div className="ssq-company-logo">Daybreak</div>
-              <div className="ssq-company-logo">Guft</div>
-              <div className="ssq-company-logo">salesforce</div>
-              <div className="ssq-company-logo">15five</div>
-              <div className="ssq-company-logo">DOORDASH</div>
-              <div className="ssq-company-logo">CARVANA</div>
-              <div className="ssq-company-logo">Daybreak</div>
+              <div className="ssq-company-logo">Nguyen Van Ty</div>
+              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Le Quang Vinh</div>
+              <div className="ssq-company-logo">Le Quoc Vinh</div>
+
+              <div className="ssq-company-logo">Nguyen Van Ty</div>
+              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Le Quang Vinh</div>
+              <div className="ssq-company-logo">Le Quoc Vinh</div>
+
+              <div className="ssq-company-logo">Nguyen Van Ty</div>
+              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Le Quang Vinh</div>
+              <div className="ssq-company-logo">Le Quoc Vinh</div>
+
+              <div className="ssq-company-logo">Nguyen Van Ty</div>
+              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Le Quang Vinh</div>
+              <div className="ssq-company-logo">Le Quoc Vinh</div>
+
+              <div className="ssq-company-logo">Nguyen Van Ty</div>
+              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Le Quang Vinh</div>
+              <div className="ssq-company-logo">Le Quoc Vinh</div>
+
+              <div className="ssq-company-logo">Nguyen Van Ty</div>
+              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Le Quang Vinh</div>
+              <div className="ssq-company-logo">Le Quoc Vinh</div>
+
+              <div className="ssq-company-logo">Nguyen Van Ty</div>
+              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Le Quang Vinh</div>
+              <div className="ssq-company-logo">Le Quoc Vinh</div>
+
+              <div className="ssq-company-logo">Nguyen Van Ty</div>
+              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Le Quang Vinh</div>
+              <div className="ssq-company-logo">Le Quoc Vinh</div>
+
+              <div className="ssq-company-logo">Nguyen Van Ty</div>
+              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Le Quang Vinh</div>
+              <div className="ssq-company-logo">Le Quoc Vinh</div>
             </div>
           </div>
         </div>
@@ -624,7 +658,7 @@ const SmoothScrollSequence = ({
         <div className="ssq-video-overlay" ref={videoOverlayRef}>
           <video ref={overlayVideoRef} muted controls>
             <source
-              src="https://www.adaline.ai/videos/product-demo.mp4"
+              src="https://res.cloudinary.com/dpystprxq/video/upload/v1750867660/Zoom_Meeting_40-Minutes_2025-06-25_10-29-29_m1ixfy.mp4"
               type="video/mp4"
             />
             Your browser does not support the video tag.
