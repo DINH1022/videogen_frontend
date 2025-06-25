@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import LoadingDemo from "./Loading.jsx";
 
 const SmoothScrollSequence = ({
   className = "",
@@ -583,7 +584,7 @@ const SmoothScrollSequence = ({
       `}</style>
 
       {/* Loading */}
-      {loading && <div className="ssq-loading">Đang tải ảnh...</div>}
+      {loading && <LoadingDemo />}
 
       {/* Sequence Container */}
       <div className="ssq-sequence-container">
