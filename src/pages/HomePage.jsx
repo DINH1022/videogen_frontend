@@ -9,6 +9,7 @@ const HomePage = () => {
     <>
       <Navigation />
       <SmoothScrollSequence />
+      <Feature />
       <Footer />
     </>
   );

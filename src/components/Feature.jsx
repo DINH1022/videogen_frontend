@@ -21,7 +21,7 @@ import {
   VolumeUp,
   ArrowForward,
 } from "@mui/icons-material";
-import AIYouTubeShortsGuide from "../components/HowTo";
+
 const Feature = () => {
   const theme = useTheme();
   const [animateStats, setAnimateStats] = useState(false);
@@ -85,7 +85,6 @@ const Feature = () => {
           overflow: "hidden",
         }}
       >
-        <AIYouTubeShortsGuide />
         <Container
           maxWidth="lg"
           sx={{ position: "relative", zIndex: 1, py: 8 }}
@@ -156,73 +155,6 @@ const Feature = () => {
               ))}
             </Grid>
           </Box>
-
-          {/* CTA Section */}
-          <Fade in timeout={2000}>
-            <Paper
-              elevation={16}
-              sx={{
-                p: 6,
-                textAlign: "center",
-                borderRadius: 6,
-                background: "linear-gradient(135deg, #667eea, #764ba2)",
-                color: "white",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background:
-                    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
-                  animation: "patternMove 20s linear infinite",
-                  "@keyframes patternMove": {
-                    "0%": { transform: "translateX(0) translateY(0)" },
-                    "100%": {
-                      transform: "translateX(-60px) translateY(-60px)",
-                    },
-                  },
-                }}
-              />
-
-              <Box position="relative" zIndex={1}>
-                <Typography variant="h3" fontWeight="bold" mb={3}>
-                  Sẵn sàng tạo video viral?
-                </Typography>
-                <Typography variant="h6" mb={4} sx={{ opacity: 0.9 }}>
-                  Tham gia cùng hàng nghìn creator đang sử dụng AI để tạo nội
-                  dung
-                </Typography>
-
-                <Button
-                  variant="contained"
-                  size="large"
-                  endIcon={<ArrowForward />}
-                  sx={{
-                    px: 6,
-                    py: 2,
-                    fontSize: "1.1rem",
-                    borderRadius: "50px",
-                    bgcolor: "white",
-                    color: "primary.main",
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
-                    "&:hover": {
-                      bgcolor: "grey.100",
-                      transform: "translateY(-2px)",
-                      boxShadow: "0 12px 40px rgba(0,0,0,0.3)",
-                    },
-                  }}
-                >
-                  Bắt đầu ngay - Miễn phí
-                </Button>
-              </Box>
-            </Paper>
-          </Fade>
         </Container>
       </Box>
     </>

@@ -28,9 +28,8 @@ const SmoothScrollSequence = ({
 
   // Constants
   const VIDEO_START_FRAME = 200;
-  const frameInterval = 16; // ~60fps
+  const frameInterval = 16;
 
-  // Tạo danh sách URL ảnh
   const imageUrls = [];
   for (let i = 20; i < 281; i++) {
     const url = `https://www.adaline.ai/sequence/16x9_281/standard/graded_4K_100_gm_50_1080_3-${i
@@ -41,7 +40,6 @@ const SmoothScrollSequence = ({
 
   const TOTAL_FRAMES = imageUrls.length;
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       imageCacheRef.current.clear();
@@ -206,14 +204,12 @@ const SmoothScrollSequence = ({
     const fadeOutProgress = Math.min(scrollProgress / 0.3, 1);
     const opacity = 1 - fadeOutProgress;
 
-    // Transform text lên trên một chút khi scroll
     const translateY = scrollProgress * 50;
 
     textOverlayRef.current.style.opacity = opacity;
     textOverlayRef.current.style.transform = `translateY(-${translateY}px)`;
   };
 
-  // Setup scroll listener - sử dụng window scroll
   useEffect(() => {
     if (loading) return;
 
@@ -232,11 +228,9 @@ const SmoothScrollSequence = ({
       const containerHeight = rect.height;
       const windowHeight = window.innerHeight;
 
-      // Tính toán progress dựa trên vị trí của container trong viewport
       let scrollProgress = 0;
 
       if (containerTop <= 0 && containerTop + containerHeight >= windowHeight) {
-        // Container đang fill viewport
         scrollProgress =
           Math.abs(containerTop) / (containerHeight - windowHeight);
       } else if (containerTop > 0) {
@@ -313,11 +307,13 @@ const SmoothScrollSequence = ({
       <style jsx>{`
         .ssq-main-container {
           position: relative;
+
           width: 100%;
           height: 1000vh; /* Đủ cao để tạo scroll space */
           background: #000;
           color: white;
           font-family: "Arial", sans-serif;
+          background: transparent;
         }
 
         .ssq-sequence-container {
@@ -329,6 +325,7 @@ const SmoothScrollSequence = ({
           align-items: center;
           justify-content: center;
           z-index: 10;
+          border-radius: 0 0 20px 20px;
           overflow: hidden;
         }
 
@@ -340,6 +337,7 @@ const SmoothScrollSequence = ({
           box-shadow: none;
           transform: translateZ(0);
           will-change: transform;
+          border-radius: 0 0 20px 20px;
         }
 
         .ssq-text-overlay {
