@@ -733,7 +733,7 @@ const Navigation = () => {
         const scrollTop = window.scrollY;
         const maxScroll = 2000;
         const fadeStartPoint = 200;
-        const showAgainPoint = 7200; // ✅ Điểm hiển thị lại navigation
+        const showAgainPoint = 7200; // Điểm hiển thị lại navigation
 
         const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4);
 
@@ -747,7 +747,7 @@ const Navigation = () => {
             // Giai đoạn 2: Từ 2000px-3000px, opacity = 0 (ẩn hoàn toàn)
             setScrollOpacity(0);
           } else if (scrollTop >= showAgainPoint) {
-            // ✅ Giai đoạn 3: Từ 3000px trở lên, hiện lại với opacity = 1
+            //  Giai đoạn 3: Từ 3000px trở lên, hiện lại với opacity = 1
             setScrollOpacity(1);
           } else {
             // Giai đoạn fade: Từ 200px-2000px, opacity giảm dần
