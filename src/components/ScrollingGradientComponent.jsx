@@ -65,25 +65,22 @@ export default function NightSkyScroll() {
       const progress = scrollTop / docHeight;
 
       setScrollProgress(Math.min(progress, 1));
-      setScrollY(scrollTop); // Lưu trữ giá trị scroll Y thực tế
+      setScrollY(scrollTop);
     };
 
-    // Thêm passive listener để tăng performance
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Tạo background gradient mượt mà từ trắng sang đen
   const getBackgroundGradient = () => {
-    // Tính toán độ mờ cho màu đen dựa trên scroll progress
-    const darknessProgress = Math.pow(scrollProgress, 1.5); // Làm cho chuyển đổi mượt hơn
+    const darknessProgress = Math.pow(scrollProgress, 1.5);
 
     // Tính toán các giá trị RGB
     const r = Math.floor(255 * (1 - darknessProgress));
     const g = Math.floor(255 * (1 - darknessProgress));
-    const b = Math.floor(255 * (1 - darknessProgress * 0.8)); // Giữ một chút màu xanh
+    const b = Math.floor(255 * (1 - darknessProgress * 0.8));
 
-    // Tạo gradient với nhiều điểm màu để mượt hơn
     return `
       radial-gradient(ellipse at center top, 
         rgb(${Math.min(r + 20, 255)}, ${Math.min(g + 20, 255)}, ${Math.min(
@@ -97,15 +94,6 @@ export default function NightSkyScroll() {
     )}) 100%
       )
     `;
-  };
-
-  // Tính toán màu text dựa trên background
-  const getTextColor = (threshold = 0.3) => {
-    return scrollProgress > threshold ? "white" : "#333";
-  };
-
-  const getSubTextColor = (threshold = 0.4) => {
-    return scrollProgress > threshold ? "#e3f2fd" : "#666";
   };
 
   return (
@@ -165,7 +153,7 @@ export default function NightSkyScroll() {
               bottom: 0,
               pointerEvents: "none",
               zIndex: 1,
-              willChange: "transform", // Optimize for animations
+              willChange: "transform",
             }}
           >
             <StarField
