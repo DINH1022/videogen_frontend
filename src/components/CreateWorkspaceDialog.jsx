@@ -10,28 +10,34 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+// Dialog for creating a new workspace
 const CreateWorkspaceDialog = ({ open, setOpen }) => {
+  // State for workspace name and note
   const [workspaceName, setWorkspaceName] = useState("");
   const [workspaceNote, setWorkspaceNote] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const navigate = useNavigate();
+
+  // Close dialog and reset fields
   const handleCloseCreateWorkspace = () => {
     setOpen(false);
     setWorkspaceName("");
     setWorkspaceNote("");
   };
 
+  // Handle workspace creation (simulate API call)
   const handleCreateWorkspace = async () => {
     if (!workspaceName.trim()) return;
 
     setIsCreating(true);
 
-    // Giả lập API call
+    // Simulate API call with setTimeout
     setTimeout(() => {
-      const workspaceId = Math.random().toString(36).substr(2, 9);
+      const workspaceId = Math.random().toString(36).substr(2, 9); // Generate random workspace ID
       setIsCreating(false);
       handleCloseCreateWorkspace();
-      navigate(`/workspace/${workspaceId}`);
+      navigate(`/workspace/${workspaceId}`); // Navigate to new workspace page
     }, 2000);
   };
 
@@ -66,6 +72,7 @@ const CreateWorkspaceDialog = ({ open, setOpen }) => {
         Tạo Workspace Mới
       </DialogTitle>
       <DialogContent sx={{ pt: 3, px: 4 }}>
+        {/* Workspace name input */}
         <TextField
           autoFocus
           margin="dense"
@@ -90,6 +97,7 @@ const CreateWorkspaceDialog = ({ open, setOpen }) => {
             },
           }}
         />
+        {/* Optional note input */}
         <TextField
           margin="dense"
           label="Ghi chú (tùy chọn)"
@@ -116,6 +124,7 @@ const CreateWorkspaceDialog = ({ open, setOpen }) => {
         />
       </DialogContent>
       <DialogActions sx={{ px: 4, pb: 3, pt: 2, gap: 2 }}>
+        {/* Cancel button */}
         <Button
           onClick={handleCloseCreateWorkspace}
           sx={{
@@ -132,6 +141,7 @@ const CreateWorkspaceDialog = ({ open, setOpen }) => {
         >
           Hủy
         </Button>
+        {/* Create button with loading indicator */}
         <Button
           onClick={handleCreateWorkspace}
           disabled={!workspaceName.trim() || isCreating}
@@ -156,6 +166,7 @@ const CreateWorkspaceDialog = ({ open, setOpen }) => {
           }}
         >
           {isCreating ? (
+            // Show loading spinner when creating
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <CircularProgress size={20} color="inherit" />
               Đang tạo...
