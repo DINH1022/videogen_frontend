@@ -32,3 +32,29 @@ export const removeCurrentUser = () => {
     console.error("Error removing user from localStorage:", error);
   }
 };
+
+export const setAccessToken = (token) => {
+  try {
+    if (!token || typeof token !== "string") {
+      throw new Error("Invalid access token");
+    }
+    localStorage.setItem("accessToken", token);
+  } catch (error) {
+    console.error("Error saving access token to localStorage:", error);
+  }
+};
+export const getAccessToken = () => {
+  try {
+    return localStorage.getItem("accessToken");
+  } catch (error) {
+    console.error("Error retrieving access token from localStorage:", error);
+    return null;
+  }
+};
+export const removeAccessToken = () => {
+  try {
+    localStorage.removeItem("accessToken");
+  } catch (error) {
+    console.error("Error removing access token from localStorage:", error);
+  }
+};

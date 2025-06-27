@@ -15,8 +15,11 @@ export const requestLogin = async (userData, dispatch, navigate) => {
   dispatch(loginStart());
   try {
     const response = await loginUser(userData);
-    if (response.success) {
-      dispatch(loginSuccess({ accessToken: response }));
+    console.log("Login response:", response);
+    if (response.token) {
+      dispatch(
+        loginSuccess({ userData: response.user, accessToken: response.token })
+      );
       Swal.fire({
         icon: "success",
         title: "Login Successful",
