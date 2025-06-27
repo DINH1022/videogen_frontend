@@ -13,15 +13,30 @@ import {
 } from "@mui/material";
 import { Image as ImageIcon, Add } from "@mui/icons-material";
 
+/**
+ * ImageGenTab component provides a UI tab for generating images from text prompts.
+ * Users can enter a description, generate an image (simulated), and view/select images.
+ *
+ * Props:
+ * - mainEngine: (object) The main engine instance for image generation (not used in this mockup)
+ * - resourceList: (array) List of available image URLs to display and use
+ */
 const ImageGenTab = ({ mainEngine, resourceList }) => {
+  // State for the user's text prompt
   const [prompt, setPrompt] = useState("");
+  // State for the currently displayed/generated image
   const [generatedImage, setGeneratedImage] = useState(
     resourceList && resourceList.length > 0
       ? resourceList[0]
       : "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
   );
+  // State for loading indicator during image generation
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Simulate image generation based on the prompt.
+   * Picks a random image from resourceList or fallback after a delay.
+   */
   const generateImage = async () => {
     if (!prompt.trim()) return;
 
@@ -38,6 +53,10 @@ const ImageGenTab = ({ mainEngine, resourceList }) => {
     }, 2000);
   };
 
+  /**
+   * Handle click on an image: open it in a popup window.
+   * @param {string} imageUrl - The URL of the image to open
+   */
   const handleImageClick = (imageUrl) => {
     window.open(imageUrl, "_blank", "width=800,height=600");
   };
@@ -103,4 +122,5 @@ const ImageGenTab = ({ mainEngine, resourceList }) => {
     </Box>
   );
 };
+
 export default ImageGenTab;
