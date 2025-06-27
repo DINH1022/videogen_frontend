@@ -257,6 +257,11 @@ import {
 } from "@mui/icons-material";
 import VideoShareDialog from "./ShareDialog";
 
+/**
+ * ExportDialog component provides a dialog UI for configuring and exporting videos,
+ * including quality, format, framerate selection, progress display, and preview after export.
+ */
+
 // Styled components for enhanced visual appeal
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   // Custom dialog style
