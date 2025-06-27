@@ -11,6 +11,11 @@ import {
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * CreateWorkspaceDialog component provides a dialog UI for creating a new workspace,
+ * including input fields for workspace name and note, and handles navigation after creation.
+ */
+
 // Dialog for creating a new workspace
 const CreateWorkspaceDialog = ({ open, setOpen }) => {
   // State for workspace name and note
