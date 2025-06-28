@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom"; // Add this import
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Container,
   Card,
@@ -23,8 +23,16 @@ import {
   Image as ImageIcon,
 } from "@mui/icons-material";
 
+/**
+ * Resource component displays and manages resources (images and audio) for a workspace.
+ * It fetches mock data, calculates image timings based on audio duration,
+ * and allows navigation to the video editor with resource data.
+ *
+ * Props:
+ * - workspace_id: (string) The workspace ID to load resources for (default: sample)
+ */
 const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
-  const navigate = useNavigate(); // Add this hook
+  const navigate = useNavigate();
 
   const audioRef = useRef(null);
   const [images, setImages] = useState([]);
@@ -34,7 +42,7 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
   const [audioDuration, setAudioDuration] = useState(0);
   const [imageTimings, setImageTimings] = useState([]);
 
-  // Simulate API calls
+  // Simulate API calls to fetch images and audio
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -69,7 +77,10 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
     fetchData();
   }, [workspace_id]);
 
-  // Calculate image timings based on actual audio duration
+  /**
+   * Calculate image timings based on actual audio duration.
+   * Divides the audio duration equally among all images.
+   */
   const handleAudioLoadedMetadata = () => {
     if (audioRef.current) {
       const duration = audioRef.current.duration;
@@ -89,10 +100,12 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
     }
   };
 
+  // Handle navigation back to previous page
   const handleNavigateBack = () => {
     console.log("Navigate back to homepage");
   };
 
+  // Navigate to the video editor with resource data
   const handleGenerateVideo = () => {
     // Navigate to editor with state similar to your example
     navigate(`/workspace/${workspace_id}/editor`, {
@@ -105,10 +118,12 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
     });
   };
 
+  // Simulate generating additional resources
   const handleGenerateResource = () => {
     console.log("Generate additional resources");
   };
 
+  // Show loading spinner while fetching data
   if (loading) {
     return (
       <Container
@@ -120,6 +135,7 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
     );
   }
 
+  // Show error alert if data fetch fails
   if (error) {
     return (
       <Container maxWidth={false} sx={{ py: 6, px: 2 }}>
@@ -277,7 +293,7 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
                         flexDirection: { xs: "column", lg: "row" },
                       }}
                     >
-                      {/* Image Section - Larger and more prominent */}
+                      {/* Image Section */}
                       <Box
                         sx={{
                           flex: { xs: "1 1 100%", lg: "1 1 60%" },
@@ -314,7 +330,7 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
                         />
                       </Box>
 
-                      {/* Info Section - Optimized width */}
+                      {/* Info Section */}
                       <Box
                         sx={{
                           flex: { xs: "1 1 100%", lg: "1 1 40%" },
