@@ -40,27 +40,47 @@ import {
 import LanguageSelect from "../components/LanguageSelect";
 import showToast from "../components/ShowToast";
 
+/**
+ * ScriptGenerator component provides a UI for searching, editing, and generating video scripts.
+ * Users can search for script ideas, edit or add custom scripts, select language and style,
+ * and generate a full script for their video project.
+ */
 const ScriptGenerator = () => {
+  // State for the topic input
   const [topic, setTopic] = useState("");
+  // State for search results (script summaries)
   const [searchResults, setSearchResults] = useState([]);
+  // State for the currently selected script
   const [selectedScript, setSelectedScript] = useState(null);
+  // State for toggling sources section
   const [sourcesOpen, setSourcesOpen] = useState(false);
+  // State for selected language
   const [language, setLanguage] = useState("");
+  // State for selected style
   const [style, setStyle] = useState("");
+  // State for editing a script
   const [editingScript, setEditingScript] = useState(null);
+  // State for editing script content
   const [editingContent, setEditingContent] = useState("");
+  // State for loading indicator during search
   const [loading, setLoading] = useState(false);
+  // State for showing the add script card
   const [showAddScript, setShowAddScript] = useState(true);
+  // State for showing custom script input dialog
   const [showCustomInput, setShowCustomInput] = useState(false);
+  // State for custom script content
   const [customScript, setCustomScript] = useState("");
+  // State for the full generated script
   const [fullScript, setFullScript] = useState(
     "Cristiano Ronaldo là một trong những cầu thủ bóng đá vĩ đại nhất mọi thời đại. Anh nổi tiếng với kỹ thuật điêu luyện, khả năng ghi bàn xuất sắc và tinh thần thi đấu không ngừng nghỉ. Sinh ra tại Bồ Đào Nha, Ronaldo đã chơi cho nhiều câu lạc bộ lớn như Manchester United, Real Madrid, Juventus và hiện tại là Al-Nassr. Với hàng loạt danh hiệu cá nhân và tập thể, anh không chỉ là biểu tượng trên sân cỏ mà còn là nguồn cảm hứng cho hàng triệu người hâm mộ trên toàn thế giới."
   );
 
-  // New states for full script display
+  // State for showing the full script section
   const [showFullScript, setShowFullScript] = useState(false);
+  // State for loading indicator during full script generation
   const [generating, setGenerating] = useState(false);
 
+  // Mock search results for demonstration
   const [mockResults, setMockResults] = useState([
     {
       id: 1,
@@ -74,6 +94,7 @@ const ScriptGenerator = () => {
     },
   ]);
 
+  // List of available styles for script generation
   const styles = [
     {
       title: "Realistic",
@@ -101,8 +122,13 @@ const ScriptGenerator = () => {
     },
   ];
 
+  // List of sources (empty in this mockup)
   const sources = [];
 
+  /**
+   * Handle searching for script ideas based on the topic.
+   * Simulates an API call and updates searchResults.
+   */
   const handleSearch = () => {
     if (!topic.trim()) return;
 
@@ -114,16 +140,27 @@ const ScriptGenerator = () => {
     }, 1500);
   };
 
+  /**
+   * Handle selecting a script from the search results.
+   * @param {object} script - The selected script object
+   */
   const handleSelectScript = (script) => {
     setSelectedScript(script);
     setSourcesOpen(false);
   };
 
+  /**
+   * Handle editing a script summary.
+   * @param {object} script - The script to edit
+   */
   const handleEditScript = (script) => {
     setEditingScript(script);
     setEditingContent(script.summary);
   };
 
+  /**
+   * Save the edited script summary.
+   */
   const handleSaveEdit = () => {
     if (!editingScript) return;
 
@@ -150,6 +187,10 @@ const ScriptGenerator = () => {
     setEditingContent("");
   };
 
+  /**
+   * Add a custom script entered by the user.
+   * Requires at least 100 words.
+   */
   const handleAddCustomScript = () => {
     const trimmedScript = customScript.trim();
     const wordCount = trimmedScript
@@ -175,11 +216,18 @@ const ScriptGenerator = () => {
     setSelectedScript(newScript);
   };
 
+  /**
+   * Cancel editing a script.
+   */
   const handleCancelEdit = () => {
     setEditingScript(null);
     setEditingContent("");
   };
 
+  /**
+   * Generate the full script based on the selected summary, language, and style.
+   * Simulates an API call and displays the full script.
+   */
   const handleGenerateFullScript = () => {
     if (!selectedScript || !language || !style) return;
 
@@ -192,6 +240,10 @@ const ScriptGenerator = () => {
     }, 3000);
   };
 
+  /**
+   * Handle changes to the full script text field.
+   * @param {object} event - The input change event
+   */
   const handleFullScriptChange = (event) => {
     setFullScript(event.target.value);
   };
