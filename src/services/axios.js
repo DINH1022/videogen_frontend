@@ -3,7 +3,7 @@ import { getAccessToken } from "../utils/localstorage";
 const backendUrl = "http://localhost:8080";
 const instance = axios.create({
   baseURL: backendUrl,
-  timeout: 1000,
+  timeout: 20000,
   headers: {
     "Content-Type": "application/json",
   },

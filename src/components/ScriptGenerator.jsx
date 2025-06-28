@@ -36,10 +36,13 @@ import {
   Check,
   Add,
   Close,
+  Save as SaveIcon,
 } from "@mui/icons-material";
+
 import LanguageSelect from "../components/LanguageSelect";
 import showToast from "../components/ShowToast";
-import { createShortScript } from "../services/script";
+import { createShortScript, createLongScript } from "../services/script";
+
 const ScriptGenerator = () => {
   const [topic, setTopic] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -53,26 +56,14 @@ const ScriptGenerator = () => {
   const [showAddScript, setShowAddScript] = useState(true);
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [customScript, setCustomScript] = useState("");
-  const [fullScript, setFullScript] = useState(
-    "Cristiano Ronaldo là một trong những cầu thủ bóng đá vĩ đại nhất mọi thời đại. Anh nổi tiếng với kỹ thuật điêu luyện, khả năng ghi bàn xuất sắc và tinh thần thi đấu không ngừng nghỉ. Sinh ra tại Bồ Đào Nha, Ronaldo đã chơi cho nhiều câu lạc bộ lớn như Manchester United, Real Madrid, Juventus và hiện tại là Al-Nassr. Với hàng loạt danh hiệu cá nhân và tập thể, anh không chỉ là biểu tượng trên sân cỏ mà còn là nguồn cảm hứng cho hàng triệu người hâm mộ trên toàn thế giới."
-  );
+  const [fullScript, setFullScript] = useState();
+  const [isSaving, setIsSaving] = useState(false);
 
   // New states for full script display
   const [showFullScript, setShowFullScript] = useState(false);
   const [generating, setGenerating] = useState(false);
 
-  const [mockResults, setMockResults] = useState([
-    {
-      id: 1,
-      summary:
-        "Một bộ phim tài liệu về những người cao tuổi khám phá lại đam mê và ước mơ của mình. Câu chuyện kể về sự can đảm của những con người không ngừng tìm kiếm ý nghĩa trong cuộc sống dù ở tuổi xế chiều. Thông qua những câu chuyện chân thực, bộ phim mang đến thông điệp về việc không bao giờ là quá muộn để bắt đầu lại. Những nhân vật trong phim đã vượt qua nỗi sợ hãi, định kiến xã hội để theo đuổi những điều họ thực sự yêu thích. Từ một cụ bà 80 tuổi học vẽ tranh, đến một cụ ông 75 tuổi mở quán cà phê nhỏ, mỗi câu chuyện đều là nguồn cảm hứng cho mọi lứa tuổi.",
-    },
-    {
-      id: 2,
-      summary:
-        "Khám phá những hiện tượng kỳ lạ trong vật lý lượng tử qua góc nhìn khoa học phổ thông. Phim tài liệu giải thích các khái niệm phức tạp như định lý Bell, thí nghiệm khe đôi và sự rối lượng tử một cách dễ hiểu. Với sự tham gia của các nhà vật lý hàng đầu thế giới, bộ phim sử dụng hình ảnh đồ họa ấn tượng để minh họa những hiện tượng không thể quan sát bằng mắt thường. Từ những thí nghiệm đột phá của Einstein, Bohr đến những ứng dụng hiện đại như máy tính lượng tử, phim mở ra một thế giới đầy bí ẩn và khả năng vô hạn.",
-    },
-  ]);
+  const [mockResults, setMockResults] = useState([]);
 
   const styles = [
     {
@@ -103,17 +94,34 @@ const ScriptGenerator = () => {
 
   const sources = [];
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!topic.trim()) return;
 
     setLoading(true);
     // Simulate API call
-    const response = createShortScript({ prompt: topic });
-    console.log("Search response:", response);
-    setTimeout(() => {
-      setSearchResults(mockResults);
-      setLoading(false);
-    }, 1500);
+    const response1 = await createShortScript({
+      prompt: topic,
+      type: "SHORT_SCRIPT",
+    });
+
+    const response2 = await createShortScript({
+      prompt: topic,
+      type: "SHORT_SCRIPT",
+    });
+
+    setLoading(false);
+    const data = [
+      {
+        id: 1,
+        summary: response1 || "",
+      },
+      {
+        id: 2,
+        summary: response2 || "",
+      },
+    ];
+    setSearchResults(data);
+    setMockResults(data);
   };
 
   const handleSelectScript = (script) => {
@@ -182,18 +190,53 @@ const ScriptGenerator = () => {
     setEditingContent("");
   };
 
-  const handleGenerateFullScript = () => {
+  const handleGenerateFullScript = async () => {
     if (!selectedScript || !language || !style) return;
 
     setGenerating(true);
-
-    // Simulate API call for full script generation
-    setTimeout(() => {
-      setGenerating(false);
-      setShowFullScript(true);
-    }, 3000);
+    const response = await createLongScript({
+      type: "LONG_SCRIPT",
+      shortScript: selectedScript.summary,
+      writingStyle: style,
+      language: language,
+    });
+    setFullScript(response || "");
+    setGenerating(false);
+    setShowFullScript(true);
   };
+  const handleSaveInformation = () => {
+    if (!topic || searchResults.length === 0 || !language || !style) {
+      showToast("Vui lòng hoàn tất tất cả thông tin trước khi lưu!", "warning");
+      return;
+    }
 
+    setIsSaving(true);
+
+    const saveData = {
+      topic: topic,
+      scripts: searchResults.map((script) => ({
+        id: script.id,
+        summary: script.summary,
+      })),
+      selectedScript: selectedScript
+        ? {
+            id: selectedScript.id,
+            summary: selectedScript.summary,
+          }
+        : null,
+      language: language,
+      style: style,
+      fullScript: showFullScript ? fullScript : null,
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log("Thông tin được lưu:", saveData);
+
+    // Hiển thị thông báo thành công
+    showToast("Thông tin đã được lưu thành công!", "success");
+
+    setIsSaving(false);
+  };
   const handleFullScriptChange = (event) => {
     setFullScript(event.target.value);
   };
@@ -759,7 +802,51 @@ const ScriptGenerator = () => {
           </CardContent>
         </Card>
       )}
-
+      {searchResults.length > 0 && language && style && (
+        <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
+          <Button
+            variant="contained"
+            startIcon={
+              isSaving ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                <SaveIcon />
+              )
+            }
+            onClick={handleSaveInformation}
+            disabled={
+              isSaving ||
+              !topic ||
+              searchResults.length === 0 ||
+              !language ||
+              !style
+            }
+            sx={{
+              py: 1.5,
+              px: 4,
+              fontSize: "16px",
+              fontWeight: 600,
+              borderRadius: "12px",
+              background: "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
+              boxShadow: "0 6px 20px rgba(33, 150, 243, 0.3)",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                background: "linear-gradient(45deg, #1976D2 30%, #0288D1 90%)",
+                transform: "translateY(-2px)",
+                boxShadow: "0 8px 25px rgba(33, 150, 243, 0.4)",
+              },
+              "&:disabled": {
+                background: "#e0e0e0",
+                color: "#999",
+                transform: "none",
+                boxShadow: "none",
+              },
+            }}
+          >
+            {isSaving ? "Đang lưu..." : "Lưu thông tin"}
+          </Button>
+        </Box>
+      )}
       {/* Custom Script Input Dialog */}
       <Dialog
         open={showCustomInput}
