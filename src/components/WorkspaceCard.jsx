@@ -50,7 +50,7 @@ const WorkspaceCard = ({ workspace, onViewResources, onCreateNew }) => {
               flex: 1,
             }}
           >
-            {workspace.name}
+            {workspace.title}
           </Typography>
         </Box>
 

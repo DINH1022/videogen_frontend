@@ -9,3 +9,14 @@ export const createWorkspace = async (workspaceData) => {
     throw error;
   }
 };
+
+export const getWorkspaces = async () => {
+  try {
+    const response = await axiosInstance.get("/workspace");
+    console.log("Get workspaces response:", response);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching workspaces:", error);
+    throw error;
+  }
+};

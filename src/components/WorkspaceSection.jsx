@@ -1,43 +1,28 @@
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Box, Typography, Grid, Button } from "@mui/material";
 import WorkspaceCard from "./WorkspaceCard";
 import { useNavigate } from "react-router-dom";
 import CreateWorkspaceDialog from "./CreateWorkspaceDialog";
+import { getWorkspaces } from "../services/workspace";
 // Dữ liệu mẫu cho workspaces
-const sampleWorkspaces = [
-  {
-    id: 1,
-    name: "Dự án Nội dung Giáo dục",
-    description:
-      "Tạo video giáo dục về khoa học tự nhiên, bao gồm các chủ đề về động vật, thực vật và môi trường sống.",
-    dateCreate: "15 thg 4, 2025",
-  },
-  {
-    id: 2,
-    name: "Marketing Sản phẩm 2025",
-    description:
-      "Workspace dành cho việc tạo content marketing cho các sản phẩm mới trong năm 2025. Bao gồm video quảng cáo và content social media.",
-    dateCreate: "22 thg 4, 2025",
-  },
-  {
-    id: 3,
-    name: "Hướng dẫn Thực hành",
-    description:
-      "Tập hợp các video hướng dẫn và tutorial cho người dùng mới bắt đầu.",
-    dateCreate: "5 thg 5, 2025",
-  },
-  {
-    id: 4,
-    name: "Nội dung Giải trí",
-    description:
-      "Workspace cho các video giải trí, funny clips và nội dung nhẹ nhàng để thu hút audience.",
-    dateCreate: "10 thg 5, 2025",
-  },
-];
 
 const WorkspaceSection = () => {
   const navigate = useNavigate();
   const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
+  const [listWorkspaces, setListWorkspaces] = useState([]);
+  useEffect(() => {
+    const fetchWorkspaces = async () => {
+      try {
+        const response = await getWorkspaces();
+        console.log("Workspaces fetched:", response);
+        setListWorkspaces(response);
+      } catch (error) {
+        console.error("Error fetching workspaces:", error);
+        throw error;
+      }
+    };
+    fetchWorkspaces();
+  }, []);
   const handleViewResources = (workspace) => {
     console.log("Xem tài nguyên cho workspace:", workspace);
   };
@@ -99,7 +84,7 @@ const WorkspaceSection = () => {
 
       {/* Workspace Grid */}
       <Grid container spacing={3} sx={{ justifyContent: "flex-start" }}>
-        {sampleWorkspaces.map((workspace) => (
+        {listWorkspaces.map((workspace) => (
           <Grid
             item
             xs={12}
