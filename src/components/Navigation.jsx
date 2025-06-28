@@ -687,22 +687,35 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import CreateWorkspaceDialog from "./CreateWorkspaceDialog";
 
+/**
+ * Navigation component renders the main application navigation bar,
+ * including responsive AppBar, navigation buttons, user menu, and mobile drawer.
+ * Handles scroll-based opacity, navigation, and workspace creation dialog.
+ */
 const Navigation = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  // State for mobile drawer open/close
   const [mobileOpen, setMobileOpen] = useState(false);
+  // State for user menu anchor
   const [anchorElUser, setAnchorElUser] = useState(null);
+  // State for login status
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // State for scroll detection
   const [scrolled, setScrolled] = useState(false);
+  // State for AppBar opacity on scroll
   const [scrollOpacity, setScrollOpacity] = useState(1);
+  // State for create workspace dialog
   const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const rafId = useRef(null);
   const lastScrollY = useRef(0);
   const navigateRef = useRef(null);
+  // Check if current page is home
   const isHomePage = location.pathname === "/" || location.pathname === "/home";
 
+  // Handle scroll events for AppBar opacity and style
   useEffect(() => {
     const handleScroll = () => {
       if (rafId.current) {
@@ -733,7 +746,7 @@ const Navigation = () => {
         const scrollTop = window.scrollY;
         const maxScroll = 2000;
         const fadeStartPoint = 200;
-        const showAgainPoint = 7200; // Điểm hiển thị lại navigation
+        const showAgainPoint = 7200; // Show navigation again after this point
 
         const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4);
 
@@ -741,16 +754,16 @@ const Navigation = () => {
 
         if (isHomePage) {
           if (scrollTop <= fadeStartPoint) {
-            // Giai đoạn 1: Từ 0-200px, opacity = 1
+            // Stage 1: From 0-200px, opacity = 1
             setScrollOpacity(1);
           } else if (scrollTop >= maxScroll && scrollTop < showAgainPoint) {
-            // Giai đoạn 2: Từ 2000px-3000px, opacity = 0 (ẩn hoàn toàn)
+            // Stage 2: From 2000px-3000px, opacity = 0 (completely hidden)
             setScrollOpacity(0);
           } else if (scrollTop >= showAgainPoint) {
-            //  Giai đoạn 3: Từ 3000px trở lên, hiện lại với opacity = 1
+            // Stage 3: From 3000px onwards, show again with opacity = 1
             setScrollOpacity(1);
           } else {
-            // Giai đoạn fade: Từ 200px-2000px, opacity giảm dần
+            // Fade stage: From 200px-2000px, opacity decreases gradually
             const fadeDistance = maxScroll - fadeStartPoint;
             const currentFadeDistance = scrollTop - fadeStartPoint;
             const progress = currentFadeDistance / fadeDistance;
@@ -768,7 +781,7 @@ const Navigation = () => {
       });
     };
 
-    // Throttle scroll event để tăng performance
+    // Throttle scroll event for performance
     let ticking = false;
     const throttledHandleScroll = () => {
       if (!ticking) {
@@ -794,26 +807,32 @@ const Navigation = () => {
     };
   }, [isHomePage]);
 
+  // Toggle mobile drawer
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  // Open user menu
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
 
+  // Close user menu
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
 
+  // Navigate to login page
   const handleLogin = () => {
     navigate("/login");
   };
 
+  // Open create workspace dialog
   const handleCreateVideoClick = () => {
     setCreateWorkspaceOpen(true);
   };
 
+  // Navigation items for menu and drawer
   const navItems = [
     { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
     { text: "Thống kê", icon: <BarChartIcon />, path: "/statistics" },
@@ -824,6 +843,7 @@ const Navigation = () => {
     },
   ];
 
+  // Get AppBar background based on page
   const getAppBarBackground = () => {
     if (isHomePage) {
       return "transparent";
@@ -831,6 +851,7 @@ const Navigation = () => {
     return "white";
   };
 
+  // Drawer content for mobile navigation
   const drawer = (
     <Box
       sx={{
@@ -982,6 +1003,7 @@ const Navigation = () => {
 
   return (
     <>
+      {/* AppBar with navigation and actions */}
       <AppBar
         ref={navigateRef}
         position="fixed"
@@ -995,7 +1017,7 @@ const Navigation = () => {
           borderBottom: "none",
           color: "white",
           opacity: isHomePage ? scrollOpacity : 1,
-          transition: "all 0.3s ease", // ✅ Tăng thời gian transition để mượt hơn
+          transition: "all 0.3s ease", // Increase transition speed for smoother effect
           visibility: isHomePage && scrollOpacity === 0 ? "hidden" : "visible",
           willChange: isHomePage ? "opacity, visibility" : "auto",
         }}
