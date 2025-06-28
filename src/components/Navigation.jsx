@@ -84,7 +84,7 @@ const Navigation = () => {
         const scrollTop = window.scrollY;
         const maxScroll = 2000;
         const fadeStartPoint = 200;
-        const showAgainPoint = 7200; // Điểm hiển thị lại navigation
+        const showAgainPoint = 7200;
 
         const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4);
 

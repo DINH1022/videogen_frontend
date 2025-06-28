@@ -39,7 +39,7 @@ import {
 } from "@mui/icons-material";
 import LanguageSelect from "../components/LanguageSelect";
 import showToast from "../components/ShowToast";
-
+import { createShortScript } from "../services/script";
 const ScriptGenerator = () => {
   const [topic, setTopic] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -108,6 +108,8 @@ const ScriptGenerator = () => {
 
     setLoading(true);
     // Simulate API call
+    const response = createShortScript({ prompt: topic });
+    console.log("Search response:", response);
     setTimeout(() => {
       setSearchResults(mockResults);
       setLoading(false);

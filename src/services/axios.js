@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getAccessToken } from "../utils/localstorage";
 const backendUrl = "http://localhost:8080";
 const instance = axios.create({
   baseURL: backendUrl,
@@ -9,13 +10,25 @@ const instance = axios.create({
 });
 instance.interceptors.request.use(
   (config) => {
-    // You can modify the request config here if needed
+    const token = getAccessToken();
+
+    // Bỏ qua các URL không cần token
+    const publicEndpoints = ["/login", "/register"];
+
+    // Kiểm tra nếu URL không nằm trong danh sách public
+    const isPublic = publicEndpoints.some((endpoint) =>
+      config.url?.includes(endpoint)
+    );
+
+    if (!isPublic && token) {
+      console.log("Token found:", token);
+      console.log(1000);
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     return config;
   },
-  (error) => {
-    // Handle request error
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 instance.interceptors.response.use(

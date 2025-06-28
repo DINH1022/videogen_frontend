@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createWorkspace } from "../services/workspace";
+import { getAccessToken } from "../utils/localstorage";
 const CreateWorkspaceDialog = ({ open, setOpen }) => {
   const [workspaceName, setWorkspaceName] = useState("");
   const [workspaceNote, setWorkspaceNote] = useState("");
@@ -27,12 +29,32 @@ const CreateWorkspaceDialog = ({ open, setOpen }) => {
     setIsCreating(true);
 
     // Giả lập API call
-    setTimeout(() => {
-      const workspaceId = Math.random().toString(36).substr(2, 9);
-      setIsCreating(false);
-      handleCloseCreateWorkspace();
-      navigate(`/workspace/${workspaceId}`);
-    }, 2000);
+    // setTimeout(() => {
+    //   const workspaceId = Math.random().toString(36).substr(2, 9);
+    //   setIsCreating(false);
+    //   handleCloseCreateWorkspace();
+    //   navigate(`/workspace/${workspaceId}`);
+    // }, 2000);
+    // try {
+    //   const response = await fetch("http://localhost:8080/workspace", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: `Bearer ${getAccessToken()}`,
+    //     },
+    //     body: JSON.stringify({ title: "example", description: "example" }),
+    //     // …
+    //   });
+    //   console.log("tessst", response.body);
+    // } catch (error) {
+    //   throw error;
+    // }
+
+    const response = await createWorkspace({
+      title: workspaceName,
+      description: workspaceNote,
+    });
+    navigate(`/workspace/${response.id}`);
   };
 
   return (
