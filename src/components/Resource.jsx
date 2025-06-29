@@ -85,28 +85,28 @@ const Resource = ({ workspace }) => {
     const time = [
       {
         startTime: 0,
-        endTime: 5,
+        endTime: 8.668800000000001,
         imageIndex: 0,
       },
       {
-        startTime: 6,
-        endTime: 10,
+        startTime: 8.668800000000001,
+        endTime: 17.337600000000002,
         imageIndex: 1,
       },
       {
-        startTime: 11,
-        endTime: 15,
+        startTime: 17.337600000000002,
+        endTime: 26.006400000000003,
         imageIndex: 2,
       },
       {
-        startTime: 16,
-        endTime: 20,
-        imageIndex: 4,
+        startTime: 26.006400000000003,
+        endTime: 34.675200000000004,
+        imageIndex: 3,
       },
       {
-        startTime: 21,
-        endTime: 25,
-        imageIndex: 5,
+        startTime: 34.675200000000004,
+        endTime: 43.34400000000001,
+        imageIndex: 4,
       },
     ];
     navigate(`/workspace/${workspace.id}/editor`, {
