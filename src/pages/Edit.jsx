@@ -44,7 +44,7 @@ export default function CesdkMuiEditor() {
   const resourceList = location.state?.resourceList ?? [];
   const timing = location.state?.timing ?? [];
   const audioUrl = location.state?.audioUrl ?? null;
-  console.log("state: ??", location.state);
+
   console.log("Editor parameters:", {
     workspaceId,
     resourceCount: resourceList.length,
