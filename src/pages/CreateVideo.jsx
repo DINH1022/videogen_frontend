@@ -243,9 +243,7 @@ const CreateVideo = () => {
             mt: 10,
           }}
         >
-          <Resource />
-
-          {/* <Resource workspace_id={workspace_id} /> */}
+          <Resource workspace_id={workspace_id} />
         </Container>
       )}
     </Box>

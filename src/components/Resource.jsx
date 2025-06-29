@@ -22,6 +22,7 @@ import {
   Schedule,
   Image as ImageIcon,
 } from "@mui/icons-material";
+import { generateImages } from "../services/images";
 
 const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
   const navigate = useNavigate(); // Add this hook
@@ -29,44 +30,19 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
   const audioRef = useRef(null);
   const [images, setImages] = useState([]);
   const [audioUrl, setAudioUrl] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [audioDuration, setAudioDuration] = useState(0);
   const [imageTimings, setImageTimings] = useState([]);
+  const [isGeneratingResources, setIsGeneratingResources] = useState(false);
 
-  // Simulate API calls
+  // Initialize with mock audio URL only
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    // Only set the mock audio URL on component mount
+    const mockAudioUrl =
+      "https://res.cloudinary.com/dpystprxq/video/upload/v1749478605/ttsmaker-file-2025-6-9-21-15-49_pfhyut.mp3";
 
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Mock data - 5 sample images
-        const mockImages = [
-          "https://th.bing.com/th/id/OIP.y7t2x8MCNy1gBCGd7UAqkAHaEK?rs=1&pid=ImgDetMain",
-          "https://th.bing.com/th/id/OIP.W2cHfeMBthAIh26hFV_sswHaFj?w=1681&h=1261&rs=1&pid=ImgDetMain",
-          "https://th.bing.com/th/id/R.1b53fdf36f8bd376916821e3cce7528d?rik=5BBNceKgjdNNuw&pid=ImgRaw&r=0",
-          "https://th.bing.com/th/id/OIP.DRstJ2S75KhAniwDSRFh8AHaFj?w=1920&h=1440&rs=1&pid=ImgDetMain",
-          "https://th.bing.com/th/id/OIP.wpiMpWT8tPG7uu2cZW8xDwAAAA?w=474&h=315&rs=1&pid=ImgDetMain",
-        ];
-
-        // Mock audio URL
-        const mockAudioUrl =
-          "https://res.cloudinary.com/dpystprxq/video/upload/v1749478605/ttsmaker-file-2025-6-9-21-15-49_pfhyut.mp3";
-
-        setImages(mockImages);
-        setAudioUrl(mockAudioUrl);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    setAudioUrl(mockAudioUrl);
   }, [workspace_id]);
 
   // Calculate image timings based on actual audio duration
@@ -75,19 +51,35 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
       const duration = audioRef.current.duration;
       setAudioDuration(duration);
 
-      // Divide audio duration equally among images
-      const timePerImage = duration / images.length;
+      // Only calculate timings if we have images
+      if (images.length > 0) {
+        // Divide audio duration equally among images
+        const timePerImage = duration / images.length;
+        const timings = images.map((_, index) => ({
+          startTime: index * timePerImage,
+          endTime: (index + 1) * timePerImage,
+          imageIndex: index,
+        }));
+
+        setImageTimings(timings);
+        console.log("Audio duration:", duration);
+        console.log("Image timings:", timings);
+      }
+    }
+  };
+
+  // Recalculate timings when images change
+  useEffect(() => {
+    if (audioDuration > 0 && images.length > 0) {
+      const timePerImage = audioDuration / images.length;
       const timings = images.map((_, index) => ({
         startTime: index * timePerImage,
         endTime: (index + 1) * timePerImage,
         imageIndex: index,
       }));
-
       setImageTimings(timings);
-      console.log("Audio duration:", duration);
-      console.log("Image timings:", timings);
     }
-  };
+  }, [images, audioDuration]);
 
   const handleNavigateBack = () => {
     console.log("Navigate back to homepage");
@@ -105,8 +97,39 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
     });
   };
 
-  const handleGenerateResource = () => {
-    console.log("Generate additional resources");
+  const handleGenerateResource = async () => {
+    try {
+      setIsGeneratingResources(true);
+      setError(null);
+
+      console.log("Generating resources...");
+
+      // Call the API to generate images
+      const response = await generateImages(
+        "Lionel Messi, with a flick of his left foot, sent the ball soaring into the top corner, silencing the roaring stadium and clinching the World Cup for Argentina. Tears streamed down his face as he finally held the trophy, a testament to years of dedication and unparalleled skill. His legacy as the greatest footballer of all time was now undeniably etched in history."
+      );
+
+      // Fallback to mock images if API fails or returns empty
+      const mockImages = [
+        "https://th.bing.com/th/id/OIP.y7t2x8MCNy1gBCGd7UAqkAHaEK?rs=1&pid=ImgDetMain",
+        "https://th.bing.com/th/id/OIP.W2cHfeMBthAIh26hFV_sswHaFj?w=1681&h=1261&rs=1&pid=ImgDetMain",
+        "https://th.bing.com/th/id/R.1b53fdf36f8bd376916821e3cce7528d?rik=5BBNceKgjdNNuw&pid=ImgRaw&r=0",
+        "https://th.bing.com/th/id/OIP.DRstJ2S75KhAniwDSRFh8AHaFj?w=1920&h=1440&rs=1&pid=ImgDetMain",
+        "https://th.bing.com/th/id/OIP.wpiMpWT8tPG7uu2cZW8xDwAAAA?w=474&h=315&rs=1&pid=ImgDetMain",
+      ];
+
+      // Use API response if available, otherwise use mock images
+      const generatedImages =
+        response && response.length > 0 ? response : mockImages;
+      setImages(generatedImages);
+
+      console.log("Resources generated successfully!");
+    } catch (err) {
+      setError(err.message);
+      console.error("Error generating resources:", err);
+    } finally {
+      setIsGeneratingResources(false);
+    }
   };
 
   if (loading) {
@@ -195,9 +218,14 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
                 variant="contained"
                 startIcon={<PlayCircle />}
                 onClick={handleGenerateVideo}
+                disabled={images.length === 0}
                 sx={{
                   bgcolor: "#2563eb",
                   "&:hover": { bgcolor: "#1d4ed8" },
+                  "&:disabled": {
+                    bgcolor: "#9ca3af",
+                    color: "#ffffff",
+                  },
                   display: "flex",
                   alignItems: "center",
                   gap: 1,
@@ -239,21 +267,53 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
               }}
             >
               <Typography variant="body2" color="text.secondary">
-                Xem các hình ảnh được chia theo timeline của audio
+                {images.length > 0
+                  ? "Xem các hình ảnh được chia theo timeline của audio"
+                  : "Chưa có tài nguyên nào. Nhấn 'Generate resource' để tạo hình ảnh"}
               </Typography>
               <Button
                 variant="outlined"
                 startIcon={<Description />}
                 onClick={handleGenerateResource}
-                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                disabled={isGeneratingResources}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  "&:disabled": {
+                    opacity: 0.6,
+                  },
+                }}
               >
-                Generate resource
+                {isGeneratingResources ? (
+                  <>
+                    <CircularProgress size={16} sx={{ mr: 1 }} />
+                    Generating...
+                  </>
+                ) : (
+                  "Generate resource"
+                )}
               </Button>
             </Box>
           }
         />
         <CardContent sx={{ p: 2 }}>
-          {images.length > 0 ? (
+          {isGeneratingResources ? (
+            <Box
+              sx={{
+                textAlign: "center",
+                py: 12,
+              }}
+            >
+              <CircularProgress size={48} sx={{ color: "#7c3aed", mb: 2 }} />
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Đang tạo tài nguyên...
+              </Typography>
+              <Typography color="text.secondary">
+                Vui lòng đợi trong giây lát
+              </Typography>
+            </Box>
+          ) : images.length > 0 ? (
             <Box sx={{ width: "100%" }}>
               {images.map((imageUrl, index) => {
                 const timing = imageTimings[index];
@@ -462,8 +522,22 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
                 Không tìm thấy tài nguyên
               </Typography>
               <Typography color="text.secondary" sx={{ mb: 3 }}>
-                Hãy tạo tài nguyên để bắt đầu
+                Hãy nhấn "Generate resource" để tạo hình ảnh cho video
               </Typography>
+              <Button
+                variant="contained"
+                startIcon={<Description />}
+                onClick={handleGenerateResource}
+                disabled={isGeneratingResources}
+                sx={{
+                  bgcolor: "#7c3aed",
+                  "&:hover": { bgcolor: "#6d28d9" },
+                  mb: 2,
+                }}
+              >
+                {isGeneratingResources ? "Generating..." : "Generate resource"}
+              </Button>
+              <br />
               <Button
                 variant="outlined"
                 startIcon={<ArrowBack />}
@@ -477,7 +551,7 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
       </Card>
 
       {/* Debug Info */}
-      {audioDuration > 0 && (
+      {audioDuration > 0 && images.length > 0 && (
         <Box sx={{ mt: 2, p: 2, bgcolor: "#f3f4f6", borderRadius: 1 }}>
           <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
             Debug: Audio Duration = {audioDuration.toFixed(2)}s | Images ={" "}
