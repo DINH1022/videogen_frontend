@@ -82,10 +82,37 @@ const Resource = ({ workspace }) => {
   };
 
   const handleGenerateVideo = () => {
+    const time = [
+      {
+        startTime: 0,
+        endTime: 5,
+        imageIndex: 0,
+      },
+      {
+        startTime: 6,
+        endTime: 10,
+        imageIndex: 1,
+      },
+      {
+        startTime: 11,
+        endTime: 15,
+        imageIndex: 2,
+      },
+      {
+        startTime: 16,
+        endTime: 20,
+        imageIndex: 4,
+      },
+      {
+        startTime: 21,
+        endTime: 25,
+        imageIndex: 5,
+      },
+    ];
     navigate(`/workspace/${workspace.id}/editor`, {
       state: {
         resourceList: images,
-        timing: imageTimings,
+        timing: time,
         audioUrl: audioUrl,
         workspaceId: workspace.id,
       },
@@ -102,17 +129,22 @@ const Resource = ({ workspace }) => {
     setLoading(false);
     if (images && images.length > 0) {
       setImages(images);
-      setImageTimings(
-        images.map((_, index) => ({
-          startTime: (index * audioDuration) / images.length,
-          endTime: ((index + 1) * audioDuration) / images.length,
-          imageIndex: index,
-        }))
-      );
-      console.log("Generated images:", images);
     }
   };
-
+  useEffect(() => {
+    if (audioRef.current && images.length > 0) {
+      const duration = audioRef.current.duration;
+      if (duration > 0) {
+        setAudioDuration(duration);
+        const timings = images.map((_, index) => ({
+          startTime: (index * duration) / images.length,
+          endTime: ((index + 1) * duration) / images.length,
+          imageIndex: index,
+        }));
+        setImageTimings(timings);
+      }
+    }
+  }, [images, audioUrl]);
   if (loading) {
     return (
       <Container
