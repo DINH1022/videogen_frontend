@@ -3,7 +3,7 @@ import { getAccessToken } from "../utils/localstorage";
 const backendUrl = "http://localhost:8080";
 const instance = axios.create({
   baseURL: backendUrl,
-  timeout: 20000,
+  timeout: 90000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -21,8 +21,6 @@ instance.interceptors.request.use(
     );
 
     if (!isPublic && token) {
-      console.log("Token found:", token);
-      console.log(1000);
       config.headers.Authorization = `Bearer ${token}`;
     }
 

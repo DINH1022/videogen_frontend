@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
@@ -19,6 +19,7 @@ import Resource from "../components/Resource";
 import ScriptGenerator from "../components/ScriptGenerator";
 import VoiceGenerator from "../components/VoiceGenerator";
 import Navigation from "../components/Navigation";
+import { getWorkspaceById } from "../services/workspace";
 // Styled components for gradient background
 const GradientCard = styled(Card)(({ theme }) => ({
   background: "linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%)",
@@ -36,10 +37,21 @@ const CreateVideo = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState("content");
   const { id: workspace_id } = useParams();
-
+  console.log("Workspace ID:", workspace_id);
+  const [workspace, setWorkspace] = useState(null);
   const scriptRef = useRef(null);
   const voiceRef = useRef(null);
-
+  useEffect(() => {
+    const fetchWorkspace = async () => {
+      try {
+        const response = await getWorkspaceById(workspace_id);
+        setWorkspace(response);
+      } catch (error) {
+        console.error("Error fetching workspace:", error);
+      }
+    };
+    fetchWorkspace();
+  }, [workspace_id]);
   const scrollToSection = (ref) => {
     if (ref.current) {
       ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -243,9 +255,7 @@ const CreateVideo = () => {
             mt: 10,
           }}
         >
-          <Resource />
-
-          {/* <Resource workspace_id={workspace_id} /> */}
+          <Resource workspace={workspace} />
         </Container>
       )}
     </Box>

@@ -20,3 +20,14 @@ export const getWorkspaces = async () => {
     throw error;
   }
 };
+
+export const getWorkspaceById = async (workspaceId) => {
+  try {
+    const response = await axiosInstance.get(`/workspace/${workspaceId}`);
+    console.log("Get workspace by ID response:", response);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching workspace by ID:", error);
+    throw error;
+  }
+};

@@ -22,91 +22,95 @@ import {
   Schedule,
   Image as ImageIcon,
 } from "@mui/icons-material";
-
-const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
-  const navigate = useNavigate(); // Add this hook
+import { getWorkspaceById } from "../services/workspace";
+import { generateImages } from "../services/images"; // Import your image generation service
+const Resource = ({ workspace }) => {
+  const navigate = useNavigate();
 
   const audioRef = useRef(null);
-  const [images, setImages] = useState([]);
-  const [audioUrl, setAudioUrl] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [images, setImages] = useState(workspace?.imageSet || []);
+  const [audioUrl, setAudioUrl] = useState(
+    workspace?.audioUrl ||
+      "https://res.cloudinary.com/dpystprxq/video/upload/v1749478605/ttsmaker-file-2025-6-9-21-15-49_pfhyut.mp3"
+  );
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [audioDuration, setAudioDuration] = useState(0);
   const [imageTimings, setImageTimings] = useState([]);
 
   // Simulate API calls
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       setError(null);
+  //       const workspace = await getWorkspaceById(workspace_id);
+  //       setImages(workspace.imageSet || []);
+  //       setAudioUrl(workspace.audioUrl || "");
+  //     } catch (err) {
+  //       setError(err.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Mock data - 5 sample images
-        const mockImages = [
-          "https://th.bing.com/th/id/OIP.y7t2x8MCNy1gBCGd7UAqkAHaEK?rs=1&pid=ImgDetMain",
-          "https://th.bing.com/th/id/OIP.W2cHfeMBthAIh26hFV_sswHaFj?w=1681&h=1261&rs=1&pid=ImgDetMain",
-          "https://th.bing.com/th/id/R.1b53fdf36f8bd376916821e3cce7528d?rik=5BBNceKgjdNNuw&pid=ImgRaw&r=0",
-          "https://th.bing.com/th/id/OIP.DRstJ2S75KhAniwDSRFh8AHaFj?w=1920&h=1440&rs=1&pid=ImgDetMain",
-          "https://th.bing.com/th/id/OIP.wpiMpWT8tPG7uu2cZW8xDwAAAA?w=474&h=315&rs=1&pid=ImgDetMain",
-        ];
-
-        // Mock audio URL
-        const mockAudioUrl =
-          "https://res.cloudinary.com/dpystprxq/video/upload/v1749478605/ttsmaker-file-2025-6-9-21-15-49_pfhyut.mp3";
-
-        setImages(mockImages);
-        setAudioUrl(mockAudioUrl);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [workspace_id]);
+  //   fetchData();
+  // }, [workspace_id]);
 
   // Calculate image timings based on actual audio duration
-  const handleAudioLoadedMetadata = () => {
-    if (audioRef.current) {
-      const duration = audioRef.current.duration;
-      setAudioDuration(duration);
+  // const handleAudioLoadedMetadata = () => {
+  //   if (audioRef.current) {
+  //     const duration = audioRef.current.duration;
+  //     setAudioDuration(duration);
 
-      // Divide audio duration equally among images
-      const timePerImage = duration / images.length;
-      const timings = images.map((_, index) => ({
-        startTime: index * timePerImage,
-        endTime: (index + 1) * timePerImage,
-        imageIndex: index,
-      }));
+  //     // Divide audio duration equally among images
+  //     const timePerImage = duration / images.length;
+  //     const timings = images.map((_, index) => ({
+  //       startTime: index * timePerImage,
+  //       endTime: (index + 1) * timePerImage,
+  //       imageIndex: index,
+  //     }));
 
-      setImageTimings(timings);
-      console.log("Audio duration:", duration);
-      console.log("Image timings:", timings);
-    }
-  };
+  //     setImageTimings(timings);
+  //     console.log("Audio duration:", duration);
+  //     console.log("Image timings:", timings);
+  //   }
+  // };
 
   const handleNavigateBack = () => {
     console.log("Navigate back to homepage");
   };
 
   const handleGenerateVideo = () => {
-    // Navigate to editor with state similar to your example
-    navigate(`/workspace/${workspace_id}/editor`, {
+    navigate(`/workspace/${workspace.id}/editor`, {
       state: {
-        resourceList: images, // Pass the images array as resourceList
-        timing: imageTimings, // Pass the calculated timings
-        audioUrl: audioUrl, // Pass the audio URL
-        workspaceId: workspace_id, // Pass the workspace ID
+        resourceList: images,
+        timing: imageTimings,
+        audioUrl: audioUrl,
+        workspaceId: workspace.id,
       },
     });
   };
 
-  const handleGenerateResource = () => {
-    console.log("Generate additional resources");
+  const handleGenerateResource = async () => {
+    // const images = await generateImages(workspace.script);
+    const temp = {
+      text: "Cristiano Ronaldo, cái tên vang danh bóng đá, một lần nữa thách thức giới hạn thể chất, ghi ba bàn thắng ngoạn mục dù nhiều người nghi ngờ. Những lời xì xào về sự sa sút phong độ nhanh chóng bị dập tắt bởi những cú sút uy lực, chứng minh tuổi tác chỉ là con số khi ngọn lửa đam mê bùng cháy. Huyền thoại sống này đã khẳng định vị thế bất diệt trong lòng người hâm mộ, không bằng lời nói, mà bằng phép thuật diệu kỳ trên sân cỏ. Màn trình diễn đẳng cấp ấy đã xoá tan mọi hoài nghi, chỉ còn lại sự ngưỡng mộ và thán phục. Giấc mơ vô địch vẫn cháy bỏng trong tim CR7, sẵn sàng chinh phục những đỉnh cao mới.",
+    };
+    setLoading(true);
+    const images = await generateImages(workspace.script || temp); // Replace with actual script data
+    setLoading(false);
+    if (images && images.length > 0) {
+      setImages(images);
+      setImageTimings(
+        images.map((_, index) => ({
+          startTime: (index * audioDuration) / images.length,
+          endTime: ((index + 1) * audioDuration) / images.length,
+          imageIndex: index,
+        }))
+      );
+      console.log("Generated images:", images);
+    }
   };
 
   if (loading) {
@@ -215,7 +219,7 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
               ref={audioRef}
               controls
               style={{ width: "100%" }}
-              onLoadedMetadata={handleAudioLoadedMetadata}
+              // onLoadedMetadata={handleAudioLoadedMetadata}
             >
               <source src={audioUrl} type="audio/mpeg" />
               Your browser does not support the audio tag.
