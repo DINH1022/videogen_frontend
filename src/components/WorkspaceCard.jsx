@@ -9,6 +9,16 @@ import {
 } from "@mui/material";
 import { Folder, Add } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+
+/**
+ * WorkspaceCard component displays a workspace as a card with name, description, and creation date.
+ * Clicking the card navigates to the workspace detail page.
+ *
+ * Props:
+ * - workspace: (object) Workspace data (id, name, description, dateCreate)
+ * - onViewResources: (function) Optional callback to view resources
+ * - onCreateNew: (function) Optional callback to create a new workspace
+ */
 const WorkspaceCard = ({ workspace, onViewResources, onCreateNew }) => {
   const navigate = useNavigate();
   return (
