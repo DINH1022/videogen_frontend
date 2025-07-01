@@ -29,6 +29,12 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
+/**
+ * VideoShareDialog component provides a dialog UI for previewing a video and preparing content
+ * for sharing to multiple platforms (YouTube, TikTok, Facebook). It allows editing titles/descriptions,
+ * auto-generating captions, and quick sharing. Includes a nested AutoCaptionDialog for AI-generated captions.
+ */
+
 // TikTok icon component
 const TikTokIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -36,15 +42,21 @@ const TikTokIcon = () => (
   </svg>
 );
 
+/**
+ * AutoCaptionDialog handles AI caption generation for video sharing.
+ * @param {boolean} open - Whether the dialog is open
+ * @param {function} onClose - Callback when dialog is closed or caption is confirmed
+ */
 const AutoCaptionDialog = ({ open, onClose }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCaption, setGeneratedCaption] = useState(null);
 
+  // Simulate API call to generate caption
   const handleGenerateCaption = () => {
     setIsGenerating(true);
     setGeneratedCaption(null);
 
-    // Giả lập API call với setTimeout
+    // Simulate a API call with a timeout
     setTimeout(() => {
       setGeneratedCaption({
         title: "NÚI LỬA: SỰ HÌNH THÀNH, HOẠT ĐỘNG VÀ ẢNH HƯỞNG ĐẾN TRÁI ĐẤT",
@@ -55,6 +67,7 @@ const AutoCaptionDialog = ({ open, onClose }) => {
     }, 3000);
   };
 
+  // Confirm and return generated caption
   const handleConfirm = () => {
     onClose(generatedCaption);
   };
@@ -180,6 +193,12 @@ const AutoCaptionDialog = ({ open, onClose }) => {
   );
 };
 
+/**
+ * VideoShareDialog main component for sharing and previewing video.
+ * @param {boolean} open - Whether the dialog is open
+ * @param {function} onClose - Callback when dialog is closed
+ * @param {string} videoSrc - Video source URL for preview
+ */
 const VideoShareDialog = ({
   open,
   onClose,
@@ -198,10 +217,12 @@ const VideoShareDialog = ({
     },
   });
 
+  // Handle tab change for platform selection
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
+  // Handle caption generated from AutoCaptionDialog
   const handleCaptionGenerated = (caption) => {
     setCaptionDialogOpen(false);
     if (caption) {
@@ -213,6 +234,7 @@ const VideoShareDialog = ({
     }
   };
 
+  // Handle input changes for each platform's title/description
   const handleInputChange = (platform, field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -223,6 +245,7 @@ const VideoShareDialog = ({
     }));
   };
 
+  // TabPanel helper for rendering tab content
   const TabPanel = ({ children, value, index }) => (
     <div hidden={value !== index}>
       {value === index && <Box>{children}</Box>}
