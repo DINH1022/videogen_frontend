@@ -2,13 +2,23 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Container, Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
+/**
+ * ScrollingGradientComponent (NightSkyScroll) displays a multi-section scrollable page
+ * with a dynamic background gradient that darkens as the user scrolls, and animated stars
+ * that appear and move with parallax effect. The final section features a glowing title,
+ * subtitle, and a call-to-action button, all animated based on scroll progress.
+ *
+ * - Star: Renders a single star with custom style.
+ * - StarField: Renders multiple stars with parallax and twinkle animation.
+ * - NightSkyScroll: Main component handling scroll, background, and content sections.
+ */
 const theme = createTheme({
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
   },
 });
 
-// Component tạo sao
+// Component for rendering a single star
 const Star = ({ style }) => (
   <div
     style={{
@@ -22,16 +32,15 @@ const Star = ({ style }) => (
   />
 );
 
-// Component tạo nhiều sao
+// Component for rendering multiple stars with parallax and twinkle
 const StarField = ({ scrollProgress, opacity, scrollY }) => {
   const stars = [];
   for (let i = 0; i < 80; i++) {
     const delay = Math.random() * 3;
     const duration = 2 + Math.random() * 3;
     const size = Math.random() * 3 + 1;
-
-    // Tạo tốc độ di chuyển khác nhau cho từng lớp sao để có hiệu ứng parallax
-    const parallaxSpeed = 0.2 + Math.random() * 0.1; // Từ 0.2 đến 1.0
+    // Parallax speed for each star
+    const parallaxSpeed = 0.2 + Math.random() * 0.1; // From 0.2 to 0.3
 
     stars.push(
       <Star
@@ -43,9 +52,9 @@ const StarField = ({ scrollProgress, opacity, scrollY }) => {
           height: `${size}px`,
           opacity: opacity * (0.4 + Math.random() * 0.6),
           animation: `twinkle ${duration}s infinite ${delay}s`,
-          // Di chuyển sao theo tốc độ scroll thực tế với hiệu ứng parallax
+          // Parallax movement based on scroll
           transform: `translateY(${scrollY * parallaxSpeed * 0.5}px)`,
-          transition: "transform 0.1s linear", // Smooth và đồng bộ với scroll
+          transition: "transform 0.1s linear", // Smooth transition for parallax
         }}
       />
     );
@@ -54,9 +63,12 @@ const StarField = ({ scrollProgress, opacity, scrollY }) => {
 };
 
 export default function NightSkyScroll() {
+  // Track scroll progress (0 to 1)
   const [scrollProgress, setScrollProgress] = useState(0);
+  // Track vertical scroll position
   const [scrollY, setScrollY] = useState(0);
 
+  // Update scroll progress and Y position on scroll
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.pageYOffset;
@@ -72,11 +84,11 @@ export default function NightSkyScroll() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Tạo background gradient mượt mà từ trắng sang đen
+  // Compute background gradient based on scroll progress
   const getBackgroundGradient = () => {
     const darknessProgress = Math.pow(scrollProgress, 1.5);
 
-    // Tính toán các giá trị RGB
+    // Calculate RGB values for gradient
     const r = Math.floor(255 * (1 - darknessProgress));
     const g = Math.floor(255 * (1 - darknessProgress));
     const b = Math.floor(255 * (1 - darknessProgress * 0.8));
@@ -107,7 +119,7 @@ export default function NightSkyScroll() {
           overflow: "hidden",
         }}
       >
-        {/* CSS Animation cho sao */}
+        {/* CSS Animation for stars and text */}
         <style>
           {`
             @keyframes twinkle {
@@ -142,7 +154,7 @@ export default function NightSkyScroll() {
           `}
         </style>
 
-        {/* Star Field - xuất hiện từ từ và di chuyển theo scroll */}
+        {/* Star Field appears as user scrolls down */}
         {scrollProgress > 0.2 && (
           <Box
             sx={{
@@ -164,34 +176,16 @@ export default function NightSkyScroll() {
           </Box>
         )}
 
-        {/* Nội dung scroll */}
+        {/* Main scrollable content sections */}
         <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
-          {/* Section 1: Trắng */}
-          <Box
-            sx={{
-              height: "100vh",
-            }}
-          ></Box>
-
-          {/* Section 2: Chuyển tiếp */}
-          <Box
-            sx={{
-              height: "100vh",
-            }}
-          ></Box>
-
-          {/* Section 3: Bầu trời đêm */}
-          <Box
-            sx={{
-              height: "100vh",
-            }}
-          ></Box>
-          <Box
-            sx={{
-              height: "100vh",
-            }}
-          ></Box>
-          {/* Section 4: Kết thúc đẹp */}
+          {/* Section 1: White */}
+          <Box sx={{ height: "100vh" }}></Box>
+          {/* Section 2: Transition */}
+          <Box sx={{ height: "100vh" }}></Box>
+          {/* Section 3: Night sky */}
+          <Box sx={{ height: "100vh" }}></Box>
+          <Box sx={{ height: "100vh" }}></Box>
+          {/* Section 4: Ending with call-to-action */}
           <Box
             sx={{
               height: "100vh",
@@ -297,7 +291,7 @@ export default function NightSkyScroll() {
               </Button>
             </Box>
 
-            {/* Decorative elements */}
+            {/* Decorative footer text */}
             <Box
               sx={{
                 position: "absolute",
