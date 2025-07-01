@@ -37,6 +37,11 @@ import {
   SmartToy,
 } from "@mui/icons-material";
 
+/**
+ * VoiceGenerator component provides a UI for generating AI voices or uploading custom voice files.
+ * Users can select provider, voice, adjust speed/pitch/intensity, generate audio, or upload their own.
+ * Includes preview, upload progress, and error handling.
+ */
 const voiceProviders = [
   {
     id: "edge_tts",
@@ -53,6 +58,7 @@ const voiceProviders = [
   },
 ];
 
+// TabPanel: Renders content for each tab
 function TabPanel({ children, value, index, ...other }) {
   return (
     <div
@@ -72,29 +78,37 @@ function TabPanel({ children, value, index, ...other }) {
 }
 
 export default function VoiceGenerator({}) {
+  // State for provider, voice, and audio settings
   const [provider, setProvider] = useState("gtts");
   const [voice, setVoice] = useState("default");
   const [speed, setSpeed] = useState(1);
   const [pitch, setPitch] = useState(1);
   const [intensity, setIntensity] = useState(0.5);
   const [activeTab, setActiveTab] = useState(0);
+
+  // State for AI audio generation
   const [showAudioPreview, setShowAudioPreview] = useState(false);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const [audioUrl, setAudioUrl] = useState(null);
+
+  // State for file upload
   const [selectedVoiceFile, setSelectedVoiceFile] = useState(null);
   const [isUploadingVoice, setIsUploadingVoice] = useState(false);
   const [uploadVoiceError, setUploadVoiceError] = useState(null);
   const [uploadedVoiceUrl, setUploadedVoiceUrl] = useState(null);
   const [audioTimestamp, setAudioTimestamp] = useState(Date.now());
+
+  // State for loading and error
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
 
+  // Refs
   const fileInputRef = useRef(null);
   const scriptId = "demo-script-id";
-
   const selectedProvider = voiceProviders.find((p) => p.id === provider);
 
+  // Fetch audio data on mount (mock)
   useEffect(() => {
     const fetchAudioData = async () => {
       try {
@@ -123,6 +137,9 @@ export default function VoiceGenerator({}) {
     fetchAudioData();
   }, []);
 
+  /**
+   * Handle AI audio creation based on selected settings.
+   */
   const handleCreateAudio = async () => {
     if (!scriptId) {
       alert("Vui lòng tạo kịch bản trước khi tạo âm thanh.");
@@ -158,6 +175,9 @@ export default function VoiceGenerator({}) {
     }
   };
 
+  /**
+   * Handle file selection for custom voice upload.
+   */
   const handleVoiceFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -172,6 +192,9 @@ export default function VoiceGenerator({}) {
     }
   };
 
+  /**
+   * Remove the selected voice file from state and reset input.
+   */
   const removeSelectedVoiceFile = () => {
     setSelectedVoiceFile(null);
     setUploadProgress(0);
@@ -180,6 +203,9 @@ export default function VoiceGenerator({}) {
     }
   };
 
+  /**
+   * Handle uploading the selected voice file (mocked).
+   */
   const handleUploadVoiceFile = async () => {
     if (!selectedVoiceFile) {
       alert("Vui lòng chọn tệp âm thanh và tạo kịch bản trước");
@@ -226,10 +252,12 @@ export default function VoiceGenerator({}) {
     }
   };
 
+  // Handle tab change between AI and upload
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
+  // CustomSlider: Renders a labeled slider for audio settings
   const CustomSlider = ({
     label,
     value,
