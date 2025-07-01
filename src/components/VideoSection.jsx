@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { Box, Typography, Tabs, Tab, Grid, Chip, Stack } from "@mui/material";
 import VideoCard from "./VideoCard";
 import VideoShareDialog from "./ShareDialog";
-// Dữ liệu mẫu với video đang xử lý
+
+/**
+ * VideoSection component displays a tabbed interface for browsing videos.
+ * Users can filter videos by all, completed, processing, or published status.
+ * Shows a responsive grid of VideoCard components and an empty state if no videos match.
+ */
 const sampleVideos = [
   {
     id: 1,
@@ -90,10 +95,12 @@ const sampleVideos = [
 const VideoSection = () => {
   const [activeTab, setActiveTab] = useState(0);
 
+  // Handle tab change
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
+  // Get filtered videos based on active tab
   const getFilteredVideos = () => {
     switch (activeTab) {
       case 0:
@@ -200,7 +207,7 @@ const VideoSection = () => {
         ))}
       </Grid>
 
-      {/* Empty state cho videos */}
+      {/* Empty state for videos */}
       {getFilteredVideos().length === 0 && (
         <Box
           sx={{
