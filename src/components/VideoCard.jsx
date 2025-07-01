@@ -23,10 +23,21 @@ import {
   LinkOutlined,
 } from "@mui/icons-material";
 import VideoShareDialog from "./ShareDialog";
-// Component Video Card
+
+/**
+ * VideoCard component displays a video card with thumbnail, status, and actions.
+ * Shows platform chips, share/download buttons, processing overlay, and video info.
+ *
+ * Props:
+ * - video: (object) Video data (thumbnail, topic, state, published, etc.)
+ * - isPublishedTab: (boolean) Whether the card is in the published tab
+ */
+
 const VideoCard = ({ video, isPublishedTab }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [openDialogShare, setOpenDialogShare] = useState(false);
+
+  // Get platform chip config (label, icon, color) by platform name
   const getPlatformChip = (platform) => {
     const configs = {
       facebook: {
@@ -47,9 +58,12 @@ const VideoCard = ({ video, isPublishedTab }) => {
     };
     return configs[platform];
   };
+
+  // Handle share button click
   const handleShareButton = () => {
     return setOpenDialogShare(true);
   };
+
   return (
     <Card
       sx={{
@@ -81,6 +95,7 @@ const VideoCard = ({ video, isPublishedTab }) => {
           }}
         />
 
+        {/* Show platform chips if published, else show share button */}
         {isPublishedTab && video.published.length > 0 ? (
           <Box sx={{ position: "absolute", top: 12, right: 12 }}>
             {video.published.map((platform) => {
@@ -132,7 +147,7 @@ const VideoCard = ({ video, isPublishedTab }) => {
           </IconButton>
         )}
 
-        {/* Processing overlay - Cleaner design */}
+        {/* Processing overlay */}
         {video.state === "processing" && (
           <Box
             sx={{
@@ -246,6 +261,7 @@ const VideoCard = ({ video, isPublishedTab }) => {
             </Typography>
           </Stack>
 
+          {/* Show status chip or views */}
           {!isPublishedTab && (
             <Chip
               label={video.state === "processing" ? "Đang xử lý" : "Hoàn thành"}
@@ -279,7 +295,7 @@ const VideoCard = ({ video, isPublishedTab }) => {
           )}
         </Stack>
 
-        {/* Action Button - Clean design */}
+        {/* Action Button */}
         {video.state === "processing" ? (
           <Typography
             variant="caption"
@@ -333,6 +349,7 @@ const VideoCard = ({ video, isPublishedTab }) => {
           </Button>
         )}
       </CardContent>
+      {/* Share dialog for sharing video */}
       <VideoShareDialog
         open={openDialogShare}
         onClose={() => setOpenDialogShare(false)}
