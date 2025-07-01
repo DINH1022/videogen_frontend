@@ -1,11 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import LoadingDemo from "./Loading.jsx";
 
+/**
+ * SmoothScrollSequence component displays a scroll-driven image sequence animation,
+ * transitioning to a video overlay as the user scrolls. Includes a sticky image sequence,
+ * animated text overlay, developer credits, and a video that fades in and plays on demand.
+ *
+ * - Preloads and displays a sequence of images as the user scrolls.
+ * - Fades in a video overlay at a certain scroll position, with play/pause controls.
+ * - Shows animated text and developer credits at the top of the sequence.
+ */
+
 const SmoothScrollSequence = ({
   className = "",
   style = {},
   containerStyle = {},
 }) => {
+  // Refs for DOM elements and state variables
   const sequenceImageRef = useRef(null);
   const progressFillRef = useRef(null);
   const videoOverlayRef = useRef(null);
@@ -18,7 +29,7 @@ const SmoothScrollSequence = ({
   const [showPlayButton, setShowPlayButton] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false);
 
-  // Cache và state variables
+  // Cache and state refs for performance
   const imageCacheRef = useRef(new Map());
   const currentImageIndexRef = useRef(0);
   const isUpdatingRef = useRef(false);
