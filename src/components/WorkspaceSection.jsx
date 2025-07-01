@@ -3,7 +3,12 @@ import { Box, Typography, Grid, Button } from "@mui/material";
 import WorkspaceCard from "./WorkspaceCard";
 import { useNavigate } from "react-router-dom";
 import CreateWorkspaceDialog from "./CreateWorkspaceDialog";
-// Dữ liệu mẫu cho workspaces
+
+/**
+ * WorkspaceSection component displays a grid of workspace cards and actions.
+ * Users can view all workspaces, open resources, or create a new workspace.
+ * Includes a dialog for creating new workspaces and navigation to resource management.
+ */
 const sampleWorkspaces = [
   {
     id: 1,
@@ -38,10 +43,13 @@ const sampleWorkspaces = [
 const WorkspaceSection = () => {
   const navigate = useNavigate();
   const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
+
+  // Handle viewing resources for a workspace
   const handleViewResources = (workspace) => {
     console.log("Xem tài nguyên cho workspace:", workspace);
   };
 
+  // Handle creating a new workspace
   const handleCreateNewWorkspace = () => {
     console.log("Tạo workspace mới");
   };
