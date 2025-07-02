@@ -38,6 +38,7 @@ import {
 } from "@mui/icons-material";
 import { uploadAudio } from "../services/audio";
 import { getAccessToken } from "../utils/localstorage";
+import { saveScript } from "../services/script";
 const voiceProviders = [
   {
     id: "edge_tts",
@@ -72,7 +73,7 @@ function TabPanel({ children, value, index, ...other }) {
   );
 }
 
-export default function VoiceGenerator({}) {
+export default function VoiceGenerator({ workspace }) {
   const [provider, setProvider] = useState("gtts");
   const [voice, setVoice] = useState("default");
   const [speed, setSpeed] = useState(1);
@@ -165,17 +166,17 @@ export default function VoiceGenerator({}) {
       const multipartForm = new FormData();
       multipartForm.append("video", file);
 
-      const response = await fetch(
-        `http://localhost:8080/utils/upload-video-to-cloudinary`,
-        {
-          method: "POST",
-          body: multipartForm,
-          headers: {
-            Authorization: `Bearer ${getAccessToken()}`,
-          },
-        }
-      );
-      console.log("resonse: >>>", response);
+      // const response = await fetch(
+      //   `http://localhost:8080/utils/upload-video-to-cloudinary`,
+      //   {
+      //     method: "POST",
+      //     body: multipartForm,
+      //     headers: {
+      //       Authorization: `Bearer ${getAccessToken()}`,
+      //     },
+      //   }
+      // );
+      // console.log("resonse: >>>", response);
       const fileExt = file.name.split(".").pop()?.toLowerCase();
       if (fileExt === "mp3" || fileExt === "wav" || fileExt === "m4a") {
         setSelectedVoiceFile(file);
@@ -237,6 +238,7 @@ export default function VoiceGenerator({}) {
       const audioData = new FormData();
       audioData.append("audio", selectedVoiceFile);
       const response = await uploadAudio(audioData);
+      await saveScript({ audioUrl: response }, workspace.id);
       setUploadedVoiceUrl(response);
       setIsUploadingVoice(false);
       setAudioTimestamp(Date.now());

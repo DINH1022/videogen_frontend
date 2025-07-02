@@ -208,7 +208,7 @@ const CreateVideo = () => {
                     }}
                   >
                     <Typography color="text.secondary">
-                      <VoiceGenerator />
+                      <VoiceGenerator workspace={workspace} />
                     </Typography>
                   </Box>
                   {/* <VoiceConfig workspace_id={workspace_id ?? ""} /> */}

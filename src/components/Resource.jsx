@@ -102,8 +102,6 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
       setIsGeneratingResources(true);
       setError(null);
 
-      console.log("Generating resources...");
-
       // Call the API to generate images
       const response = await generateImages(
         "Lionel Messi, with a flick of his left foot, sent the ball soaring into the top corner, silencing the roaring stadium and clinching the World Cup for Argentina. Tears streamed down his face as he finally held the trophy, a testament to years of dedication and unparalleled skill. His legacy as the greatest footballer of all time was now undeniably etched in history."

@@ -480,45 +480,6 @@ const RegisterComponent = () => {
             </Button>
           </Box>
 
-          <Box sx={{ position: "relative", my: 2 }}>
-            <Divider sx={{ bgcolor: "#333" }} />
-            <Typography
-              variant="body2"
-              component="span"
-              sx={{
-                position: "absolute",
-                top: -10,
-                left: "50%",
-                transform: "translateX(-50%)",
-                bgcolor: "black",
-                px: 2,
-                color: "#aaa",
-              }}
-            >
-              OR
-            </Typography>
-          </Box>
-
-          <Button
-            fullWidth
-            variant="outlined"
-            startIcon={<GoogleIcon />}
-            sx={{
-              mb: 2,
-              py: 1.5,
-              color: "#000",
-              bgcolor: "white",
-              borderColor: "#ddd",
-              "&:hover": {
-                bgcolor: "#f8f8f8",
-                borderColor: "#ccc",
-              },
-              borderRadius: 3,
-            }}
-          >
-            Sign Up with Google
-          </Button>
-
           <Box sx={{ mt: 2, textAlign: "center" }}>
             <Typography variant="body2" sx={{ color: "#aaa" }}>
               Already have an account?{" "}

@@ -34,9 +34,10 @@ import {
   GetApp,
 } from "@mui/icons-material";
 import VideoShareDialog from "./ShareDialog";
-
+import { saveScript } from "../services/script";
 import { uploadVideo } from "../services/video";
 import { getAccessToken } from "../utils/localstorage";
+import { useParams } from "react-router-dom";
 // Styled components for enhanced visual appeal
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
@@ -146,7 +147,7 @@ export default function ExportDialog({
   const [exportProgress, setExportProgress] = useState(0);
   const [exportedVideoUrl, setExportedVideoUrl] = useState("");
   const [showPreview, setShowPreview] = useState(false);
-
+  const { id: workspace_id } = useParams();
   const handleExport = async () => {
     if (!mainEngine || !workspaceId) return;
 
@@ -232,7 +233,7 @@ export default function ExportDialog({
           },
         }
       );
-
+      await saveScript(response, workspace_id);
       const videoUrl = URL.createObjectURL(videoBlob);
       console.log("tesst2: ", videoUrl);
       setExportedVideoUrl(videoUrl);
