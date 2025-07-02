@@ -36,7 +36,8 @@ import {
   Mic,
   SmartToy,
 } from "@mui/icons-material";
-
+import { uploadAudio } from "../services/audio";
+import { getAccessToken } from "../utils/localstorage";
 const voiceProviders = [
   {
     id: "edge_tts",
@@ -103,8 +104,7 @@ export default function VoiceGenerator({}) {
 
         setTimeout(() => {
           const mockData = {
-            audio_url:
-              "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+            audio_url: "",
           };
 
           if (mockData && mockData.audio_url) {
@@ -158,9 +158,24 @@ export default function VoiceGenerator({}) {
     }
   };
 
-  const handleVoiceFileChange = (e) => {
+  const handleVoiceFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      console.log("file: ", file);
+      const multipartForm = new FormData();
+      multipartForm.append("video", file);
+
+      const response = await fetch(
+        `http://localhost:8080/utils/upload-video-to-cloudinary`,
+        {
+          method: "POST",
+          body: multipartForm,
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+          },
+        }
+      );
+      console.log("resonse: >>>", response);
       const fileExt = file.name.split(".").pop()?.toLowerCase();
       if (fileExt === "mp3" || fileExt === "wav" || fileExt === "m4a") {
         setSelectedVoiceFile(file);
@@ -194,30 +209,37 @@ export default function VoiceGenerator({}) {
       setUploadProgress((prev) => {
         if (prev >= 90) {
           clearInterval(progressInterval);
-          return 90;
+          return 99;
         }
-        return prev + 10;
+        return prev + 7;
       });
     }, 200);
 
     try {
-      setTimeout(() => {
-        clearInterval(progressInterval);
-        setUploadProgress(100);
+      // setTimeout(() => {
+      //   clearInterval(progressInterval);
+      //   setUploadProgress(100);
 
-        const mockResponse = {
-          data: {
-            audio_url: URL.createObjectURL(selectedVoiceFile),
-            script_id: "new-script-id",
-          },
-        };
+      //   const mockResponse = {
+      //     data: {
+      //       audio_url: URL.createObjectURL(selectedVoiceFile),
+      //       script_id: "new-script-id",
+      //     },
+      //   };
 
-        if (mockResponse.data && mockResponse.data.audio_url) {
-          setUploadedVoiceUrl(mockResponse.data.audio_url);
-          setAudioTimestamp(Date.now());
-        }
-        setIsUploadingVoice(false);
-      }, 2000);
+      //   if (mockResponse.data && mockResponse.data.audio_url) {
+      //     setUploadedVoiceUrl(mockResponse.data.audio_url);
+      //     setAudioTimestamp(Date.now());
+      //   }
+      //   setIsUploadingVoice(false);
+      // }, 2000);
+
+      const audioData = new FormData();
+      audioData.append("audio", selectedVoiceFile);
+      const response = await uploadAudio(audioData);
+      setUploadedVoiceUrl(response);
+      setIsUploadingVoice(false);
+      setAudioTimestamp(Date.now());
     } catch (error) {
       clearInterval(progressInterval);
       setUploadVoiceError("Đã xảy ra lỗi khi xử lý tệp âm thanh");
