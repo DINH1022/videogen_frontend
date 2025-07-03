@@ -20,6 +20,8 @@ import ScriptGenerator from "../components/ScriptGenerator";
 import VoiceGenerator from "../components/VoiceGenerator";
 import Navigation from "../components/Navigation";
 import { getWorkspaceById } from "../services/workspace";
+import { setSelectedWorkspace } from "../redux/workspaceSlice";
+import { useDispatch } from "react-redux";
 // Styled components for gradient background
 const GradientCard = styled(Card)(({ theme }) => ({
   background: "linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%)",
@@ -40,7 +42,7 @@ const CreateVideo = () => {
   const [workspace, setWorkspace] = useState(null);
   const scriptRef = useRef(null);
   const voiceRef = useRef(null);
-
+  const dispatch = useDispatch();
   const scrollToSection = (ref) => {
     if (ref.current) {
       ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -50,6 +52,7 @@ const CreateVideo = () => {
     const fetchData = async () => {
       const response = await getWorkspaceById(workspace_id);
       setWorkspace(response);
+      dispatch(setSelectedWorkspace(response));
     };
     fetchData();
   }, [workspace_id]);
@@ -174,7 +177,7 @@ const CreateVideo = () => {
                     }}
                   >
                     <Typography color="text.secondary">
-                      <ScriptGenerator workspace={workspace} />
+                      <ScriptGenerator />
                     </Typography>
                   </Box>
                   {/* <ScriptGenerator workspace_id={workspace_id ?? ""} /> */}

@@ -1055,9 +1055,13 @@ import {
 } from "@mui/icons-material";
 import { createAudio } from "../services/audio";
 import { saveScript } from "../services/script";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedWorkspace } from "../redux/workspaceSlice";
 
-const VoiceConfigComponent = ({ workspace }) => {
+const VoiceConfigComponent = ({}) => {
   const theme = useTheme();
+  const workspace = useSelector((state) => state.workspace.selectedWorkspace);
+  const dispatch = useDispatch();
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedVoice, setSelectedVoice] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
@@ -1309,7 +1313,8 @@ const VoiceConfigComponent = ({ workspace }) => {
       "Cristiano Ronaldo clutched his heavily bandaged knee, a grimace etched on his face as he watched the tense Euro 2016 final unfold from the bench. He rose with every attack, a whirlwind of frantic gestures and fervent shouts aimed at spurring on his Portuguese teammates. When Éder’s stunning strike found the net in extra time, an uncontrollable wave of emotion washed over Ronaldo. Ignoring the throbbing pain, he hobbled onto the pitch, tears blurring his vision as he embraced his fellow countrymen, celebrating their astounding victory forged through sheer resilience and belief.",
       selectedVoice
     );
-    await saveScript({ audioUrl: response }, workspace.id);
+    const response2 = await saveScript({ audioUrl: response }, workspace.id);
+    dispatch(setSelectedWorkspace(response2));
     setAudioUrl(response);
     setShowAudioPreview(true);
   };

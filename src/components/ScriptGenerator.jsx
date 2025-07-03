@@ -43,7 +43,12 @@ import LanguageSelect from "../components/LanguageSelect";
 import showToast from "../components/ShowToast";
 import { createShortScript, createLongScript } from "../services/script";
 import { searchLinkWiki } from "../services/wiki";
-const ScriptGenerator = ({ workspace }) => {
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { setSelectedWorkspace } from "../redux/workspaceSlice";
+const ScriptGenerator = ({}) => {
+  const workspace = useSelector((state) => state.workspace.selectedWorkspace);
+  const dispatch = useDispatch();
   const [topic, setTopic] = useState(workspace?.topic || "");
   const [searchResults, setSearchResults] = useState(
     workspace?.shortScript || []
@@ -220,10 +225,8 @@ const ScriptGenerator = ({ workspace }) => {
     };
 
     const response = await saveScript(saveData, workspace.id);
-    console.log("response >> ", response);
-    // Hiển thị thông báo thành công
+    dispatch(setSelectedWorkspace(response));
     showToast("Thông tin đã được lưu thành công!", "success");
-
     setIsSaving(false);
   };
   const handleFullScriptChange = (event) => {

@@ -23,27 +23,22 @@ import {
   Image as ImageIcon,
 } from "@mui/icons-material";
 import { generateImages } from "../services/images";
+import { useSelector } from "react-redux";
 
-const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
+const Resource = ({}) => {
   const navigate = useNavigate(); // Add this hook
-
+  const workspace = useSelector((state) => state.workspace.selectedWorkspace);
   const audioRef = useRef(null);
   const [images, setImages] = useState([]);
-  const [audioUrl, setAudioUrl] = useState("");
+  const [audioUrl, setAudioUrl] = useState(
+    workspace.audioUrl ||
+      "https://res.cloudinary.com/dpystprxq/video/upload/v1749478605/ttsmaker-file-2025-6-9-21-15-49_pfhyut.mp3"
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [audioDuration, setAudioDuration] = useState(0);
   const [imageTimings, setImageTimings] = useState([]);
   const [isGeneratingResources, setIsGeneratingResources] = useState(false);
-
-  // Initialize with mock audio URL only
-  useEffect(() => {
-    // Only set the mock audio URL on component mount
-    const mockAudioUrl =
-      "https://res.cloudinary.com/dpystprxq/video/upload/v1749478605/ttsmaker-file-2025-6-9-21-15-49_pfhyut.mp3";
-
-    setAudioUrl(mockAudioUrl);
-  }, [workspace_id]);
 
   // Calculate image timings based on actual audio duration
   const handleAudioLoadedMetadata = () => {
@@ -87,12 +82,12 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
 
   const handleGenerateVideo = () => {
     // Navigate to editor with state similar to your example
-    navigate(`/workspace/${workspace_id}/editor`, {
+    navigate(`/workspace/${workspace.id}/editor`, {
       state: {
         resourceList: images, // Pass the images array as resourceList
         timing: imageTimings, // Pass the calculated timings
         audioUrl: audioUrl, // Pass the audio URL
-        workspaceId: workspace_id, // Pass the workspace ID
+        workspaceId: workspace.id, // Pass the workspace ID
       },
     });
   };
@@ -269,29 +264,6 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
                   ? "Xem các hình ảnh được chia theo timeline của audio"
                   : "Chưa có tài nguyên nào. Nhấn 'Generate resource' để tạo hình ảnh"}
               </Typography>
-              <Button
-                variant="outlined"
-                startIcon={<Description />}
-                onClick={handleGenerateResource}
-                disabled={isGeneratingResources}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  "&:disabled": {
-                    opacity: 0.6,
-                  },
-                }}
-              >
-                {isGeneratingResources ? (
-                  <>
-                    <CircularProgress size={16} sx={{ mr: 1 }} />
-                    Generating...
-                  </>
-                ) : (
-                  "Generate resource"
-                )}
-              </Button>
             </Box>
           }
         />
@@ -536,13 +508,6 @@ const Resource = ({ workspace_id = "sample-89sdfukshdf" }) => {
                 {isGeneratingResources ? "Generating..." : "Generate resource"}
               </Button>
               <br />
-              <Button
-                variant="outlined"
-                startIcon={<ArrowBack />}
-                onClick={handleNavigateBack}
-              >
-                Quay lại trang chủ
-              </Button>
             </Box>
           )}
         </CardContent>
