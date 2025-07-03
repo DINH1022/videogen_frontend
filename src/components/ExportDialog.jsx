@@ -38,6 +38,8 @@ import { saveScript } from "../services/script";
 import { uploadVideo } from "../services/video";
 import { getAccessToken } from "../utils/localstorage";
 import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedWorkspace } from "../redux/workspaceSlice";
 // Styled components for enhanced visual appeal
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
@@ -147,7 +149,8 @@ export default function ExportDialog({
   const [exportProgress, setExportProgress] = useState(0);
   const [exportedVideoUrl, setExportedVideoUrl] = useState("");
   const [showPreview, setShowPreview] = useState(false);
-  const { id: workspace_id } = useParams();
+  const workspace = useSelector((state) => state.workspace.selectedWorkspace);
+  const dispatch = useDispatch();
   const handleExport = async () => {
     if (!mainEngine || !workspaceId) return;
 
@@ -212,31 +215,16 @@ export default function ExportDialog({
         progressCallback,
         videoOptions
       );
-      // console.log("tesst11111: ", videoBlob);
-      // const data = new FormData();
-      // data.append("video", videoBlob);
-      // const response = await uploadVideo(data);
-      // console.log("Upload response: ", response);
-
-      console.log("Video Blob:", videoBlob);
 
       const multipartForm = new FormData();
       multipartForm.append("video", videoBlob);
 
-      const response = await fetch(
-        `http://localhost:8080/utils/upload-video-to-cloudinary`,
-        {
-          method: "POST",
-          body: multipartForm,
-          headers: {
-            Authorization: `Bearer ${getAccessToken()}`,
-          },
-        }
-      );
-      await saveScript(response, workspace_id);
-      const videoUrl = URL.createObjectURL(videoBlob);
-      console.log("tesst2: ", videoUrl);
-      setExportedVideoUrl(videoUrl);
+      const response = await uploadVideo(multipartForm);
+      const res = await saveScript({ videoUrl: response }, workspace.id);
+      dispatch(setSelectedWorkspace(res));
+      // const videoUrl = URL.createObjectURL(videoBlob);
+      // console.log("tesst2: ", videoUrl);
+      setExportedVideoUrl(response);
       setShowPreview(true);
 
       console.log("Video exported successfully");

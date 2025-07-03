@@ -23,8 +23,9 @@ import {
   Image as ImageIcon,
 } from "@mui/icons-material";
 import { generateImages } from "../services/images";
-import { useSelector } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
+import { saveScript } from "../services/script";
+import { setSelectedWorkspace } from "../redux/workspaceSlice";
 const Resource = ({}) => {
   const navigate = useNavigate(); // Add this hook
   const workspace = useSelector((state) => state.workspace.selectedWorkspace);
@@ -39,6 +40,7 @@ const Resource = ({}) => {
   const [audioDuration, setAudioDuration] = useState(0);
   const [imageTimings, setImageTimings] = useState([]);
   const [isGeneratingResources, setIsGeneratingResources] = useState(false);
+  const dispatch = useDispatch();
   // const clipTimings = JSON.parse(audioUrl?.timings);
   // console.log("1999999");
   // console.log("audioUrl>>>", clipTimings);
@@ -89,7 +91,7 @@ const Resource = ({}) => {
         resourceList: images, // Pass the images array as resourceList
         timing: imageTimings, // Pass the calculated timings
         audioUrl: audioUrl, // Pass the audio URL
-        workspaceId: workspace.id, // Pass the workspace ID
+        workspaceId: toString(workspace.id), // Pass the workspace ID
       },
     });
   };
@@ -118,7 +120,11 @@ const Resource = ({}) => {
         response && response.length > 0 ? response : mockImages;
       setImages(generatedImages);
 
-      console.log("Resources generated successfully!");
+      const response2 = await saveScript(
+        { imagesSet: generatedImages },
+        workspace.id
+      );
+      dispatch(setSelectedWorkspace(response2));
     } catch (err) {
       setError(err.message);
       console.error("Error generating resources:", err);

@@ -185,6 +185,7 @@ const VideoShareDialog = ({
   onClose,
   videoSrc = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
 }) => {
+  console.log("video>> ", videoSrc);
   const [activeTab, setActiveTab] = useState(0);
   const [selectedChannel, setSelectedChannel] = useState("Kênh Hàm Học");
   const [captionDialogOpen, setCaptionDialogOpen] = useState(false);
