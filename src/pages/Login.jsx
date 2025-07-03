@@ -204,7 +204,7 @@ const LoginComponent = () => {
             component="h1"
             sx={{ mb: 4, color: "white", fontWeight: "bold" }}
           >
-            Sign Up
+            Sign In
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mb: 2 }}>
@@ -314,7 +314,7 @@ const LoginComponent = () => {
                 borderRadius: 3,
               }}
             >
-              Sign Up
+              Sign In
             </Button>
           </Box>
 
@@ -347,7 +347,7 @@ const LoginComponent = () => {
                 sx={{ color: "#6c38e8" }}
                 onClick={() => navigate("/register")}
               >
-                Sign in now
+                Sign up now
               </Link>
             </Typography>
           </Box>

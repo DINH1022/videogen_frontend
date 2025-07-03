@@ -18,3 +18,15 @@ export const createLongScript = async (scriptData) => {
     throw error;
   }
 };
+
+export const saveScript = async (scriptData, workspaceId) => {
+  try {
+    const response = await axiosInstance.put(
+      `/workspace/${workspaceId}`,
+      scriptData
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

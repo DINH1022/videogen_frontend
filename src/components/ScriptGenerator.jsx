@@ -38,27 +38,34 @@ import {
   Close,
   Save as SaveIcon,
 } from "@mui/icons-material";
-
+import { saveScript } from "../services/script";
 import LanguageSelect from "../components/LanguageSelect";
 import showToast from "../components/ShowToast";
 import { createShortScript, createLongScript } from "../services/script";
-
-const ScriptGenerator = () => {
-  const [topic, setTopic] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+import { searchLinkWiki } from "../services/wiki";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { setSelectedWorkspace } from "../redux/workspaceSlice";
+const ScriptGenerator = ({}) => {
+  const workspace = useSelector((state) => state.workspace.selectedWorkspace);
+  const dispatch = useDispatch();
+  const [topic, setTopic] = useState(workspace?.topic || "");
+  const [searchResults, setSearchResults] = useState(
+    workspace?.shortScript || []
+  );
   const [selectedScript, setSelectedScript] = useState(null);
   const [sourcesOpen, setSourcesOpen] = useState(false);
-  const [language, setLanguage] = useState("");
-  const [style, setStyle] = useState("");
+  const [language, setLanguage] = useState(workspace?.language || "");
+  const [style, setStyle] = useState(workspace?.writingStyle || "");
   const [editingScript, setEditingScript] = useState(null);
   const [editingContent, setEditingContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [showAddScript, setShowAddScript] = useState(true);
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [customScript, setCustomScript] = useState("");
-  const [fullScript, setFullScript] = useState();
+  const [fullScript, setFullScript] = useState(workspace?.script || "");
   const [isSaving, setIsSaving] = useState(false);
-
+  const [sources, setSources] = useState([]);
   // New states for full script display
   const [showFullScript, setShowFullScript] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -86,13 +93,7 @@ const ScriptGenerator = () => {
       title: "Neonpunk",
       img: "https://pub-static.fotor.com/assets/aiImageConfig/template/webText2Video/iw5pf432impk.jpg",
     },
-    {
-      title: "Cartoon",
-      img: "https://th.bing.com/th?id=OIF.2Oqx%2fhr5TzT%2fNJ2xy0Es6Q&rs=1&pid=ImgDetMain",
-    },
   ];
-
-  const sources = [];
 
   const handleSearch = async () => {
     if (!topic.trim()) return;
@@ -108,6 +109,7 @@ const ScriptGenerator = () => {
       prompt: topic,
       type: "SHORT_SCRIPT",
     });
+    const response3 = await searchLinkWiki(topic);
 
     setLoading(false);
     const data = [
@@ -121,6 +123,7 @@ const ScriptGenerator = () => {
       },
     ];
     setSearchResults(data);
+    setSources(response3);
     setMockResults(data);
   };
 
@@ -204,7 +207,7 @@ const ScriptGenerator = () => {
     setGenerating(false);
     setShowFullScript(true);
   };
-  const handleSaveInformation = () => {
+  const handleSaveInformation = async () => {
     if (!topic || searchResults.length === 0 || !language || !style) {
       showToast("Vui lòng hoàn tất tất cả thông tin trước khi lưu!", "warning");
       return;
@@ -214,27 +217,16 @@ const ScriptGenerator = () => {
 
     const saveData = {
       topic: topic,
-      scripts: searchResults.map((script) => ({
-        id: script.id,
-        summary: script.summary,
-      })),
-      selectedScript: selectedScript
-        ? {
-            id: selectedScript.id,
-            summary: selectedScript.summary,
-          }
-        : null,
+      shortScript: searchResults.map((script) => script.summary),
       language: language,
-      style: style,
-      fullScript: showFullScript ? fullScript : null,
+      writingStyle: style,
+      script: showFullScript ? fullScript : null,
       timestamp: new Date().toISOString(),
     };
 
-    console.log("Thông tin được lưu:", saveData);
-
-    // Hiển thị thông báo thành công
+    const response = await saveScript(saveData, workspace.id);
+    dispatch(setSelectedWorkspace(response));
     showToast("Thông tin đã được lưu thành công!", "success");
-
     setIsSaving(false);
   };
   const handleFullScriptChange = (event) => {
@@ -593,14 +585,14 @@ const ScriptGenerator = () => {
                 {sources.map((source, index) => (
                   <ListItem key={index} sx={{ pl: 4 }}>
                     <ListItemText
-                      primary={source}
+                      primary={source.url}
                       primaryTypographyProps={{
                         fontSize: "0.875rem",
                         color: "#1976D2",
                         textDecoration: "underline",
                         cursor: "pointer",
                       }}
-                      onClick={() => window.open(source, "_blank")}
+                      onClick={() => window.open(source.url, "_blank")}
                     />
                   </ListItem>
                 ))}

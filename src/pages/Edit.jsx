@@ -92,7 +92,7 @@ export default function CesdkMuiEditor() {
 
         const config = {
           license:
-            "sTjOpvmvcA8xu3AxiP31kgtQzRmoQjTCDlIdOEeoCjNL-XPM89OtHv4ZaadOWluJ",
+            "D9F4Q8oTmX1GIKddna5yTSzuE0FgT7rxGu-Ye4WiYJ6QEseUInIAyPpqyqzZoQAv",
           userId: workspaceId || "USER_ID",
           theme: "light",
           baseURL: "https://cdn.img.ly/packages/imgly/cesdk-js/1.52.0/assets",
@@ -367,8 +367,28 @@ export default function CesdkMuiEditor() {
           },
         }}
       >
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        <Toolbar
+          sx={{
+            borderRadius: "12px",
+            boxShadow: "0 4px 16px rgba(102, 126, 234, 0.1)",
+            padding: "16px 24px",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            "&:hover": {
+              transform: "translateY(-1px)",
+              boxShadow: "0 6px 24px rgba(102, 126, 234, 0.15)",
+            },
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              flexGrow: 1,
+              color: "#5f6b8a",
+              fontWeight: 600,
+              fontSize: "1.25rem",
+              letterSpacing: "0.5px",
+            }}
+          >
             Tools
           </Typography>
           <Button
@@ -377,27 +397,42 @@ export default function CesdkMuiEditor() {
             onClick={() => setExportDialogOpen(true)}
             disabled={!editorReady}
             size="small"
+            sx={{
+              background: "rgba(102, 126, 234, 0.1)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(102, 126, 234, 0.2)",
+              borderRadius: "25px",
+              padding: "8px 20px",
+              color: "#667eea",
+              fontWeight: 500,
+              textTransform: "none",
+              fontSize: "0.875rem",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                background: "rgba(102, 126, 234, 0.15)",
+                transform: "scale(1.02)",
+                boxShadow: "0 4px 16px rgba(102, 126, 234, 0.2)",
+              },
+              "&:disabled": {
+                background: "rgba(102, 126, 234, 0.05)",
+                color: "rgba(102, 126, 234, 0.4)",
+                border: "1px solid rgba(102, 126, 234, 0.1)",
+              },
+              "& .MuiButton-startIcon": {
+                marginRight: "8px",
+                transition: "transform 0.3s ease",
+              },
+              "&:hover .MuiButton-startIcon": {
+                transform: "rotate(10deg)",
+              },
+            }}
           >
             Export
           </Button>
         </Toolbar>
 
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={activeTab}
-            onChange={(e, newValue) => setActiveTab(newValue)}
-            variant="fullWidth"
-          >
-            <Tab icon={<ImageIcon />} label="Images" />
-            <Tab icon={<VideoLibrary />} label="Videos" />
-          </Tabs>
-        </Box>
-
         <Box sx={{ flex: 1, overflow: "auto" }}>
-          {activeTab === 0 && (
-            <ImageGenTab mainEngine={mainEngine} resourceList={resourceList} />
-          )}
-          {activeTab === 1 && <VideoSearchTab />}
+          <ImageGenTab mainEngine={mainEngine} resourceList={resourceList} />
         </Box>
       </Box>
 
