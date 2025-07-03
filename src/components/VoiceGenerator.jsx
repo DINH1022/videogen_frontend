@@ -1305,13 +1305,11 @@ const VoiceConfigComponent = ({ workspace }) => {
 
   const handleCreateAudio = async () => {
     // const response = await createAudio(workspace.script, selectedVoice);
-    // const response = await createAudio(
-    //   "Cristiano Ronaldo clutched his heavily bandaged knee, a grimace etched on his face as he watched the tense Euro 2016 final unfold from the bench. He rose with every attack, a whirlwind of frantic gestures and fervent shouts aimed at spurring on his Portuguese teammates. When Éder’s stunning strike found the net in extra time, an uncontrollable wave of emotion washed over Ronaldo. Ignoring the throbbing pain, he hobbled onto the pitch, tears blurring his vision as he embraced his fellow countrymen, celebrating their astounding victory forged through sheer resilience and belief.",
-    //   selectedVoice
-    // );
-    // await saveScript({ audioUrl: response }, workspace.id);
-    const response =
-      "https://res.cloudinary.com/db1pazhew/video/upload/v1751555334/yh0myf88bzmiopsunlt7.mp3";
+    const response = await createAudio(
+      "Cristiano Ronaldo clutched his heavily bandaged knee, a grimace etched on his face as he watched the tense Euro 2016 final unfold from the bench. He rose with every attack, a whirlwind of frantic gestures and fervent shouts aimed at spurring on his Portuguese teammates. When Éder’s stunning strike found the net in extra time, an uncontrollable wave of emotion washed over Ronaldo. Ignoring the throbbing pain, he hobbled onto the pitch, tears blurring his vision as he embraced his fellow countrymen, celebrating their astounding victory forged through sheer resilience and belief.",
+      selectedVoice
+    );
+    await saveScript({ audioUrl: response }, workspace.id);
     setAudioUrl(response);
     setShowAudioPreview(true);
   };
