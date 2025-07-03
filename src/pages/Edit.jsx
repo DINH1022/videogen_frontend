@@ -92,7 +92,7 @@ export default function CesdkMuiEditor() {
 
         const config = {
           license:
-            "sTjOpvmvcA8xu3AxiP31kgtQzRmoQjTCDlIdOEeoCjNL-XPM89OtHv4ZaadOWluJ",
+            "D9F4Q8oTmX1GIKddna5yTSzuE0FgT7rxGu-Ye4WiYJ6QEseUInIAyPpqyqzZoQAv",
           userId: workspaceId || "USER_ID",
           theme: "light",
           baseURL: "https://cdn.img.ly/packages/imgly/cesdk-js/1.52.0/assets",
