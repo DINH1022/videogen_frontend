@@ -39,7 +39,9 @@ const Resource = ({}) => {
   const [audioDuration, setAudioDuration] = useState(0);
   const [imageTimings, setImageTimings] = useState([]);
   const [isGeneratingResources, setIsGeneratingResources] = useState(false);
-
+  // const clipTimings = JSON.parse(audioUrl?.timings);
+  // console.log("1999999");
+  // console.log("audioUrl>>>", clipTimings);
   // Calculate image timings based on actual audio duration
   const handleAudioLoadedMetadata = () => {
     if (audioRef.current) {
@@ -99,7 +101,7 @@ const Resource = ({}) => {
 
       // Call the API to generate images
       const response = await generateImages(
-        "Lionel Messi, with a flick of his left foot, sent the ball soaring into the top corner, silencing the roaring stadium and clinching the World Cup for Argentina. Tears streamed down his face as he finally held the trophy, a testament to years of dedication and unparalleled skill. His legacy as the greatest footballer of all time was now undeniably etched in history."
+        "Ở tuổi xế chiều, Cristiano Ronaldo vẫn miệt mài trên sân cỏ, những cú đánh đầu hiểm hóc cùng những pha sút phạt thần sầu làm lay động hàng triệu trái tim. Khao khát chiến thắng mãnh liệt đã tạo nên những màn lội ngược dòng kinh điển, truyền cảm hứng cho vô số người trên toàn thế giới, củng cố vị thế huyền thoại bóng đá của anh. Dù thời gian trôi đi, Ronaldo không ngừng phá vỡ kỷ lục, minh chứng cho thấy đam mê và sự cống hiến có thể vượt qua mọi giới hạn. Anh đã trở thành biểu tượng cho sự kiên trì và nỗ lực không ngừng nghỉ, một nguồn động lực to lớn cho thế hệ trẻ. Giấc mơ về một Ronaldo bất tử dường như đã thành sự thật, khi anh vẫn sừng sững trên đỉnh cao, thách thức mọi định kiến về tuổi tác."
       );
 
       // Fallback to mock images if API fails or returns empty
