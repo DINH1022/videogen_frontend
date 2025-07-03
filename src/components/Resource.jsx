@@ -102,9 +102,7 @@ const Resource = ({}) => {
       setError(null);
 
       // Call the API to generate images
-      const response = await generateImages(
-        "Ở tuổi xế chiều, Cristiano Ronaldo vẫn miệt mài trên sân cỏ, những cú đánh đầu hiểm hóc cùng những pha sút phạt thần sầu làm lay động hàng triệu trái tim. Khao khát chiến thắng mãnh liệt đã tạo nên những màn lội ngược dòng kinh điển, truyền cảm hứng cho vô số người trên toàn thế giới, củng cố vị thế huyền thoại bóng đá của anh. Dù thời gian trôi đi, Ronaldo không ngừng phá vỡ kỷ lục, minh chứng cho thấy đam mê và sự cống hiến có thể vượt qua mọi giới hạn. Anh đã trở thành biểu tượng cho sự kiên trì và nỗ lực không ngừng nghỉ, một nguồn động lực to lớn cho thế hệ trẻ. Giấc mơ về một Ronaldo bất tử dường như đã thành sự thật, khi anh vẫn sừng sững trên đỉnh cao, thách thức mọi định kiến về tuổi tác."
-      );
+      const response = await generateImages(workspace.script);
 
       // Fallback to mock images if API fails or returns empty
       const mockImages = [
