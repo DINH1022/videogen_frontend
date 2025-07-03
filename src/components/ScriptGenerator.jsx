@@ -42,7 +42,7 @@ import { saveScript } from "../services/script";
 import LanguageSelect from "../components/LanguageSelect";
 import showToast from "../components/ShowToast";
 import { createShortScript, createLongScript } from "../services/script";
-
+import { searchLinkWiki } from "../services/wiki";
 const ScriptGenerator = ({ workspace }) => {
   const [topic, setTopic] = useState(workspace?.topic || "");
   const [searchResults, setSearchResults] = useState(
@@ -60,7 +60,7 @@ const ScriptGenerator = ({ workspace }) => {
   const [customScript, setCustomScript] = useState("");
   const [fullScript, setFullScript] = useState(workspace?.script || "");
   const [isSaving, setIsSaving] = useState(false);
-
+  const [sources, setSources] = useState([]);
   // New states for full script display
   const [showFullScript, setShowFullScript] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -90,8 +90,6 @@ const ScriptGenerator = ({ workspace }) => {
     },
   ];
 
-  const sources = [];
-
   const handleSearch = async () => {
     if (!topic.trim()) return;
 
@@ -106,6 +104,7 @@ const ScriptGenerator = ({ workspace }) => {
       prompt: topic,
       type: "SHORT_SCRIPT",
     });
+    const response3 = await searchLinkWiki(topic);
 
     setLoading(false);
     const data = [
@@ -119,6 +118,7 @@ const ScriptGenerator = ({ workspace }) => {
       },
     ];
     setSearchResults(data);
+    setSources(response3);
     setMockResults(data);
   };
 
@@ -212,16 +212,7 @@ const ScriptGenerator = ({ workspace }) => {
 
     const saveData = {
       topic: topic,
-      // shortScript: searchResults.map((script) => ({
-      //   id: script.id,
-      //   summary: script.summary,
-      // })),
-      // selectedScript: selectedScript
-      //   ? {
-      //       id: selectedScript.id,
-      //       summary: selectedScript.summary,
-      //     }
-      //   : null,
+      shortScript: searchResults.map((script) => script.summary),
       language: language,
       writingStyle: style,
       script: showFullScript ? fullScript : null,
@@ -591,14 +582,14 @@ const ScriptGenerator = ({ workspace }) => {
                 {sources.map((source, index) => (
                   <ListItem key={index} sx={{ pl: 4 }}>
                     <ListItemText
-                      primary={source}
+                      primary={source.url}
                       primaryTypographyProps={{
                         fontSize: "0.875rem",
                         color: "#1976D2",
                         textDecoration: "underline",
                         cursor: "pointer",
                       }}
-                      onClick={() => window.open(source, "_blank")}
+                      onClick={() => window.open(source.url, "_blank")}
                     />
                   </ListItem>
                 ))}
