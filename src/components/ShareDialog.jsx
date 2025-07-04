@@ -30,7 +30,7 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-
+import { uploadVideoToYoutube } from "../services/uploadYoutube";
 // TikTok icon component
 const TikTokIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -181,6 +181,11 @@ const AutoCaptionDialog = ({ open, onClose }) => {
     </Dialog>
   );
 };
+const TabPanel = ({ children, value, index }) => (
+  <Box hidden={value !== index} key={index}>
+    {value === index && <Box>{children}</Box>}
+  </Box>
+);
 
 const VideoShareDialog = ({
   open,
@@ -227,12 +232,6 @@ const VideoShareDialog = ({
       },
     }));
   };
-
-  const TabPanel = ({ children, value, index }) => (
-    <div hidden={value !== index}>
-      {value === index && <Box>{children}</Box>}
-    </div>
-  );
 
   return (
     <>
@@ -390,11 +389,6 @@ const VideoShareDialog = ({
                 iconPosition="start"
               />
               <Tab icon={<TikTokIcon />} label="TikTok" iconPosition="start" />
-              <Tab
-                icon={<FacebookIcon sx={{ color: "#1877F2", fontSize: 20 }} />}
-                label="Facebook"
-                iconPosition="start"
-              />
             </Tabs>
 
             <Box sx={{ pt: 2, flex: 1, overflow: "auto" }}>
@@ -481,8 +475,13 @@ const VideoShareDialog = ({
 
                   <Button
                     variant="contained"
-                    onClick={() =>
-                      (window.location.href = `http://localhost:8080/connect/youtube?user-id=${user.id}`)
+                    onClick={async () =>
+                      // (window.location.href = `http://localhost:8080/connect/youtube?user-id=${user.id}`)
+                      await uploadVideoToYoutube(
+                        videoSrc,
+                        formData.youtube.title,
+                        formData.youtube.description
+                      )
                     }
                     fullWidth
                     sx={{
@@ -591,89 +590,6 @@ const VideoShareDialog = ({
                     }}
                   >
                     Chia sẻ lên TikTok
-                  </Button>
-                </Box>
-              </TabPanel>
-
-              {/* Facebook Tab */}
-              <TabPanel value={activeTab} index={2}>
-                <Box
-                  sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
-                >
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.5, fontWeight: 600 }}
-                    >
-                      Chọn Trang
-                    </Typography>
-                    <FormControl fullWidth size="small">
-                      <Select
-                        value={selectedChannel}
-                        onChange={(e) => setSelectedChannel(e.target.value)}
-                      >
-                        <MenuItem value="Kênh Hàm Học">Kênh Hàm Học</MenuItem>
-                        <MenuItem value="Trang khác">Trang khác</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.5, fontWeight: 600 }}
-                    >
-                      Tiêu đề bài đăng
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      placeholder="Nhập tiêu đề bài đăng..."
-                      variant="outlined"
-                      size="small"
-                      value={formData.facebook.title}
-                      onChange={(e) =>
-                        handleInputChange("facebook", "title", e.target.value)
-                      }
-                    />
-                  </Box>
-
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.5, fontWeight: 600 }}
-                    >
-                      Nội dung
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={5}
-                      placeholder="Nhập nội dung bài đăng..."
-                      variant="outlined"
-                      size="small"
-                      value={formData.facebook.description}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "facebook",
-                          "description",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </Box>
-
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    sx={{
-                      backgroundColor: "#1877F2",
-                      "&:hover": { backgroundColor: "#166FE5" },
-                      textTransform: "none",
-                      py: 1.5,
-                      mt: 0.5,
-                    }}
-                  >
-                    Chia sẻ lên facebook
                   </Button>
                 </Box>
               </TabPanel>
