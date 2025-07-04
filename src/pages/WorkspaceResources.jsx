@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -36,113 +36,122 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Navigation from "../components/Navigation";
+import { getWorkspaces } from "../services/workspace";
 const WorkspaceManagement = () => {
   const navigate = useNavigate();
-  const [workspaces] = useState([
-    {
-      id: "1",
-      name: "Demo",
-      description: "Không có mô tả",
-      createdDate: "13:13 5 thg 5, 2025",
-      resources: [
-        {
-          type: "Video",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: "https://videos.pexels.com/video-files/19843107/19843107-uhd_2560_1440_30fps.mp4",
-        },
-      ],
-    },
-    {
-      id: "2",
-      name: "Video mẫu",
-      description: "Không có mô tả",
-      createdDate: "18:43 6 thg 5, 2025",
-      resources: [
-        {
-          type: "Hình Ảnh",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: null,
-        },
-        {
-          type: "Video",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: "https://videos.pexels.com/video-files/19843107/19843107-uhd_2560_1440_30fps.mp4",
-        },
-        {
-          type: "Hình Ảnh",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: null,
-        },
-        {
-          type: "Video",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: "https://videos.pexels.com/video-files/31988293/31988293-1920_1080_24fps.mp4",
-        },
-        {
-          type: "Video",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: "https://videos.pexels.com/video-files/5428316/5428316-hd_1920_1080_25fps.mp4",
-        },
-        {
-          type: "Hình Ảnh",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: null,
-        },
-      ],
-    },
-    {
-      id: "3",
-      name: "Demo",
-      description: "Không có mô tả",
-      createdDate: "13:13 5 thg 5, 2025",
-      resources: [
-        {
-          type: "Video",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: "https://videos.pexels.com/video-files/19843107/19843107-uhd_2560_1440_30fps.mp4",
-        },
-      ],
-    },
-    {
-      id: "4",
-      name: "Video mẫu",
-      description: "Không có mô tả",
-      createdDate: "18:43 6 thg 5, 2025",
-      resources: [
-        {
-          type: "Hình Ảnh",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: null,
-        },
-        {
-          type: "Video",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: "https://videos.pexels.com/video-files/19843107/19843107-uhd_2560_1440_30fps.mp4",
-        },
-        {
-          type: "Hình Ảnh",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: null,
-        },
-        {
-          type: "Video",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: "https://videos.pexels.com/video-files/31988293/31988293-1920_1080_24fps.mp4",
-        },
-        {
-          type: "Video",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: "https://videos.pexels.com/video-files/5428316/5428316-hd_1920_1080_25fps.mp4",
-        },
-        {
-          type: "Hình Ảnh",
-          createdDate: "07:15 10 thg 5, 2025",
-          url: null,
-        },
-      ],
-    },
-  ]);
-
+  // const [workspaces] = useState([
+  //   {
+  //     id: "1",
+  //     name: "Demo",
+  //     description: "Không có mô tả",
+  //     createdDate: "13:13 5 thg 5, 2025",
+  //     resources: [
+  //       {
+  //         type: "Video",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: "https://videos.pexels.com/video-files/19843107/19843107-uhd_2560_1440_30fps.mp4",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: "2",
+  //     name: "Video mẫu",
+  //     description: "Không có mô tả",
+  //     createdDate: "18:43 6 thg 5, 2025",
+  //     resources: [
+  //       {
+  //         type: "Hình Ảnh",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: null,
+  //       },
+  //       {
+  //         type: "Video",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: "https://videos.pexels.com/video-files/19843107/19843107-uhd_2560_1440_30fps.mp4",
+  //       },
+  //       {
+  //         type: "Hình Ảnh",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: null,
+  //       },
+  //       {
+  //         type: "Video",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: "https://videos.pexels.com/video-files/31988293/31988293-1920_1080_24fps.mp4",
+  //       },
+  //       {
+  //         type: "Video",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: "https://videos.pexels.com/video-files/5428316/5428316-hd_1920_1080_25fps.mp4",
+  //       },
+  //       {
+  //         type: "Hình Ảnh",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: null,
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: "3",
+  //     name: "Demo",
+  //     description: "Không có mô tả",
+  //     createdDate: "13:13 5 thg 5, 2025",
+  //     resources: [
+  //       {
+  //         type: "Video",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: "https://videos.pexels.com/video-files/19843107/19843107-uhd_2560_1440_30fps.mp4",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: "4",
+  //     name: "Video mẫu",
+  //     description: "Không có mô tả",
+  //     createdDate: "18:43 6 thg 5, 2025",
+  //     resources: [
+  //       {
+  //         type: "Hình Ảnh",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: null,
+  //       },
+  //       {
+  //         type: "Video",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: "https://videos.pexels.com/video-files/19843107/19843107-uhd_2560_1440_30fps.mp4",
+  //       },
+  //       {
+  //         type: "Hình Ảnh",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: null,
+  //       },
+  //       {
+  //         type: "Video",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: "https://videos.pexels.com/video-files/31988293/31988293-1920_1080_24fps.mp4",
+  //       },
+  //       {
+  //         type: "Video",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: "https://videos.pexels.com/video-files/5428316/5428316-hd_1920_1080_25fps.mp4",
+  //       },
+  //       {
+  //         type: "Hình Ảnh",
+  //         createdDate: "07:15 10 thg 5, 2025",
+  //         url: null,
+  //       },
+  //     ],
+  //   },
+  // ]);
+  const [reset, setReset] = useState();
+  const [workspaces, setWorkspaces] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await getWorkspaces();
+      setWorkspaces(response);
+    };
+    fetchData();
+  }, [reset]);
   const [selectedWorkspace, setSelectedWorkspace] = useState(null);
 
   const getResourceIcon = (type) => {
@@ -186,8 +195,10 @@ const WorkspaceManagement = () => {
   };
 
   const getResourceStats = (resources) => {
-    const videoCount = resources.filter((r) => r.type === "Video").length;
-    const imageCount = resources.filter((r) => r.type === "Hình Ảnh").length;
+    const videoCount = 0;
+    // const imageCount = resources.imagesSet.length || 0;
+    const imageCount = 1 || 0;
+
     return { videoCount, imageCount };
   };
 
@@ -389,7 +400,7 @@ const WorkspaceManagement = () => {
             </TableHead>
             <TableBody>
               {workspaces.map((workspace, index) => {
-                const stats = getResourceStats(workspace.resources);
+                const stats = getResourceStats(workspace.imagesSet);
                 return (
                   <React.Fragment key={workspace.id}>
                     <TableRow
@@ -451,7 +462,7 @@ const WorkspaceManagement = () => {
                                 mb: 0.5,
                               }}
                             >
-                              {workspace.name}
+                              {workspace.title}
                             </Typography>
                           </Box>
                         </Box>
@@ -478,7 +489,7 @@ const WorkspaceManagement = () => {
                             fontWeight: 500,
                           }}
                         >
-                          {workspace.createdDate}
+                          {workspace.createAt}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -486,7 +497,9 @@ const WorkspaceManagement = () => {
                           sx={{ display: "flex", alignItems: "center", gap: 1 }}
                         >
                           <Chip
-                            label={`${workspace.resources.length} tài nguyên`}
+                            label={`${
+                              workspace.imagesSet?.length || 0
+                            } tài nguyên`}
                             size="small"
                             sx={{
                               backgroundColor: "#667eea",
@@ -547,7 +560,7 @@ const WorkspaceManagement = () => {
                               <Language
                                 sx={{ fontSize: 18, color: "#6366f1" }}
                               />
-                              Tài nguyên của {workspace.name}
+                              Tài nguyên của {workspace.title}
                             </Typography>
                             <TableContainer
                               component={Paper}
@@ -600,7 +613,7 @@ const WorkspaceManagement = () => {
                                   </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                  {workspace.resources.map(
+                                  {workspace.imagesSet?.map(
                                     (resource, index) => (
                                       <TableRow
                                         key={index}
@@ -636,11 +649,11 @@ const WorkspaceManagement = () => {
                                               fontSize: "0.85rem",
                                             }}
                                           >
-                                            {resource.createdDate}
+                                            {workspace.createAt}
                                           </Typography>
                                         </TableCell>
                                         <TableCell>
-                                          {resource.url ? (
+                                          {resource ? (
                                             <Typography
                                               variant="body2"
                                               sx={{
@@ -657,13 +670,10 @@ const WorkspaceManagement = () => {
                                                 },
                                               }}
                                               onClick={() =>
-                                                window.open(
-                                                  resource.url,
-                                                  "_blank"
-                                                )
+                                                window.open(resource, "_blank")
                                               }
                                             >
-                                              {resource.url}
+                                              {resource}
                                             </Typography>
                                           ) : (
                                             <Chip
