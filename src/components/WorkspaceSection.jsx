@@ -6,23 +6,10 @@ import CreateWorkspaceDialog from "./CreateWorkspaceDialog";
 import { getWorkspaces } from "../services/workspace";
 // Dữ liệu mẫu cho workspaces
 
-const WorkspaceSection = () => {
+const WorkspaceSection = ({ workspaces }) => {
   const navigate = useNavigate();
   const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
-  const [listWorkspaces, setListWorkspaces] = useState([]);
-  useEffect(() => {
-    const fetchWorkspaces = async () => {
-      try {
-        const response = await getWorkspaces();
-        console.log("Workspaces fetched:", response);
-        setListWorkspaces(response);
-      } catch (error) {
-        console.error("Error fetching workspaces:", error);
-        throw error;
-      }
-    };
-    fetchWorkspaces();
-  }, []);
+
   const handleViewResources = (workspace) => {
     console.log("Xem tài nguyên cho workspace:", workspace);
   };
@@ -84,7 +71,7 @@ const WorkspaceSection = () => {
 
       {/* Workspace Grid */}
       <Grid container spacing={3} sx={{ justifyContent: "flex-start" }}>
-        {listWorkspaces.map((workspace) => (
+        {workspaces.map((workspace) => (
           <Grid
             item
             xs={12}

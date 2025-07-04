@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Tabs, Tab, Container, Paper } from "@mui/material";
 
 import VideoSection from "../components/VideoSection";
 import WorkspaceSection from "../components/WorkspaceSection";
 import Navigation from "../components/Navigation";
+import { getWorkspaces } from "../services/workspace";
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -29,6 +30,19 @@ function a11yProps(index) {
 
 const Dashboard = () => {
   const [value, setValue] = useState(0);
+  const [workspaces, setWorkspaces] = useState([]);
+  useEffect(() => {
+    const fetchWorkspaces = async () => {
+      try {
+        const response = await getWorkspaces();
+        setWorkspaces(response);
+      } catch (error) {
+        console.error("Error fetching workspaces:", error);
+        throw error;
+      }
+    };
+    fetchWorkspaces();
+  }, []);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -122,10 +136,10 @@ const Dashboard = () => {
 
         <Box sx={{ px: 3, pb: 4 }}>
           <TabPanel value={value} index={0}>
-            <VideoSection />
+            <VideoSection workspaces={workspaces} />
           </TabPanel>
           <TabPanel value={value} index={1}>
-            <WorkspaceSection />
+            <WorkspaceSection workspaces={workspaces} />
           </TabPanel>
         </Box>
       </Paper>
