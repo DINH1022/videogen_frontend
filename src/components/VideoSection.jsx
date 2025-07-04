@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Tabs, Tab, Grid, Chip, Stack } from "@mui/material";
 import VideoCard from "./VideoCard";
 import VideoShareDialog from "./ShareDialog";
+import { getAllVideosUploadToYoutube } from "../services/youtube";
 // Dữ liệu mẫu với video đang xử lý
 const sampleVideos = [
   {
@@ -87,13 +88,19 @@ const sampleVideos = [
   },
 ];
 
-const VideoSection = () => {
+const VideoSection = ({ workspaces }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
-
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await getAllVideosUploadToYoutube();
+      console.log("response>> ", response);
+    };
+    fetchData();
+  }, []);
   const getFilteredVideos = () => {
     switch (activeTab) {
       case 0:

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Card,
@@ -54,6 +54,7 @@ import {
 } from "recharts";
 import { useMemo } from "react";
 import Navigation from "../components/Navigation";
+import { getAllVideosUploadToYoutube } from "../services/youtube";
 // TikTok icon component
 const TikTokIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -66,100 +67,107 @@ const Statistics = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [videoFilter, setVideoFilter] = useState("latest");
-  // Xử lý data để chỉ hiển thị top 5 và gộp phần còn lại thành "Khác"
-
+  const [videosYoutube, setVideosYoutube] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await getAllVideosUploadToYoutube();
+      console.log("vidoes: >>", response);
+      setVideosYoutube(response);
+    };
+    fetchData();
+  }, []);
   // Sample data based on the structure you provided
   const sampleData = [
     {
       title: "Video không có tiêu đề",
       url: "https://youtube.com/watch?v=1",
-      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
-      numOfViews: 1250,
-      numOfLikes: 89,
-      numOfComments: 12,
-      publishedAt: "2025-05-03T10:30:00Z",
+      thumb_nail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      number_of_views: 1250,
+      number_of_likes: 89,
+      number_of_comments: 12,
+      published_at: "2025-05-03T10:30:00Z",
     },
     {
       title: "Demo chức năng của Chat Application  MeTalk",
       url: "https://youtube.com/watch?v=2",
-      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
-      numOfViews: 2840,
-      numOfLikes: 156,
-      numOfComments: 23,
-      publishedAt: "2024-12-17T14:20:00Z",
+      thumb_nail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      number_of_views: 2840,
+      number_of_likes: 156,
+      number_of_comments: 23,
+      published_at: "2024-12-17T14:20:00Z",
     },
     {
       title: "THE MATCHING GAME HCMUS",
       url: "https://youtube.com/watch?v=3",
-      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
-      numOfViews: 8900,
-      numOfLikes: 445,
-      numOfComments: 67,
-      publishedAt: "2023-04-15T09:15:00Z",
+      thumb_nail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      number_of_views: 8900,
+      number_of_likes: 445,
+      number_of_comments: 67,
+      published_at: "2023-04-15T09:15:00Z",
     },
     {
       title: "STREET FOOD FOR SWEET TOOTH",
       url: "https://youtube.com/watch?v=4",
-      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
-      numOfViews: 15600,
-      numOfLikes: 892,
-      numOfComments: 134,
-      publishedAt: "2021-02-27T16:45:00Z",
+      thumb_nail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      number_of_views: 15600,
+      number_of_likes: 892,
+      number_of_comments: 134,
+      published_at: "2021-02-27T16:45:00Z",
     },
     {
       title: "Studentsdf sdf - v3",
       url: "https://youtube.com/watch?v=5",
-      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
-      numOfViews: 520,
-      numOfLikes: 28,
-      numOfComments: 45,
-      publishedAt: "2024-08-10T11:30:00Z",
+      thumb_nail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      number_of_views: 520,
+      number_of_likes: 28,
+      number_of_comments: 45,
+      published_at: "2024-08-10T11:30:00Z",
     },
 
     {
       title: "STREETT TOOTH",
       url: "https://youtube.com/watch?v=4",
-      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
-      numOfViews: 100,
-      numOfLikes: 82,
-      numOfComments: 14,
-      publishedAt: "2021-02-27T16:45:00Z",
+      thumb_nail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      number_of_views: 100,
+      number_of_likes: 82,
+      number_of_comments: 14,
+      published_at: "2021-02-27T16:45:00Z",
     },
     {
       title: "Student App dfs sdf sdf dsf - v3",
       url: "https://youtube.com/watch?v=5",
-      thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
-      numOfViews: 50,
-      numOfLikes: 29,
-      numOfComments: 45,
-      publishedAt: "2024-08-10T11:30:00Z",
+      thumb_nail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+      number_of_views: 50,
+      number_of_likes: 29,
+      number_of_comments: 45,
+      published_at: "2024-08-10T11:30:00Z",
     },
   ];
 
-  const totalViews = sampleData.reduce(
-    (sum, video) => sum + video.numOfViews,
+  const totalViews = videosYoutube.reduce(
+    (sum, video) => sum + video.number_of_views,
     0
   );
-  const totalLikes = sampleData.reduce(
-    (sum, video) => sum + video.numOfLikes,
+  const totalLikes = videosYoutube.reduce(
+    (sum, video) => sum + video.number_of_likes,
     0
   );
-  const totalComments = sampleData.reduce(
-    (sum, video) => sum + video.numOfComments,
+  const totalComments = videosYoutube.reduce(
+    (sum, video) => sum + video.number_of_comments,
     0
   );
 
   // Prepare data for pie chart (top 5 videos + others)
   const pieData = useMemo(() => {
-    if (!sampleData || sampleData.length === 0) return [];
+    if (!videosYoutube || videosYoutube.length === 0) return [];
 
-    return sampleData.map((video, index) => ({
+    return videosYoutube.map((video, index) => ({
       name:
         video.title.length > 25
           ? video.title.substring(0, 25) + "..."
           : video.title, // Rút ngắn tên để tránh tràn
       fullName: video.title, // Giữ tên đầy đủ cho tooltip
-      value: video.numOfViews,
+      value: video.number_of_views,
       color: [
         "#8B5FBF",
         "#6B8DD6",
@@ -173,7 +181,7 @@ const Statistics = () => {
         "#DEB887",
       ][index % 10],
     }));
-  }, [sampleData]);
+  }, [videosYoutube]);
   const processedPieData = useMemo(() => {
     if (!pieData || pieData.length === 0) return [];
     if (pieData.length <= 5) return pieData;
@@ -201,17 +209,17 @@ const Statistics = () => {
     return top5;
   }, [pieData]);
   // Prepare data for bar chart - Video performance over time
-  const barData = sampleData
-    .sort((a, b) => new Date(a.publishedAt) - new Date(b.publishedAt))
+  const barData = videosYoutube
+    .sort((a, b) => new Date(a.published_at) - new Date(b.published_at))
     .map((video) => ({
       name:
         video.title.length > 15
           ? video.title.substring(0, 15) + "..."
           : video.title,
-      views: video.numOfViews,
-      likes: video.numOfLikes,
-      comments: video.numOfComments,
-      date: new Date(video.publishedAt).getFullYear(),
+      views: video.number_of_views,
+      likes: video.number_of_likes,
+      comments: video.number_of_comments,
+      date: new Date(video.published_at).getFullYear(),
     }));
 
   const COLORS = ["#8B5FBF", "#6B8DD6", "#8FBC8F", "#DDA0DD", "#87CEEB"];
@@ -228,17 +236,17 @@ const Statistics = () => {
   };
 
   const getSortedVideos = () => {
-    const sorted = [...sampleData];
+    const sorted = [...videosYoutube];
     switch (videoFilter) {
       case "popular":
-        return sorted.sort((a, b) => b.numOfViews - a.numOfViews);
+        return sorted.sort((a, b) => b.number_of_views - a.number_of_views);
       case "oldest":
         return sorted.sort(
-          (a, b) => new Date(a.publishedAt) - new Date(b.publishedAt)
+          (a, b) => new Date(a.published_at) - new Date(b.published_at)
         );
       default: // latest
         return sorted.sort(
-          (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)
+          (a, b) => new Date(b.published_at) - new Date(a.published_at)
         );
     }
   };
@@ -468,7 +476,7 @@ const Statistics = () => {
                 variant="h3"
                 sx={{ fontWeight: 700, color: "#2c3e50" }}
               >
-                {sampleData.length}
+                {videosYoutube.length}
               </Typography>
             </CardContent>
           </Card>
@@ -861,7 +869,7 @@ const Statistics = () => {
                           ]}
                           labelFormatter={(label) => {
                             // Tìm video có tên rút gọn tương ứng để lấy tên đầy đủ
-                            const video = sampleData.find((v) => {
+                            const video = videosYoutube.find((v) => {
                               const shortName =
                                 v.title.length > 15
                                   ? v.title.substring(0, 15) + "..."
@@ -961,7 +969,7 @@ const Statistics = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {sampleData.map((video, index) => (
+                  {videosYoutube.map((video, index) => (
                     <TableRow
                       key={index}
                       hover
@@ -972,7 +980,7 @@ const Statistics = () => {
                           sx={{ display: "flex", alignItems: "center", gap: 2 }}
                         >
                           <Avatar
-                            src={video.thumbnail}
+                            src={video.thumb_nail}
                             variant="rounded"
                             sx={{ width: 60, height: 45 }}
                           />
@@ -986,24 +994,24 @@ const Statistics = () => {
                           </Box>
                         </Box>
                       </TableCell>
-                      <TableCell>{formatDate(video.publishedAt)}</TableCell>
+                      <TableCell>{formatDate(video.published_at)}</TableCell>
                       <TableCell>
                         <Chip
-                          label={formatNumber(video.numOfViews)}
+                          label={formatNumber(video.number_of_views)}
                           color="primary"
                           size="small"
                         />
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={formatNumber(video.numOfLikes)}
+                          label={formatNumber(video.number_of_likes)}
                           color="primary"
                           size="small"
                         />
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={formatNumber(video.numOfComments)}
+                          label={formatNumber(video.number_of_comments)}
                           color="primary"
                           size="small"
                         />
@@ -1087,24 +1095,12 @@ const Statistics = () => {
                   >
                     <Box sx={{ position: "relative" }}>
                       <Avatar
-                        src={video.thumbnail}
+                        src={video.thumb_nail}
                         variant="rounded"
                         sx={{
                           width: "100%",
                           height: 180,
                           borderRadius: "8px 8px 0 0",
-                        }}
-                      />
-                      <Chip
-                        label="2:47"
-                        size="small"
-                        sx={{
-                          position: "absolute",
-                          bottom: 8,
-                          right: 8,
-                          backgroundColor: "rgba(0,0,0,0.8)",
-                          color: "white",
-                          fontWeight: "bold",
                         }}
                       />
                     </Box>
@@ -1129,8 +1125,8 @@ const Statistics = () => {
                         color="text.secondary"
                         sx={{ display: "block" }}
                       >
-                        {formatNumber(video.numOfViews)} lượt xem •{" "}
-                        {formatDate(video.publishedAt)}
+                        {formatNumber(video.number_of_views)} lượt xem •{" "}
+                        {formatDate(video.published_at)}
                       </Typography>
                     </CardContent>
                   </Card>
