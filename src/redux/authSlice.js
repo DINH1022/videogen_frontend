@@ -32,6 +32,7 @@ const authSlice = createSlice({
       state.login.isFetching = true;
     },
     loginSuccess: (state, action) => {
+      console.log("payload: >>", action.payload);
       state.login.currentUser = action.payload.userData;
       state.login.accessToken = action.payload.accessToken;
       setCurrentUser(action.payload.userData);

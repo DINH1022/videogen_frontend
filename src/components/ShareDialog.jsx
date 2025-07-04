@@ -28,6 +28,8 @@ import {
   Fullscreen as FullscreenIcon,
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 // TikTok icon component
 const TikTokIcon = () => (
@@ -190,6 +192,8 @@ const VideoShareDialog = ({
   const [selectedChannel, setSelectedChannel] = useState("Kênh Hàm Học");
   const [captionDialogOpen, setCaptionDialogOpen] = useState(false);
   const videoRef = useRef(null);
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.login.currentUser);
   const [formData, setFormData] = useState({
     youtube: { title: "", description: "" },
     tiktok: { title: "", description: "" },
@@ -477,6 +481,9 @@ const VideoShareDialog = ({
 
                   <Button
                     variant="contained"
+                    onClick={() =>
+                      (window.location.href = `http://localhost:8080/connect/youtube?user-id=${user.id}`)
+                    }
                     fullWidth
                     sx={{
                       backgroundColor: "#FF0000",

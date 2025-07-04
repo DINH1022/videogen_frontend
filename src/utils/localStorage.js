@@ -11,12 +11,7 @@ export const getCurrentUser = () => {
 
 export const setCurrentUser = (user) => {
   try {
-    if (
-      !user ||
-      typeof user !== "object" ||
-      !user.infoUser ||
-      !user.accessToken
-    ) {
+    if (!user || typeof user !== "object") {
       throw new Error("Invalid user object");
     }
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(user));
