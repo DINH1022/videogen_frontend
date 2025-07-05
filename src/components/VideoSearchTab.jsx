@@ -12,11 +12,19 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Image as ImageIcon, VideoLibrary } from "@mui/icons-material";
+
+/**
+ * VideoSearchTab component provides a UI tab for searching and previewing videos by keyword.
+ * Users can enter a keyword, trigger a (mock) search, and preview or drag the found video.
+ *
+ * - searchVideo: Handles searching for a video based on the entered keyword (simulated).
+ */
 const VideoSearchTab = () => {
   const [keyword, setKeyword] = useState("");
   const [foundVideo, setFoundVideo] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Handles searching for a video based on the entered keyword (simulated)
   const searchVideo = async () => {
     if (!keyword.trim()) return;
 

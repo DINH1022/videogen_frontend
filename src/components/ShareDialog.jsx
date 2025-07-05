@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -11,48 +11,48 @@ import {
   IconButton,
   Typography,
   Avatar,
-  Select,
-  MenuItem,
-  FormControl,
   CircularProgress,
+  Alert,
 } from "@mui/material";
 import {
   Close as CloseIcon,
   Download as DownloadIcon,
   Share as ShareIcon,
   YouTube as YouTubeIcon,
-  Facebook as FacebookIcon,
-  PlayArrow as PlayArrowIcon,
-  Pause as PauseIcon,
-  VolumeUp as VolumeUpIcon,
-  Fullscreen as FullscreenIcon,
-  MoreVert as MoreVertIcon,
+  Login as LoginIcon,
 } from "@mui/icons-material";
-
-// TikTok icon component
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { uploadVideoToYoutube } from "../services/uploadYoutube";
+import { checkLoginSocialAccount } from "../services/status";
+import { uploadVideoToTiktok } from "../services/uploadTiktok";
+import Swal from "sweetalert2";
+import { generateCaption } from "../services/script";
+import showToast from "./ShowToast";
 const TikTokIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43V7.56a8.16 8.16 0 0 0 4.77 1.52v-3.39z" />
   </svg>
 );
 
-const AutoCaptionDialog = ({ open, onClose }) => {
+const AutoCaptionDialog = ({ open, onClose, script, language }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCaption, setGeneratedCaption] = useState(null);
 
-  const handleGenerateCaption = () => {
+  const handleGenerateCaption = async () => {
     setIsGenerating(true);
     setGeneratedCaption(null);
-
-    // Giả lập API call với setTimeout
-    setTimeout(() => {
-      setGeneratedCaption({
-        title: "NÚI LỬA: SỰ HÌNH THÀNH, HOẠT ĐỘNG VÀ ẢNH HƯỞNG ĐẾN TRÁI ĐẤT",
-        description:
-          "Núi lửa: Cấu trúc địa chất hùng vĩ, hình thành từ áp lực nội tại Trái Đất.\nNghiên cứu phun trào để hiểu rõ hơn về hành tinh chúng ta.\n#NuiLuaHocThuat",
-      });
-      setIsGenerating(false);
-    }, 3000);
+    const title1 = await generateCaption(
+      "SOCIAL_MEDIA_TITLE",
+      script,
+      language
+    );
+    const description1 = await generateCaption("CAPTION", script, language);
+    setGeneratedCaption({
+      title: title1,
+      description: description1,
+    });
+    setIsGenerating(false);
   };
 
   const handleConfirm = () => {
@@ -180,22 +180,79 @@ const AutoCaptionDialog = ({ open, onClose }) => {
   );
 };
 
+const TabPanel = ({ children, value, index }) => (
+  <Box hidden={value !== index} key={index}>
+    {value === index && <Box>{children}</Box>}
+  </Box>
+);
+
 const VideoShareDialog = ({
   open,
   onClose,
   videoSrc = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+  language = "vietnamese",
+  script = "Video Description",
 }) => {
   const [activeTab, setActiveTab] = useState(0);
-  const [selectedChannel, setSelectedChannel] = useState("Kênh Hàm Học");
   const [captionDialogOpen, setCaptionDialogOpen] = useState(false);
   const videoRef = useRef(null);
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.login.currentUser);
+  const [statusAccountSocial, setStatusAccountSocial] = useState({
+    youtube_status: false,
+    tiktok_status: false,
+  });
+  const [uploadLoading, setUploadLoading] = useState({
+    youtube: false,
+    tiktok: false,
+  });
+  const handleYoutubeUpload = async () => {
+    setUploadLoading((prev) => ({ ...prev, youtube: true }));
+    try {
+      const response = await uploadVideoToYoutube(
+        videoSrc,
+        formData.youtube.title,
+        formData.youtube.description
+      );
+      showToast("Upload video to Youtube successfull", "success");
+    } catch (error) {
+      console.error("Upload failed:", error);
+      // Có thể thêm thông báo lỗi ở đây
+    } finally {
+      setUploadLoading((prev) => ({ ...prev, youtube: false }));
+    }
+  };
+
+  // 3. Thêm hàm xử lý upload với loading cho TikTok
+  const handleTiktokUpload = async () => {
+    setUploadLoading((prev) => ({ ...prev, tiktok: true }));
+    try {
+      await uploadVideoToTiktok(
+        videoSrc,
+        formData.tiktok.title,
+        formData.tiktok.description
+      );
+      // Có thể thêm thông báo thành công ở đây
+      showToast("Upload video to Tiktok successfull", "success");
+    } catch (error) {
+      console.error("Upload failed:", error);
+      // Có thể thêm thông báo lỗi ở đây
+    } finally {
+      setUploadLoading((prev) => ({ ...prev, tiktok: false }));
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await checkLoginSocialAccount();
+      setStatusAccountSocial(response);
+    };
+    fetchData();
+  }, []);
+
   const [formData, setFormData] = useState({
     youtube: { title: "", description: "" },
     tiktok: { title: "", description: "" },
-    facebook: {
-      title: "",
-      description: "",
-    },
   });
 
   const handleTabChange = (event, newValue) => {
@@ -208,7 +265,6 @@ const VideoShareDialog = ({
       setFormData({
         youtube: { title: caption.title, description: caption.description },
         tiktok: { title: caption.title, description: caption.description },
-        facebook: { title: caption.title, description: caption.description },
       });
     }
   };
@@ -223,10 +279,66 @@ const VideoShareDialog = ({
     }));
   };
 
-  const TabPanel = ({ children, value, index }) => (
-    <div hidden={value !== index}>
-      {value === index && <Box>{children}</Box>}
-    </div>
+  const handleLoginRedirect = async (platform) => {
+    // Redirect to login for specific platform
+    if (platform === "youtube") {
+      window.location.href = `http://localhost:8080/connect/youtube?user-id=${user.id}`;
+    } else if (platform === "tiktok") {
+      window.location.href = `http://localhost:8080/connect/tiktok?user-id=${user.id}`;
+    }
+  };
+
+  const renderLoginRequired = (platform, platformName, color, icon) => (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 3,
+        py: 4,
+        textAlign: "center",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          mb: 2,
+        }}
+      >
+        {icon}
+        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          {platformName}
+        </Typography>
+      </Box>
+
+      <Alert severity="warning" sx={{ width: "100%", mb: 2 }}>
+        <Typography variant="body2">
+          Bạn cần đăng nhập vào tài khoản {platformName} để share video
+        </Typography>
+      </Alert>
+
+      <Button
+        variant="contained"
+        startIcon={<LoginIcon />}
+        onClick={() => handleLoginRedirect(platform)}
+        sx={{
+          textTransform: "none",
+          backgroundColor: color,
+          "&:hover": {
+            backgroundColor: platform === "youtube" ? "#CC0000" : "#333",
+          },
+          py: 1.5,
+          px: 4,
+          borderRadius: 2,
+          fontWeight: 600,
+        }}
+      >
+        Đăng nhập {platformName}
+      </Button>
+    </Box>
   );
 
   return (
@@ -385,289 +497,242 @@ const VideoShareDialog = ({
                 iconPosition="start"
               />
               <Tab icon={<TikTokIcon />} label="TikTok" iconPosition="start" />
-              <Tab
-                icon={<FacebookIcon sx={{ color: "#1877F2", fontSize: 20 }} />}
-                label="Facebook"
-                iconPosition="start"
-              />
             </Tabs>
 
             <Box sx={{ pt: 2, flex: 1, overflow: "auto" }}>
               {/* YouTube Tab */}
               <TabPanel value={activeTab} index={0}>
-                <Box
-                  sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
-                >
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.5, fontWeight: 600 }}
-                    >
-                      Kênh
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        p: 1,
-                        backgroundColor: "#e5dede",
-                        borderRadius: 1,
-                      }}
-                    >
-                      <Avatar
+                {!statusAccountSocial.youtube_status ? (
+                  renderLoginRequired(
+                    "youtube",
+                    "YouTube",
+                    "#FF0000",
+                    <YouTubeIcon sx={{ color: "#FF0000", fontSize: 24 }} />
+                  )
+                ) : (
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
+                  >
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{ mb: 0.5, fontWeight: 600 }}
+                      >
+                        Kênh
+                      </Typography>
+                      <Box
                         sx={{
-                          width: "40px",
-                          height: "40px",
-                          bgcolor: "#FF69B4",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          p: 1,
+                          backgroundColor: "#e5dede",
+                          borderRadius: 1,
                         }}
                       >
-                        T
-                      </Avatar>
-                      <Typography variant="body2" sx={{ fontWeight: "600" }}>
-                        Ty Nguyen Chanel
-                      </Typography>
+                        <Avatar
+                          sx={{
+                            width: "40px",
+                            height: "40px",
+                            bgcolor: "#FF69B4",
+                          }}
+                        >
+                          T
+                        </Avatar>
+                        <Typography variant="body2" sx={{ fontWeight: "600" }}>
+                          Ty Nguyen Chanel
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Box>
 
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.5, fontWeight: 600 }}
-                    >
-                      Tiêu đề video
-                    </Typography>
-                    <TextField
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{ mb: 0.5, fontWeight: 600 }}
+                      >
+                        Tiêu đề video
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        placeholder="Nhập tiêu đề video..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.youtube.title}
+                        onChange={(e) =>
+                          handleInputChange("youtube", "title", e.target.value)
+                        }
+                      />
+                    </Box>
+
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{ mb: 0.5, fontWeight: 600 }}
+                      >
+                        Mô tả
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        placeholder="Nhập mô tả video..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.youtube.description}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "youtube",
+                            "description",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </Box>
+                    <Button
+                      variant="contained"
+                      onClick={handleYoutubeUpload}
                       fullWidth
-                      placeholder="Nhập tiêu đề video..."
-                      variant="outlined"
-                      size="small"
-                      value={formData.youtube.title}
-                      onChange={(e) =>
-                        handleInputChange("youtube", "title", e.target.value)
-                      }
-                    />
-                  </Box>
-
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.5, fontWeight: 600 }}
+                      disabled={uploadLoading.youtube}
+                      sx={{
+                        backgroundColor: "#FF0000",
+                        "&:hover": { backgroundColor: "#CC0000" },
+                        "&:disabled": { backgroundColor: "#ffcccc" },
+                        textTransform: "none",
+                        py: 1.5,
+                        mt: 0.5,
+                      }}
                     >
-                      Mô tả
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={4}
-                      placeholder="Nhập mô tả video..."
-                      variant="outlined"
-                      size="small"
-                      value={formData.youtube.description}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "youtube",
-                          "description",
-                          e.target.value
-                        )
-                      }
-                    />
+                      {uploadLoading.youtube ? (
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          <CircularProgress size={16} sx={{ color: "white" }} />
+                          Đang tải lên YouTube...
+                        </Box>
+                      ) : (
+                        "Chia sẻ lên YouTube"
+                      )}
+                    </Button>
                   </Box>
-
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    sx={{
-                      backgroundColor: "#FF0000",
-                      "&:hover": { backgroundColor: "#CC0000" },
-                      textTransform: "none",
-                      py: 1.5,
-                      mt: 0.5,
-                    }}
-                  >
-                    Chia sẻ lên YouTube
-                  </Button>
-                </Box>
+                )}
               </TabPanel>
 
               {/* TikTok Tab */}
               <TabPanel value={activeTab} index={1}>
-                <Box
-                  sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
-                >
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.5, fontWeight: 600 }}
-                    >
-                      Kênh
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        p: 1,
-                        backgroundColor: "#e5dede",
-                        borderRadius: 1,
-                      }}
-                    >
-                      <Avatar
+                {!statusAccountSocial.tiktok_status ? (
+                  renderLoginRequired(
+                    "tiktok",
+                    "TikTok",
+                    "#000",
+                    <TikTokIcon />
+                  )
+                ) : (
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
+                  >
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{ mb: 0.5, fontWeight: 600 }}
+                      >
+                        Kênh
+                      </Typography>
+                      <Box
                         sx={{
-                          width: "40px",
-                          height: "40px",
-                          bgcolor: "#000",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          p: 1,
+                          backgroundColor: "#e5dede",
+                          borderRadius: 1,
                         }}
                       >
-                        <TikTokIcon />
-                      </Avatar>
-                      <Typography variant="body2">
-                        cr7 (cristiano ronaldo)
-                      </Typography>
+                        <Avatar
+                          sx={{
+                            width: "40px",
+                            height: "40px",
+                            bgcolor: "#000",
+                          }}
+                        >
+                          <TikTokIcon />
+                        </Avatar>
+                        <Typography variant="body2">
+                          cr7 (cristiano ronaldo)
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Box>
 
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.5, fontWeight: 600 }}
-                    >
-                      Tiêu đề video
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      placeholder="Nhập tiêu đề cho video TikTok..."
-                      variant="outlined"
-                      size="small"
-                      value={formData.tiktok.title}
-                      onChange={(e) =>
-                        handleInputChange("tiktok", "title", e.target.value)
-                      }
-                    />
-                  </Box>
-
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.5, fontWeight: 600 }}
-                    >
-                      Mô tả
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={4}
-                      placeholder="Nhập mô tả cho video TikTok..."
-                      variant="outlined"
-                      size="small"
-                      value={formData.tiktok.description}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "tiktok",
-                          "description",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </Box>
-
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    sx={{
-                      backgroundColor: "#000",
-                      "&:hover": { backgroundColor: "#333" },
-                      textTransform: "none",
-                      py: 1.5,
-                      mt: 0.5,
-                    }}
-                  >
-                    Chia sẻ lên TikTok
-                  </Button>
-                </Box>
-              </TabPanel>
-
-              {/* Facebook Tab */}
-              <TabPanel value={activeTab} index={2}>
-                <Box
-                  sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
-                >
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.5, fontWeight: 600 }}
-                    >
-                      Chọn Trang
-                    </Typography>
-                    <FormControl fullWidth size="small">
-                      <Select
-                        value={selectedChannel}
-                        onChange={(e) => setSelectedChannel(e.target.value)}
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{ mb: 0.5, fontWeight: 600 }}
                       >
-                        <MenuItem value="Kênh Hàm Học">Kênh Hàm Học</MenuItem>
-                        <MenuItem value="Trang khác">Trang khác</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
+                        Tiêu đề video
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        placeholder="Nhập tiêu đề cho video TikTok..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.tiktok.title}
+                        onChange={(e) =>
+                          handleInputChange("tiktok", "title", e.target.value)
+                        }
+                      />
+                    </Box>
 
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.5, fontWeight: 600 }}
-                    >
-                      Tiêu đề bài đăng
-                    </Typography>
-                    <TextField
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{ mb: 0.5, fontWeight: 600 }}
+                      >
+                        Mô tả
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        placeholder="Nhập mô tả cho video TikTok..."
+                        variant="outlined"
+                        size="small"
+                        value={formData.tiktok.description}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "tiktok",
+                            "description",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </Box>
+
+                    <Button
+                      variant="contained"
                       fullWidth
-                      placeholder="Nhập tiêu đề bài đăng..."
-                      variant="outlined"
-                      size="small"
-                      value={formData.facebook.title}
-                      onChange={(e) =>
-                        handleInputChange("facebook", "title", e.target.value)
-                      }
-                    />
-                  </Box>
-
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.5, fontWeight: 600 }}
+                      onClick={handleTiktokUpload}
+                      disabled={uploadLoading.tiktok}
+                      sx={{
+                        backgroundColor: "#000",
+                        "&:hover": { backgroundColor: "#333" },
+                        "&:disabled": { backgroundColor: "#cccccc" },
+                        textTransform: "none",
+                        py: 1.5,
+                        mt: 0.5,
+                      }}
                     >
-                      Nội dung
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={5}
-                      placeholder="Nhập nội dung bài đăng..."
-                      variant="outlined"
-                      size="small"
-                      value={formData.facebook.description}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "facebook",
-                          "description",
-                          e.target.value
-                        )
-                      }
-                    />
+                      {uploadLoading.tiktok ? (
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          <CircularProgress size={16} sx={{ color: "white" }} />
+                          Đang tải lên TikTok...
+                        </Box>
+                      ) : (
+                        "Chia sẻ lên TikTok"
+                      )}
+                    </Button>
                   </Box>
-
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    sx={{
-                      backgroundColor: "#1877F2",
-                      "&:hover": { backgroundColor: "#166FE5" },
-                      textTransform: "none",
-                      py: 1.5,
-                      mt: 0.5,
-                    }}
-                  >
-                    Chia sẻ lên facebook
-                  </Button>
-                </Box>
+                )}
               </TabPanel>
             </Box>
           </Box>
@@ -684,7 +749,6 @@ const VideoShareDialog = ({
             mx: 3,
             mb: 2,
             border: "1px solid #e0e0e0",
-
             boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
           }}
         >
@@ -765,6 +829,8 @@ const VideoShareDialog = ({
       <AutoCaptionDialog
         open={captionDialogOpen}
         onClose={handleCaptionGenerated}
+        script={script}
+        language={language}
       />
     </>
   );

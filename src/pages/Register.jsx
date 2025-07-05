@@ -14,21 +14,39 @@ import {
   InputAdornment,
   IconButton,
   FormHelperText,
+  Grid,
 } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
-
-const LoginComponent = () => {
+import { useDispatch } from "react-redux";
+import { registerUser } from "../services/auth";
+import { requestRegister } from "../redux/requestAuth";
+const RegisterComponent = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({
+    username: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
+
+  const validateUsername = (username) => {
+    if (!username) {
+      return "Username is required";
+    } else if (username.length < 3) {
+      return "Username must be at least 3 characters";
+    }
+    return "";
+  };
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -48,6 +66,25 @@ const LoginComponent = () => {
     }
     return "";
   };
+
+  const validateConfirmPassword = (confirmPassword) => {
+    if (!confirmPassword) {
+      return "Please confirm your password";
+    } else if (confirmPassword !== password) {
+      return "Passwords do not match";
+    }
+    return "";
+  };
+
+  const handleUsernameChange = (e) => {
+    const newUsername = e.target.value;
+    setUsername(newUsername);
+    setErrors({
+      ...errors,
+      username: "",
+    });
+  };
+
   const handleEmailChange = (e) => {
     const newEmail = e.target.value;
     setEmail(newEmail);
@@ -63,6 +100,21 @@ const LoginComponent = () => {
     setErrors({
       ...errors,
       password: "",
+      // Also clear confirmPassword error if it was a match error
+      confirmPassword: confirmPassword
+        ? confirmPassword === newPassword
+          ? ""
+          : "Passwords do not match"
+        : errors.confirmPassword,
+    });
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    const newConfirmPassword = e.target.value;
+    setConfirmPassword(newConfirmPassword);
+    setErrors({
+      ...errors,
+      confirmPassword: "",
     });
   };
 
@@ -70,23 +122,44 @@ const LoginComponent = () => {
     setShowPassword(!showPassword);
   };
 
+  const handleClickShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate all fields before submission
+    const usernameError = validateUsername(username);
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password);
+    const confirmPasswordError = validateConfirmPassword(confirmPassword);
 
     setErrors({
+      username: usernameError,
       email: emailError,
       password: passwordError,
+      confirmPassword: confirmPasswordError,
     });
 
-    if (!emailError && !passwordError) {
-      console.log({ email, password });
+    // Only proceed if there are no errors
+    if (
+      !usernameError &&
+      !emailError &&
+      !passwordError &&
+      !confirmPasswordError
+    ) {
+      const userData = {
+        username,
+        email,
+        password,
+        confirm_password: confirmPassword,
+      };
+      await requestRegister(userData, dispatch, navigate);
     }
   };
 
@@ -100,6 +173,7 @@ const LoginComponent = () => {
         background: "linear-gradient(135deg, #070332 0%, #780080 100%)",
       }}
     >
+      {/* Left Side - Brand and video preview */}
       <Box
         sx={{
           display: { xs: "none", md: "flex" },
@@ -182,7 +256,7 @@ const LoginComponent = () => {
         </Paper>
       </Box>
 
-      {/* Right Side - Login Form */}
+      {/* Right Side - Registration Form */}
       <Box
         sx={{
           flex: 1,
@@ -192,22 +266,57 @@ const LoginComponent = () => {
           justifyContent: "center",
           bgcolor: "black",
           p: 4,
+          overflowY: "auto",
         }}
       >
         <Container maxWidth="sm">
           <Typography
             variant="h4"
             component="h1"
-            sx={{ mb: 4, color: "white", fontWeight: "bold" }}
+            sx={{ mb: 3, color: "white", fontWeight: "bold" }}
           >
-            Sign Up
+            Create Account
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mb: 2 }}>
-            {/* Email field with validation */}
+            {/* Username field with validation */}
             <TextField
               margin="normal"
               required
+              fullWidth
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
+              value={username}
+              onChange={handleUsernameChange}
+              error={!!errors.username}
+              helperText={errors.username}
+              sx={{
+                mb: 2,
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: errors.username ? "#f44336" : "#333",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: errors.username ? "#f44336" : "#666",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: errors.username ? "#f44336" : "#aaa",
+                },
+                "& .MuiInputBase-input": {
+                  color: "white",
+                },
+                "& .MuiFormHelperText-root": {
+                  color: "#f44336",
+                },
+              }}
+            />
+
+            {/* Email field with validation */}
+            <TextField
+              margin="normal"
               fullWidth
               id="email"
               label="Email"
@@ -295,6 +404,63 @@ const LoginComponent = () => {
               )}
             </FormControl>
 
+            {/* Confirm Password field with toggle visibility */}
+            <FormControl
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              error={!!errors.confirmPassword}
+              sx={{
+                mb: 2,
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: errors.confirmPassword ? "#f44336" : "#333",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: errors.confirmPassword ? "#f44336" : "#666",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: errors.confirmPassword ? "#f44336" : "#aaa",
+                },
+                "& .MuiInputBase-input": {
+                  color: "white",
+                },
+                "& .MuiFormHelperText-root": {
+                  color: "#f44336",
+                },
+              }}
+            >
+              <InputLabel htmlFor="confirmPassword">
+                Confirm Password
+              </InputLabel>
+              <OutlinedInput
+                id="confirmPassword"
+                name="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={handleConfirmPasswordChange}
+                autoComplete="new-password"
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle confirm password visibility"
+                      onClick={handleClickShowConfirmPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                      sx={{ color: "#aaa" }}
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+                label="Confirm Password"
+              />
+              {errors.confirmPassword && (
+                <FormHelperText>{errors.confirmPassword}</FormHelperText>
+              )}
+            </FormControl>
+
             <Button
               type="submit"
               fullWidth
@@ -310,29 +476,9 @@ const LoginComponent = () => {
                 borderRadius: 3,
               }}
             >
-              Sign Up
+              Create Account
             </Button>
           </Box>
-
-          <Button
-            fullWidth
-            variant="outlined"
-            startIcon={<GoogleIcon />}
-            sx={{
-              mb: 2,
-              py: 1.5,
-              color: "#000",
-              bgcolor: "white",
-              borderColor: "#ddd",
-              "&:hover": {
-                bgcolor: "#f8f8f8",
-                borderColor: "#ccc",
-              },
-              borderRadius: 3,
-            }}
-          >
-            Sign In with Google
-          </Button>
 
           <Box sx={{ mt: 2, textAlign: "center" }}>
             <Typography variant="body2" sx={{ color: "#aaa" }}>
@@ -341,7 +487,7 @@ const LoginComponent = () => {
                 href="#"
                 underline="none"
                 sx={{ color: "#6c38e8" }}
-                onClick={() => navigate("/register")}
+                onClick={() => navigate("/login")}
               >
                 Sign in now
               </Link>
@@ -353,4 +499,4 @@ const LoginComponent = () => {
   );
 };
 
-export default LoginComponent;
+export default RegisterComponent;

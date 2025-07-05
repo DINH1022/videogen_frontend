@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   AppBar,
   Toolbar,
@@ -20,12 +20,6 @@ import {
   Divider,
   Chip,
   Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  CircularProgress,
 } from "@mui/material";
 import {
   VideoCall as VideoCallIcon,
@@ -42,33 +36,114 @@ import {
   Info as InfoIcon,
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import CreateWorkspaceDialog from "./CreateWorkspaceDialog";
+import { useSelector } from "react-redux";
 const Navigation = () => {
   const theme = useTheme();
+  const accessToken = useSelector((state) => state.auth.login.accessToken);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(accessToken ? true : false);
   const [scrolled, setScrolled] = useState(false);
+  const [scrollOpacity, setScrollOpacity] = useState(1);
   const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
-  const [workspaceName, setWorkspaceName] = useState("");
-  const [workspaceNote, setWorkspaceNote] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
+  const rafId = useRef(null);
+  const lastScrollY = useRef(0);
+  const navigateRef = useRef(null);
   const isHomePage = location.pathname === "/" || location.pathname === "/home";
 
   useEffect(() => {
-    if (!isHomePage) return;
-
     const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      setScrolled(scrollTop > 50);
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
+
+      if (window.scrollY === 0) {
+        navigateRef.current.style.borderBottom = "none";
+        if (!isHomePage) {
+          navigateRef.current.style.background = "transparent";
+        }
+      } else {
+        if (!isHomePage) {
+          navigateRef.current.style.borderBottom =
+            "2px solid rgba(40, 36, 36, 0.2)";
+        }
+        if (!isHomePage) {
+          navigateRef.current.style.background = "white";
+        }
+        if (isHomePage && window.scrollY > 4000) {
+          navigateRef.current.style.background = "white";
+          navigateRef.current.style.borderBottom =
+            "2px solid rgba(40, 36, 36, 0.2)";
+        }
+      }
+
+      rafId.current = requestAnimationFrame(() => {
+        const scrollTop = window.scrollY;
+        const maxScroll = 2000;
+        const fadeStartPoint = 200;
+        const showAgainPoint = 7200;
+
+        const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4);
+
+        setScrolled(scrollTop > fadeStartPoint);
+
+        if (isHomePage) {
+          if (scrollTop <= fadeStartPoint) {
+            // Giai đoạn 1: Từ 0-200px, opacity = 1
+            setScrollOpacity(1);
+          } else if (scrollTop >= maxScroll && scrollTop < showAgainPoint) {
+            // Giai đoạn 2: Từ 2000px-3000px, opacity = 0 (ẩn hoàn toàn)
+            setScrollOpacity(0);
+          } else if (scrollTop >= showAgainPoint) {
+            //  Giai đoạn 3: Từ 3000px trở lên, hiện lại với opacity = 1
+            setScrollOpacity(1);
+          } else {
+            // Giai đoạn fade: Từ 200px-2000px, opacity giảm dần
+            const fadeDistance = maxScroll - fadeStartPoint;
+            const currentFadeDistance = scrollTop - fadeStartPoint;
+            const progress = currentFadeDistance / fadeDistance;
+
+            const easedProgress = easeOutQuart(progress);
+            const opacity = 1 - easedProgress;
+
+            setScrollOpacity(Math.max(0, Math.min(1, opacity)));
+          }
+        } else {
+          setScrollOpacity(1);
+        }
+
+        lastScrollY.current = scrollTop;
+      });
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    // Throttle scroll event để tăng performance
+    let ticking = false;
+    const throttledHandleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", throttledHandleScroll, { passive: true });
+
+    if (!isHomePage) {
+      setScrollOpacity(1);
+    }
+
+    return () => {
+      window.removeEventListener("scroll", throttledHandleScroll);
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
+    };
   }, [isHomePage]);
 
   const handleDrawerToggle = () => {
@@ -91,26 +166,6 @@ const Navigation = () => {
     setCreateWorkspaceOpen(true);
   };
 
-  const handleCloseCreateWorkspace = () => {
-    setCreateWorkspaceOpen(false);
-    setWorkspaceName("");
-    setWorkspaceNote("");
-  };
-
-  const handleCreateWorkspace = async () => {
-    if (!workspaceName.trim()) return;
-
-    setIsCreating(true);
-
-    // Giả lập API call
-    setTimeout(() => {
-      const workspaceId = Math.random().toString(36).substr(2, 9);
-      setIsCreating(false);
-      handleCloseCreateWorkspace();
-      navigate(`/workspace/${workspaceId}`);
-    }, 2000);
-  };
-
   const navItems = [
     { text: "Giới thiệu", icon: <InfoIcon />, path: "/about" },
     { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
@@ -119,17 +174,14 @@ const Navigation = () => {
       text: "Tạo Video",
       icon: <VideoCallIcon />,
       action: handleCreateVideoClick,
-      featured: true,
     },
   ];
 
   const getAppBarBackground = () => {
     if (isHomePage) {
-      return scrolled
-        ? "linear-gradient(135deg, rgba(213, 216, 228, 0.95) 0%, rgba(185, 171, 166, 0.95) 100%)"
-        : "rgba(0, 0, 0, 0.1)";
+      return "transparent";
     }
-    return "linear-gradient(135deg, rgba(213, 216, 228, 0.95) 0%, rgba(241, 173, 151, 0.95) 100%)";
+    return "white";
   };
 
   const drawer = (
@@ -137,7 +189,8 @@ const Navigation = () => {
       sx={{
         width: 280,
         height: "100%",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background:
+          "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b9d 100%)",
         color: "white",
       }}
     >
@@ -219,18 +272,6 @@ const Navigation = () => {
                 fontSize: "0.95rem",
               }}
             />
-            {item.featured && (
-              <Chip
-                label="New"
-                size="small"
-                sx={{
-                  bgcolor: "#ff6b9d",
-                  color: "white",
-                  fontWeight: 600,
-                  fontSize: "0.7rem",
-                }}
-              />
-            )}
           </ListItem>
         ))}
       </List>
@@ -248,13 +289,13 @@ const Navigation = () => {
               textTransform: "none",
               fontSize: "1rem",
               fontWeight: 600,
-              bgcolor: "rgba(255, 255, 255, 0.2)",
-              backdropFilter: "blur(10px)",
+              background: "#283c1c",
               color: "white",
               border: "1px solid rgba(255, 255, 255, 0.3)",
               "&:hover": {
-                bgcolor: "rgba(255, 255, 255, 0.3)",
+                background: "#283c1c",
                 transform: "translateY(-2px)",
+                boxShadow: "0 8px 25px rgba(255, 107, 157, 0.4)",
               },
               transition: "all 0.3s ease",
             }}
@@ -295,27 +336,21 @@ const Navigation = () => {
   return (
     <>
       <AppBar
+        ref={navigateRef}
         position="fixed"
-        elevation={isHomePage && !scrolled ? 0 : 4}
+        elevation={0}
         sx={{
-          borderRadius: "0 0 20px 20px",
+          boxSizing: "border-box",
+          borderRadius: isHomePage ? "0" : "0 0 10px 10px",
           background: getAppBarBackground(),
-          backdropFilter:
-            isHomePage && scrolled
-              ? "blur(20px)"
-              : isHomePage
-              ? "blur(5px)"
-              : "blur(20px)",
-          borderBottom:
-            isHomePage && !scrolled
-              ? "none"
-              : "1px solid rgba(255, 255, 255, 0.1)",
+          backdropFilter: "blur(20px)",
+          border: "none",
+          borderBottom: "none",
           color: "white",
-          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          boxShadow:
-            isHomePage && !scrolled
-              ? "none"
-              : "0 4px 20px rgba(0, 0, 0, 0.1), 0 1px 5px rgba(0, 0, 0, 0.1)",
+          opacity: isHomePage ? scrollOpacity : 1,
+          transition: "all 0.3s ease", // ✅ Tăng thời gian transition để mượt hơn
+          visibility: isHomePage && scrollOpacity === 0 ? "hidden" : "visible",
+          willChange: isHomePage ? "opacity, visibility" : "auto",
         }}
       >
         <Container maxWidth="xl">
@@ -336,13 +371,21 @@ const Navigation = () => {
                 onClick={handleDrawerToggle}
                 sx={{
                   mr: 2,
-                  bgcolor:
-                    isHomePage && !scrolled
-                      ? "rgba(255, 255, 255, 0.15)"
-                      : "rgba(255, 255, 255, 0.1)",
-                  "&:hover": { bgcolor: "rgba(255, 255, 255, 0.2)" },
+                  bgcolor: isHomePage
+                    ? "rgba(255, 255, 255, 0.9)"
+                    : "rgba(102, 126, 234, 0.2)",
+                  color: isHomePage ? "#667eea" : "white",
+                  "&:hover": {
+                    bgcolor: isHomePage
+                      ? "rgba(255, 255, 255, 1)"
+                      : "rgba(102, 126, 234, 0.3)",
+                    transform: "scale(1.05)",
+                  },
                   borderRadius: 2,
                   transition: "all 0.3s ease",
+                  border: isHomePage
+                    ? "1px solid rgba(102, 126, 234, 0.2)"
+                    : "1px solid rgba(255, 255, 255, 0.2)",
                 }}
               >
                 <MenuIcon />
@@ -370,33 +413,37 @@ const Navigation = () => {
                   width: 44,
                   height: 44,
                   borderRadius: 3,
-                  bgcolor:
-                    isHomePage && !scrolled
-                      ? "rgba(255, 255, 255, 0.25)"
-                      : "rgba(255, 255, 255, 0.2)",
+                  background: "rgba(255, 255, 255, 0.9)",
+
                   backdropFilter: "blur(10px)",
-                  border: `1px solid ${
-                    isHomePage && !scrolled
-                      ? "rgba(255, 255, 255, 0.4)"
-                      : "rgba(255, 255, 255, 0.3)"
-                  }`,
+                  border: isHomePage
+                    ? "1px solid rgba(102, 126, 234, 0.2)"
+                    : "1px solid rgba(255, 255, 255, 0.3)",
                   transition: "all 0.3s ease",
+                  "&:hover": {
+                    transform: "scale(1.05)",
+                    background: isHomePage
+                      ? "rgba(255, 255, 255, 1)"
+                      : "linear-gradient(135deg, rgba(102, 126, 234, 0.4) 0%, rgba(255, 107, 157, 0.4) 100%)",
+                  },
                 }}
               >
-                <MovieIcon sx={{ color: "white", fontSize: 24 }} />
+                <MovieIcon
+                  sx={{
+                    color: "#667eea",
+                    fontSize: 24,
+                  }}
+                />
               </Box>
               <Typography
                 variant="h6"
                 component="div"
                 sx={{
                   fontWeight: 700,
-                  color: "white",
+                  color: "#333",
                   fontSize: "1.3rem",
                   display: { xs: "none", sm: "block" },
-                  textShadow:
-                    isHomePage && !scrolled
-                      ? "0 2px 10px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3)"
-                      : "0 2px 10px rgba(0,0,0,0.3)",
+                  textShadow: "none",
                   transition: "all 0.3s ease",
                 }}
               >
@@ -425,30 +472,30 @@ const Navigation = () => {
                         }
                       }}
                       sx={{
-                        color: "white",
+                        color: "#333",
                         textTransform: "none",
                         fontWeight: 600,
                         px: 3,
                         py: 1.5,
                         borderRadius: 3,
-                        bgcolor: item.featured
-                          ? isHomePage && !scrolled
-                            ? "rgba(255, 255, 255, 0.2)"
-                            : "rgba(255, 255, 255, 0.15)"
-                          : isHomePage && !scrolled
-                          ? "rgba(255, 255, 255, 0.15)"
-                          : "rgba(255, 255, 255, 0.1)",
+                        background: item.featured
+                          ? "rgba(255, 107, 157, 0.9)"
+                          : "rgba(255, 255, 255, 0.9)",
+
                         backdropFilter: "blur(10px)",
-                        border: `1px solid ${
-                          isHomePage && !scrolled
-                            ? "rgba(255, 255, 255, 0.3)"
-                            : "rgba(255, 255, 255, 0.2)"
-                        }`,
+                        border: isHomePage
+                          ? "1px solid rgba(102, 126, 234, 0.2)"
+                          : "1px solid rgba(107, 95, 95, 0.25)",
                         transition: "all 0.3s ease",
                         "&:hover": {
-                          bgcolor: "rgba(255, 255, 255, 0.25)",
+                          background: item.featured
+                            ? "rgba(255, 107, 157, 1)"
+                            : "rgba(255, 255, 255, 1)",
+
                           transform: "translateY(-2px)",
-                          boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
+                          boxShadow: item.featured
+                            ? "0 2px 10px rgba(255, 107, 157, 0.3)"
+                            : "0 2px 10px rgba(102, 126, 234, 0.3)",
                         },
                       }}
                     >
@@ -468,21 +515,13 @@ const Navigation = () => {
                     px: 4,
                     py: 1.5,
                     borderRadius: 3,
-                    background:
-                      isHomePage && !scrolled
-                        ? "linear-gradient(135deg, rgba(255, 107, 157, 0.9) 0%, rgba(240, 147, 251, 0.9) 100%)"
-                        : "linear-gradient(135deg, #ff6b9d 0%, #f093fb 100%)",
-                    border: `1px solid ${
-                      isHomePage && !scrolled
-                        ? "rgba(255, 255, 255, 0.4)"
-                        : "rgba(255, 255, 255, 0.3)"
-                    }`,
+                    background: "#283c1c",
+                    border: "1px solid rgba(255, 255, 255, 0.3)",
                     color: "white",
                     fontSize: "0.95rem",
                     transition: "all 0.3s ease",
                     "&:hover": {
                       transform: "translateY(-2px)",
-                      boxShadow: "0 8px 25px rgba(255, 107, 157, 0.4)",
                     },
                   }}
                 >
@@ -497,14 +536,11 @@ const Navigation = () => {
                         width: 44,
                         height: 44,
                         fontWeight: 700,
-                        border: `2px solid ${
-                          isHomePage && !scrolled
-                            ? "rgba(255, 255, 255, 0.4)"
-                            : "rgba(255, 255, 255, 0.3)"
-                        }`,
+                        border: "2px solid rgba(255, 255, 255, 0.3)",
                         transition: "all 0.3s ease",
                         "&:hover": {
                           transform: "scale(1.1)",
+                          boxShadow: "0 8px 25px rgba(255, 107, 157, 0.4)",
                         },
                       }}
                     >
@@ -616,136 +652,10 @@ const Navigation = () => {
       </Drawer>
 
       {/* Create Workspace Dialog */}
-      <Dialog
+      <CreateWorkspaceDialog
         open={createWorkspaceOpen}
-        onClose={handleCloseCreateWorkspace}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 4,
-            background:
-              "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-            boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
-          },
-        }}
-      >
-        <DialogTitle
-          sx={{
-            pb: 2,
-            textAlign: "center",
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "white",
-            fontWeight: 700,
-            fontSize: "1.5rem",
-            mb: 2,
-          }}
-        >
-          Tạo Workspace Mới
-        </DialogTitle>
-        <DialogContent sx={{ pt: 3, px: 4 }}>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Tên Workspace"
-            fullWidth
-            variant="outlined"
-            value={workspaceName}
-            onChange={(e) => setWorkspaceName(e.target.value)}
-            sx={{
-              mb: 2,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 2,
-                "&:hover fieldset": {
-                  borderColor: "#667eea",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#667eea",
-                },
-              },
-              "& .MuiInputLabel-root.Mui-focused": {
-                color: "#667eea",
-              },
-            }}
-          />
-          <TextField
-            margin="dense"
-            label="Ghi chú (tùy chọn)"
-            fullWidth
-            multiline
-            rows={3}
-            variant="outlined"
-            value={workspaceNote}
-            onChange={(e) => setWorkspaceNote(e.target.value)}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 2,
-                "&:hover fieldset": {
-                  borderColor: "#667eea",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#667eea",
-                },
-              },
-              "& .MuiInputLabel-root.Mui-focused": {
-                color: "#667eea",
-              },
-            }}
-          />
-        </DialogContent>
-        <DialogActions sx={{ px: 4, pb: 3, pt: 2, gap: 2 }}>
-          <Button
-            onClick={handleCloseCreateWorkspace}
-            sx={{
-              px: 3,
-              py: 1.5,
-              borderRadius: 2,
-              textTransform: "none",
-              fontWeight: 600,
-              color: "#666",
-              "&:hover": {
-                bgcolor: "rgba(0,0,0,0.05)",
-              },
-            }}
-          >
-            Hủy
-          </Button>
-          <Button
-            onClick={handleCreateWorkspace}
-            disabled={!workspaceName.trim() || isCreating}
-            variant="contained"
-            sx={{
-              px: 4,
-              py: 1.5,
-              borderRadius: 2,
-              textTransform: "none",
-              fontWeight: 700,
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              "&:hover": {
-                background: "linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)",
-                transform: "translateY(-1px)",
-                boxShadow: "0 8px 25px rgba(102, 126, 234, 0.3)",
-              },
-              "&:disabled": {
-                background: "rgba(0,0,0,0.12)",
-                color: "rgba(0,0,0,0.26)",
-              },
-              transition: "all 0.3s ease",
-            }}
-          >
-            {isCreating ? (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <CircularProgress size={20} color="inherit" />
-                Đang tạo...
-              </Box>
-            ) : (
-              "Tạo Workspace"
-            )}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        setOpen={setCreateWorkspaceOpen}
+      />
     </>
   );
 };
