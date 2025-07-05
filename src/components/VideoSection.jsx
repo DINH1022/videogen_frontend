@@ -552,6 +552,7 @@ import { Box, Typography, Tabs, Tab, Grid, Chip, Stack } from "@mui/material";
 import VideoCard from "./VideoCard";
 import VideoShareDialog from "./ShareDialog";
 import { getAllVideosUploadToYoutube } from "../services/youtube";
+import { getAllVideosUploadToTiktok } from "../services/tiktok";
 
 // Sample 2: Video đang xử lý
 const processingVideos = [
@@ -650,7 +651,7 @@ const VideoSection = ({ workspaces }) => {
       try {
         setLoading(true);
         const response = await getAllVideosUploadToYoutube();
-        console.log("API response:", response);
+        const response2 = await getAllVideosUploadToTiktok();
 
         const videos = configVideosPublishedYoutube(response);
         console.log("Processed published videos:", videos);
