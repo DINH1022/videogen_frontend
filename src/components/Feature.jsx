@@ -1,10 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 
+/**
+ * FeaturesParallax component displays a parallax grid of feature cards
+ * with scroll-triggered animations and decorative background.
+ */
 const FeaturesParallax = () => {
+  // Track vertical scroll position for parallax effect
   const [scrollY, setScrollY] = useState(0);
+  // Track which feature cards are currently visible in viewport
   const [visibleCards, setVisibleCards] = useState(new Set());
   const containerRef = useRef(null);
 
+  // List of features to display
   const features = [
     {
       id: 1,
@@ -66,6 +73,7 @@ const FeaturesParallax = () => {
     },
   ];
 
+  // Handle scroll event for parallax and visibility detection
   useEffect(() => {
     let ticking = false;
 
@@ -150,6 +158,7 @@ const FeaturesParallax = () => {
         />
       ))}
 
+      {/* CSS Animations and Effects */}
       <style jsx>{`
         @keyframes float0 {
           0%,
@@ -298,6 +307,7 @@ const FeaturesParallax = () => {
         >
           {features.map((feature, index) => {
             const isVisible = visibleCards.has(feature.id);
+            // Parallax effect for each card
             const parallaxY = Math.sin((scrollY + index * 100) * 0.002) * 8;
 
             return (
@@ -385,7 +395,7 @@ const FeaturesParallax = () => {
                   }}
                 />
 
-                {/* Hover Glow Effect */}
+                {/* Hover Glow Effect (decorative, not interactive) */}
                 <div
                   style={{
                     position: "absolute",
