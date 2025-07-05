@@ -617,49 +617,49 @@ const SmoothScrollSequence = ({
           <div className="ssq-company-logos-container">
             <div className="ssq-company-logos">
               <div className="ssq-company-logo">Nguyen Van Ty</div>
-              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Truong Le Anh Vu</div>
               <div className="ssq-company-logo">Le Quang Vinh</div>
-              <div className="ssq-company-logo">Le Quoc Vinh</div>
+              <div className="ssq-company-logo">Nguyen Quoc Vinh</div>
 
               <div className="ssq-company-logo">Nguyen Van Ty</div>
-              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Truong Le Anh Vu</div>
               <div className="ssq-company-logo">Le Quang Vinh</div>
-              <div className="ssq-company-logo">Le Quoc Vinh</div>
+              <div className="ssq-company-logo">Nguyen Quoc Vinh</div>
 
               <div className="ssq-company-logo">Nguyen Van Ty</div>
-              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Truong Le Anh Vu</div>
               <div className="ssq-company-logo">Le Quang Vinh</div>
-              <div className="ssq-company-logo">Le Quoc Vinh</div>
+              <div className="ssq-company-logo">Nguyen Quoc Vinh</div>
 
               <div className="ssq-company-logo">Nguyen Van Ty</div>
-              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Truong Le Anh Vu</div>
               <div className="ssq-company-logo">Le Quang Vinh</div>
-              <div className="ssq-company-logo">Le Quoc Vinh</div>
+              <div className="ssq-company-logo">Nguyen Quoc Vinh</div>
 
               <div className="ssq-company-logo">Nguyen Van Ty</div>
-              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Truong Le Anh Vu</div>
               <div className="ssq-company-logo">Le Quang Vinh</div>
-              <div className="ssq-company-logo">Le Quoc Vinh</div>
+              <div className="ssq-company-logo">Nguyen Quoc Vinh</div>
 
               <div className="ssq-company-logo">Nguyen Van Ty</div>
-              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Truong Le Anh Vu</div>
               <div className="ssq-company-logo">Le Quang Vinh</div>
-              <div className="ssq-company-logo">Le Quoc Vinh</div>
+              <div className="ssq-company-logo">Nguyen Quoc Vinh</div>
 
               <div className="ssq-company-logo">Nguyen Van Ty</div>
-              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Truong Le Anh Vu</div>
               <div className="ssq-company-logo">Le Quang Vinh</div>
-              <div className="ssq-company-logo">Le Quoc Vinh</div>
+              <div className="ssq-company-logo">Nguyen Quoc Vinh</div>
 
               <div className="ssq-company-logo">Nguyen Van Ty</div>
-              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Truong Le Anh Vu</div>
               <div className="ssq-company-logo">Le Quang Vinh</div>
-              <div className="ssq-company-logo">Le Quoc Vinh</div>
+              <div className="ssq-company-logo">Nguyen Quoc Vinh</div>
 
               <div className="ssq-company-logo">Nguyen Van Ty</div>
-              <div className="ssq-company-logo">Nguyen Hoang Vu</div>
+              <div className="ssq-company-logo">Truong Le Anh Vu</div>
               <div className="ssq-company-logo">Le Quang Vinh</div>
-              <div className="ssq-company-logo">Le Quoc Vinh</div>
+              <div className="ssq-company-logo">Nguyen Quoc Vinh</div>
             </div>
           </div>
         </div>

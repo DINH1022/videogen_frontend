@@ -3,6 +3,9 @@ import {
   getCurrentUser,
   removeCurrentUser,
   setCurrentUser,
+  setAccessToken,
+  getAccessToken,
+  removeAccessToken,
 } from "../utils/localstorage";
 const authSlice = createSlice({
   name: "authSlice",
@@ -11,6 +14,7 @@ const authSlice = createSlice({
       isFetching: false,
       error: false,
       currentUser: getCurrentUser() || null,
+      accessToken: getAccessToken() || null,
     },
     register: {
       isFetching: false,
@@ -28,8 +32,11 @@ const authSlice = createSlice({
       state.login.isFetching = true;
     },
     loginSuccess: (state, action) => {
-      state.login.currentUser = action.payload;
-      setCurrentUser(action.payload);
+      console.log("payload: >>", action.payload);
+      state.login.currentUser = action.payload.userData;
+      state.login.accessToken = action.payload.accessToken;
+      setCurrentUser(action.payload.userData);
+      setAccessToken(action.payload.accessToken);
       state.login.isFetching = false;
       state.login.error = false;
     },

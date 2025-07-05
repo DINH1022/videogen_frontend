@@ -21,6 +21,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { requestLogin } from "../redux/requestAuth.js";
+
 const LoginComponent = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -33,12 +34,12 @@ const LoginComponent = () => {
   });
 
   const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      return "Email is required";
-    } else if (!re.test(email)) {
-      return "Please enter a valid email address";
-    }
+    // const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // if (!email) {
+    //   return "Email is required";
+    // } else if (!re.test(email)) {
+    //   return "Please enter a valid email address";
+    // }
     return "";
   };
 
@@ -88,7 +89,7 @@ const LoginComponent = () => {
     });
 
     if (!emailError && !passwordError) {
-      const userData = { email, password };
+      const userData = { username: email, password };
       await requestLogin(userData, dispatch, navigate);
     }
   };
@@ -203,7 +204,7 @@ const LoginComponent = () => {
             component="h1"
             sx={{ mb: 4, color: "white", fontWeight: "bold" }}
           >
-            Sign Up
+            Sign In
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mb: 2 }}>
@@ -313,7 +314,7 @@ const LoginComponent = () => {
                 borderRadius: 3,
               }}
             >
-              Sign Up
+              Sign In
             </Button>
           </Box>
 
@@ -346,7 +347,7 @@ const LoginComponent = () => {
                 sx={{ color: "#6c38e8" }}
                 onClick={() => navigate("/register")}
               >
-                Sign in now
+                Sign up now
               </Link>
             </Typography>
           </Box>
