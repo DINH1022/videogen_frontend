@@ -8,3 +8,12 @@ export const getAllVideosUploadToTiktok = async () => {
     throw error;
   }
 };
+
+export const getAllVideosUploadToTiktokStore = async () => {
+  try {
+    const response = await axiosInstance.get("/video/tiktok-videos");
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

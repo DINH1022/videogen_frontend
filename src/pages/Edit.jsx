@@ -11,17 +11,12 @@ import {
   Toolbar,
   CircularProgress,
 } from "@mui/material";
-import {
-  Image as ImageIcon,
-  VideoLibrary,
-  Share,
-  CloudDownload,
-  Add,
-} from "@mui/icons-material";
+import { Image as ImageIcon, Share } from "@mui/icons-material";
 import { useLocation } from "react-router-dom";
 import ExportDialog from "../components/ExportDialog";
 import ImageGenTab from "../components/ImageGenTab";
 import VideoSearchTab from "../components/VideoSearchTab";
+import { useSelector } from "react-redux";
 
 // Fallback sample resources (only used if no data is passed)
 const fallbackImages = [
@@ -33,12 +28,11 @@ const fallbackImages = [
 
 export default function CesdkMuiEditor() {
   const containerRef = useRef(null);
-  const [activeTab, setActiveTab] = useState(0);
   const [mainEngine, setMainEngine] = useState(null);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [editorReady, setEditorReady] = useState(false);
   const location = useLocation();
-
+  const workspace = useSelector((state) => state.selectedWorkspace);
   // Extract parameters from navigation state
   const workspaceId = location.state?.workspaceId ?? null;
   const resourceList = location.state?.resourceList ?? [];
