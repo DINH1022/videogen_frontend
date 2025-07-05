@@ -38,7 +38,6 @@ const TikTokIcon = () => (
 const AutoCaptionDialog = ({ open, onClose, script, language }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCaption, setGeneratedCaption] = useState(null);
-
   const handleGenerateCaption = async () => {
     setIsGenerating(true);
     setGeneratedCaption(null);
@@ -502,7 +501,7 @@ const VideoShareDialog = ({
             <Box sx={{ pt: 2, flex: 1, overflow: "auto" }}>
               {/* YouTube Tab */}
               <TabPanel value={activeTab} index={0}>
-                {!statusAccountSocial.youtube_status ? (
+                {statusAccountSocial.youtube_status ? (
                   renderLoginRequired(
                     "youtube",
                     "YouTube",

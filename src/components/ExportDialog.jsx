@@ -256,19 +256,6 @@ export default function ExportDialog({
     onClose();
   };
 
-  const getQualityIcon = (quality) => {
-    switch (quality) {
-      case "4k":
-        return "🎬";
-      case "1080p":
-        return "🎥";
-      case "720p":
-        return "📹";
-      default:
-        return "🎥";
-    }
-  };
-
   return (
     <>
       <StyledDialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
@@ -445,6 +432,8 @@ export default function ExportDialog({
             open={showPreview}
             onClose={() => setShowPreview(false)}
             videoSrc={exportedVideoUrl}
+            language={workspace?.language || "english"}
+            script={workspace?.script || ""}
           />
         )}
       </StyledDialog>

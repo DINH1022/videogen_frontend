@@ -552,7 +552,10 @@ import { Box, Typography, Tabs, Tab, Grid, Chip, Stack } from "@mui/material";
 import VideoCard from "./VideoCard";
 import VideoShareDialog from "./ShareDialog";
 import { getAllVideosUploadToYoutube } from "../services/youtube";
-import { getAllVideosUploadToTiktok } from "../services/tiktok";
+import {
+  getAllVideosUploadToTiktok,
+  getAllVideosUploadToTiktokStore,
+} from "../services/tiktok";
 
 // Sample 2: Video đang xử lý
 const processingVideos = [
@@ -607,7 +610,7 @@ const VideoSection = ({ workspaces }) => {
             script: item.script || "",
           };
         }
-        return null; // Trả về null thay vì undefined
+        return null;
       })
       .filter(Boolean); // Loại bỏ các giá trị null/undefined
 
@@ -632,7 +635,23 @@ const VideoSection = ({ workspaces }) => {
     });
     return videos;
   };
+  const configVideosPublishedTiktok = (data) => {
+    if (!data || !Array.isArray(data)) return [];
 
+    const videos = data.map((item, index) => {
+      return {
+        id: index + 10,
+        topic: item?.title || "Untitled Video",
+        url: item?.url || "",
+        thumbnail: item?.thumbnail || "",
+        dateCreate: item?.publishedAt || new Date().toISOString(),
+        views: `${item?.numOfViews || 0} lượt xem`,
+        state: "complete", // Thêm field này
+        published: ["tiktok"], // Thêm field này
+      };
+    });
+    return videos;
+  };
   // Update workspaceVideos when workspaces prop changes
   useEffect(() => {
     try {
@@ -645,18 +664,21 @@ const VideoSection = ({ workspaces }) => {
     }
   }, [workspaces]);
 
-  // Fetch published videos
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const response = await getAllVideosUploadToYoutube();
-        const response2 = await getAllVideosUploadToTiktok();
+        const response2 = await getAllVideosUploadToTiktokStore();
 
-        const videos = configVideosPublishedYoutube(response);
-        console.log("Processed published videos:", videos);
+        const videosYoutube = configVideosPublishedYoutube(response);
+        const videosTiktok = configVideosPublishedTiktok(response2);
+        // Gộp 2 mảng và sắp xếp theo dateCreate (mới nhất đến cũ nhất)
+        const allVideos = [...videosYoutube, ...videosTiktok].sort((a, b) => {
+          return new Date(b.dateCreate) - new Date(a.dateCreate);
+        });
 
-        setPublishedVideos(videos);
+        setPublishedVideos(allVideos);
       } catch (error) {
         console.error("Error fetching published videos:", error);
         setPublishedVideos([]);
