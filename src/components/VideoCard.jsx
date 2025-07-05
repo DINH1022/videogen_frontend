@@ -374,7 +374,6 @@ import VideoShareDialog from "./ShareDialog";
 const VideoCard = ({ video, isPublishedTab }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [openDialogShare, setOpenDialogShare] = useState(false);
-
   const getPlatformChip = (platform) => {
     const configs = {
       facebook: {
@@ -727,6 +726,8 @@ const VideoCard = ({ video, isPublishedTab }) => {
         open={openDialogShare}
         onClose={() => setOpenDialogShare(false)}
         videoSrc={video.url}
+        language={video.language}
+        script={video.script || ""} // Thêm mô tả nếu có
       />
     </Card>
   );

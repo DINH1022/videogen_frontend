@@ -602,6 +602,8 @@ const VideoSection = ({ workspaces }) => {
             state: "complete",
             published: [], // Thêm field này
             views: "0 lượt xem", // Thêm field này
+            language: item.language || "vietnamese", // Thêm field này
+            script: item.script || "",
           };
         }
         return null; // Trả về null thay vì undefined

@@ -30,3 +30,17 @@ export const saveScript = async (scriptData, workspaceId) => {
     throw error;
   }
 };
+
+export const generateCaption = async (type, shortScript, language) => {
+  try {
+    const response = await axiosInstance.post("/text/generate", {
+      type,
+      shortScript,
+      language,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error getting caption:", error);
+    throw error;
+  }
+};

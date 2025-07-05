@@ -27,6 +27,7 @@ import { uploadVideoToYoutube } from "../services/uploadYoutube";
 import { checkLoginSocialAccount } from "../services/status";
 import { uploadVideoToTiktok } from "../services/uploadTiktok";
 import Swal from "sweetalert2";
+import { generateCaption } from "../services/script";
 import showToast from "./ShowToast";
 const TikTokIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -34,23 +35,24 @@ const TikTokIcon = () => (
   </svg>
 );
 
-const AutoCaptionDialog = ({ open, onClose }) => {
+const AutoCaptionDialog = ({ open, onClose, script, language }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedCaption, setGeneratedCaption] = useState(null);
 
-  const handleGenerateCaption = () => {
+  const handleGenerateCaption = async () => {
     setIsGenerating(true);
     setGeneratedCaption(null);
-
-    // Giả lập API call với setTimeout
-    setTimeout(() => {
-      setGeneratedCaption({
-        title: "NÚI LỬA: SỰ HÌNH THÀNH, HOẠT ĐỘNG VÀ ẢNH HƯỞNG ĐẾN TRÁI ĐẤT",
-        description:
-          "Núi lửa: Cấu trúc địa chất hùng vĩ, hình thành từ áp lực nội tại Trái Đất.\nNghiên cứu phun trào để hiểu rõ hơn về hành tinh chúng ta.\n#NuiLuaHocThuat",
-      });
-      setIsGenerating(false);
-    }, 3000);
+    const title1 = await generateCaption(
+      "SOCIAL_MEDIA_TITLE",
+      script,
+      language
+    );
+    const description1 = await generateCaption("CAPTION", script, language);
+    setGeneratedCaption({
+      title: title1,
+      description: description1,
+    });
+    setIsGenerating(false);
   };
 
   const handleConfirm = () => {
@@ -188,6 +190,8 @@ const VideoShareDialog = ({
   open,
   onClose,
   videoSrc = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+  language = "vietnamese",
+  script = "Video Description",
 }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [captionDialogOpen, setCaptionDialogOpen] = useState(false);
@@ -825,6 +829,8 @@ const VideoShareDialog = ({
       <AutoCaptionDialog
         open={captionDialogOpen}
         onClose={handleCaptionGenerated}
+        script={script}
+        language={language}
       />
     </>
   );
