@@ -213,10 +213,10 @@ const VideoShareDialog = ({
         formData.youtube.title,
         formData.youtube.description
       );
+      alert("Upload successful: " + response);
       showToast("Upload video to Youtube successfull", "success");
     } catch (error) {
       console.error("Upload failed:", error);
-      // Có thể thêm thông báo lỗi ở đây
     } finally {
       setUploadLoading((prev) => ({ ...prev, youtube: false }));
     }
