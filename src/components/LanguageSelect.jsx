@@ -20,6 +20,16 @@ import {
   Add,
 } from "@mui/icons-material";
 
+/**
+ * LanguageSelect component provides a dropdown UI for selecting a language from a predefined list,
+ * or allows the user to add a custom language. Supports search, selection, and custom input.
+ *
+ * Props:
+ * - value: (string) The currently selected language value
+ * - onChange: (function) Callback when the language changes
+ * - sx: (object) Optional styling for the root Box
+ * - ...props: Other props passed to the Button
+ */
 const languages = [
   { value: "afrikaans", label: "Tiếng Afrikaans" },
   { value: "arabic", label: "Tiếng Ả Rập" },
@@ -71,21 +81,29 @@ const languages = [
 ];
 
 const LanguageSelect = ({ value, onChange, sx, ...props }) => {
+  // State for popper open/close
   const [open, setOpen] = useState(false);
+  // State for custom language input value
   const [customLanguage, setCustomLanguage] = useState("");
+  // State to show/hide custom input field
   const [showCustomInput, setShowCustomInput] = useState(false);
+  // Anchor element for Popper positioning
   const [anchorEl, setAnchorEl] = useState(null);
+  // Ref for focusing the custom input field
   const inputRef = useRef(null);
 
+  // Get the selected language object from the list or fallback to custom
   const selectedLanguage =
     languages.find((lang) => lang.value === value) ||
     (value ? { value, label: value } : null);
 
+  // Handle dropdown button click
   const handleButtonClick = (event) => {
     setAnchorEl(event.currentTarget);
     setOpen(!open);
   };
 
+  // Handle closing the dropdown and resetting custom input
   const handleClose = () => {
     setOpen(false);
     setAnchorEl(null);
@@ -93,11 +111,13 @@ const LanguageSelect = ({ value, onChange, sx, ...props }) => {
     setCustomLanguage("");
   };
 
+  // Handle selecting a language from the list
   const handleSelect = (language) => {
     onChange(language.value);
     handleClose();
   };
 
+  // Handle submitting a custom language
   const handleCustomSubmit = () => {
     if (customLanguage.trim()) {
       onChange(customLanguage.trim());
@@ -105,6 +125,7 @@ const LanguageSelect = ({ value, onChange, sx, ...props }) => {
     }
   };
 
+  // Show the custom input field and focus it
   const handleShowCustomInput = () => {
     setShowCustomInput(true);
     setTimeout(() => inputRef.current?.focus(), 100);
@@ -173,6 +194,7 @@ const LanguageSelect = ({ value, onChange, sx, ...props }) => {
               </Box>
             ) : (
               <List dense>
+                {/* Render the list of predefined languages */}
                 {languages.map((language) => (
                   <ListItem key={language.value} disablePadding>
                     <ListItemButton
@@ -187,6 +209,7 @@ const LanguageSelect = ({ value, onChange, sx, ...props }) => {
                   </ListItem>
                 ))}
                 <Divider />
+                {/* Option to add a custom language */}
                 <ListItem disablePadding>
                   <ListItemButton onClick={handleShowCustomInput}>
                     <Add sx={{ mr: 1 }} fontSize="small" />

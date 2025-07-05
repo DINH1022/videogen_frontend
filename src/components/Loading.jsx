@@ -2,7 +2,13 @@ import React from "react";
 import { Box, CircularProgress, Fade } from "@mui/material";
 import { styled, keyframes } from "@mui/material/styles";
 
-// Animation cho các dots xung quanh
+/**
+ * LoadingSpinner component displays a full-screen animated loading indicator
+ * with a gradient background, animated dots, and two spinning CircularProgress elements.
+ * Used to indicate loading state for the entire application or a major section.
+ */
+
+// Animation for the surrounding dots
 const pulse = keyframes`
   0% {
     transform: scale(0.8);
@@ -18,7 +24,7 @@ const pulse = keyframes`
   }
 `;
 
-// Animation cho gradient background
+// Animation for the gradient background
 const gradientShift = keyframes`
   0% {
     background-position: 0% 50%;
@@ -54,6 +60,7 @@ const LoadingContent = styled(Box)({
   justifyContent: "center",
 });
 
+// Dot styled component for animated dots around the spinner
 const Dot = styled(Box)(({ delay }) => ({
   position: "absolute",
   width: 12,
@@ -65,7 +72,7 @@ const Dot = styled(Box)(({ delay }) => ({
 }));
 
 const LoadingSpinner = () => {
-  // Tạo 8 dots xung quanh spinner chính
+  // Generate 8 animated dots around the main spinner
   const dots = Array.from({ length: 8 }, (_, i) => {
     const angle = (i * 360) / 8;
     const radius = 60;
@@ -89,7 +96,7 @@ const LoadingSpinner = () => {
     <Fade in={true} timeout={600}>
       <LoadingContainer>
         <LoadingContent>
-          {/* Spinner chính */}
+          {/* Main spinner */}
           <CircularProgress
             size={80}
             thickness={2}
@@ -101,7 +108,7 @@ const LoadingSpinner = () => {
             }}
           />
 
-          {/* Spinner thứ hai quay ngược chiều */}
+          {/* Secondary spinner rotating in the opposite direction */}
           <CircularProgress
             size={60}
             thickness={3}
@@ -115,10 +122,10 @@ const LoadingSpinner = () => {
             }}
           />
 
-          {/* Các dots xung quanh */}
+          {/* Animated dots around the spinner */}
           {dots}
 
-          {/* Dot trung tâm */}
+          {/* Center dot */}
           <Box
             sx={{
               position: "absolute",
