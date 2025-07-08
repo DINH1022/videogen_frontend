@@ -501,7 +501,7 @@ const VideoShareDialog = ({
             <Box sx={{ pt: 2, flex: 1, overflow: "auto" }}>
               {/* YouTube Tab */}
               <TabPanel value={activeTab} index={0}>
-                {statusAccountSocial.youtube_status ? (
+                {!statusAccountSocial.youtube_status ? (
                   renderLoginRequired(
                     "youtube",
                     "YouTube",

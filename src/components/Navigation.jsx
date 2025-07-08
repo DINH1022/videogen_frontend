@@ -167,7 +167,6 @@ const Navigation = () => {
   };
 
   const navItems = [
-    { text: "Giới thiệu", icon: <InfoIcon />, path: "/about" },
     { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
     { text: "Thống kê", icon: <BarChartIcon />, path: "/statistics" },
     {

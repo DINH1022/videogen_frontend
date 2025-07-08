@@ -25,22 +25,20 @@ import { requestLogin } from "../redux/requestAuth.js";
 const LoginComponent = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
-  const validateEmail = (email) => {
-    // const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // if (!email) {
-    //   return "Email is required";
-    // } else if (!re.test(email)) {
-    //   return "Please enter a valid email address";
-    // }
-    return "";
+  const validateUsername = (email) => {
+    if (!email) {
+      return "Username is required";
+    } else if (email.length < 3) {
+      return "Username must be at least 3 characters";
+    }
   };
 
   const validatePassword = (password) => {
@@ -52,11 +50,11 @@ const LoginComponent = () => {
     return "";
   };
   const handleEmailChange = (e) => {
-    const newEmail = e.target.value;
-    setEmail(newEmail);
+    const newUsername = e.target.value;
+    setUsername(newUsername);
     setErrors({
       ...errors,
-      email: "",
+      username: "",
     });
   };
 
@@ -80,16 +78,16 @@ const LoginComponent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const emailError = validateEmail(email);
+    const usernameError = validateUsername(username);
     const passwordError = validatePassword(password);
 
     setErrors({
-      email: emailError,
+      username: usernameError,
       password: passwordError,
     });
 
-    if (!emailError && !passwordError) {
-      const userData = { username: email, password };
+    if (!usernameError && !passwordError) {
+      const userData = { username: username, password };
       await requestLogin(userData, dispatch, navigate);
     }
   };
@@ -213,26 +211,26 @@ const LoginComponent = () => {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email"
-              name="email"
-              autoComplete="email"
-              value={email}
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
+              value={username}
               onChange={handleEmailChange}
-              error={!!errors.email}
-              helperText={errors.email}
+              error={!!errors.username}
+              helperText={errors.username}
               sx={{
                 mb: 2,
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": {
-                    borderColor: errors.email ? "#f44336" : "#333",
+                    borderColor: errors.username ? "#f44336" : "#333",
                   },
                   "&:hover fieldset": {
-                    borderColor: errors.email ? "#f44336" : "#666",
+                    borderColor: errors.username ? "#f44336" : "#666",
                   },
                 },
                 "& .MuiInputLabel-root": {
-                  color: errors.email ? "#f44336" : "#aaa",
+                  color: errors.username ? "#f44336" : "#aaa",
                 },
                 "& .MuiInputBase-input": {
                   color: "white",
@@ -317,26 +315,6 @@ const LoginComponent = () => {
               Sign In
             </Button>
           </Box>
-
-          <Button
-            fullWidth
-            variant="outlined"
-            startIcon={<GoogleIcon />}
-            sx={{
-              mb: 2,
-              py: 1.5,
-              color: "#000",
-              bgcolor: "white",
-              borderColor: "#ddd",
-              "&:hover": {
-                bgcolor: "#f8f8f8",
-                borderColor: "#ccc",
-              },
-              borderRadius: 3,
-            }}
-          >
-            Sign In with Google
-          </Button>
 
           <Box sx={{ mt: 2, textAlign: "center" }}>
             <Typography variant="body2" sx={{ color: "#aaa" }}>

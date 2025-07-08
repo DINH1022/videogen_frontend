@@ -200,6 +200,7 @@ const ScriptGenerator = ({}) => {
     const response = await createLongScript({
       type: "LONG_SCRIPT",
       shortScript: selectedScript.summary,
+      topic: topic,
       writingStyle: style,
       language: language,
     });
