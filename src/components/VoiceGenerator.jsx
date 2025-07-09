@@ -64,7 +64,7 @@ const VoiceConfigComponent = ({}) => {
   const progressIntervalRef = useRef(null);
   useEffect(() => {
     // Mặc định chọn giọng nam đầu tiên
-    if (workspace.audioUrl) {
+    if (workspace?.audioUrl) {
       setAudioUrl(workspace.audioUrl);
       setShowAudioPreview(true);
     }
