@@ -644,17 +644,15 @@ export default function CesdkMuiEditor() {
         y: e.clientY - rect.top,
       };
 
-      console.log("Drop position:", position);
-
       // Add image to timeline
       const success = await addImageToTimeline(imageUrl, position);
 
-      if (success) {
-        // Show success notification
-        showNotification("Image added to timeline!", "success");
-      } else {
-        showNotification("Failed to add image to timeline", "error");
-      }
+      // if (success) {
+      //   // Show success notification
+      //   showNotification("Image added to timeline!", "success");
+      // } else {
+      //   showNotification("Failed to add image to timeline", "error");
+      // }
     };
 
     // Add event listeners

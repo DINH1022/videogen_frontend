@@ -351,27 +351,22 @@ import {
   AutoAwesome,
   DragIndicator,
 } from "@mui/icons-material";
-
+import { generateImage } from "../services/images";
 const ImageGenTab = ({ mainEngine, resourceList }) => {
   const [prompt, setPrompt] = useState("");
   const [generatedImage, setGeneratedImage] = useState();
   const [loading, setLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  const generateImage = async () => {
+  const createImage = async () => {
+    console.log("Generating image with prompt:", prompt);
     if (!prompt.trim()) return;
+    console.log("Generating image with prompt:", 12);
 
     setLoading(true);
-
-    setTimeout(() => {
-      // Use resourceList if available, otherwise fallback
-      const imagesToUse =
-        resourceList && resourceList.length > 0 ? resourceList : fallbackImages;
-      const randomImage =
-        imagesToUse[Math.floor(Math.random() * imagesToUse.length)];
-      setGeneratedImage(randomImage);
-      setLoading(false);
-    }, 2000);
+    const response = await generateImage(prompt);
+    setGeneratedImage(response);
+    setLoading(false);
   };
 
   const handleImageClick = (imageUrl) => {
@@ -595,7 +590,7 @@ const ImageGenTab = ({ mainEngine, resourceList }) => {
           <Button
             fullWidth
             variant="contained"
-            onClick={generateImage}
+            onClick={createImage}
             disabled={loading || !prompt.trim()}
             startIcon={
               loading ? (

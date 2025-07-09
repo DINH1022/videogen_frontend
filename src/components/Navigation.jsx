@@ -37,10 +37,12 @@ import {
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import CreateWorkspaceDialog from "./CreateWorkspaceDialog";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutSuccess } from "../redux/authSlice";
 const Navigation = () => {
   const theme = useTheme();
   const accessToken = useSelector((state) => state.auth.login.accessToken);
+  const userData = useSelector((state) => state.auth.login.currentUser);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -54,6 +56,7 @@ const Navigation = () => {
   const lastScrollY = useRef(0);
   const navigateRef = useRef(null);
   const isHomePage = location.pathname === "/" || location.pathname === "/home";
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -153,7 +156,14 @@ const Navigation = () => {
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
-
+  const handleLogout = () => {
+    // Xử lý đăng xuất ở đây
+    setIsLoggedIn(false);
+    localStorage.removeItem("accessToken");
+    dispatch(logoutSuccess({ userData: null, accessToken: "" }));
+    setAnchorElUser(null);
+    navigate("/login");
+  };
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
@@ -543,8 +553,20 @@ const Navigation = () => {
                         },
                       }}
                     >
-                      U
+                      {userData.username[0].toUpperCase() || "U"}
                     </Avatar>
+
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        ml: 1,
+                        color: "#333",
+                        fontWeight: 600,
+                        display: { xs: "none", sm: "block" },
+                      }}
+                    >
+                      {userData.username || "User Name"}
+                    </Typography>
                   </IconButton>
                 </Tooltip>
               )}
@@ -619,7 +641,11 @@ const Navigation = () => {
                   }}
                 >
                   <LogoutIcon sx={{ mr: 2, color: "#ff6b9d" }} />
-                  <Typography fontWeight={500} color="#ff6b9d">
+                  <Typography
+                    fontWeight={500}
+                    color="#ff6b9d"
+                    onCclick={handleLogout}
+                  >
                     Đăng xuất
                   </Typography>
                 </MenuItem>
