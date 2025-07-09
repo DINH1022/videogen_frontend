@@ -39,110 +39,6 @@ import Navigation from "../components/Navigation";
 import { getWorkspaces } from "../services/workspace";
 const WorkspaceManagement = () => {
   const navigate = useNavigate();
-  // const [workspaces] = useState([
-  //   {
-  //     id: "1",
-  //     name: "Demo",
-  //     description: "Không có mô tả",
-  //     createdDate: "13:13 5 thg 5, 2025",
-  //     resources: [
-  //       {
-  //         type: "Video",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: "https://videos.pexels.com/video-files/19843107/19843107-uhd_2560_1440_30fps.mp4",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "2",
-  //     name: "Video mẫu",
-  //     description: "Không có mô tả",
-  //     createdDate: "18:43 6 thg 5, 2025",
-  //     resources: [
-  //       {
-  //         type: "Hình Ảnh",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: null,
-  //       },
-  //       {
-  //         type: "Video",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: "https://videos.pexels.com/video-files/19843107/19843107-uhd_2560_1440_30fps.mp4",
-  //       },
-  //       {
-  //         type: "Hình Ảnh",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: null,
-  //       },
-  //       {
-  //         type: "Video",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: "https://videos.pexels.com/video-files/31988293/31988293-1920_1080_24fps.mp4",
-  //       },
-  //       {
-  //         type: "Video",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: "https://videos.pexels.com/video-files/5428316/5428316-hd_1920_1080_25fps.mp4",
-  //       },
-  //       {
-  //         type: "Hình Ảnh",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: null,
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "3",
-  //     name: "Demo",
-  //     description: "Không có mô tả",
-  //     createdDate: "13:13 5 thg 5, 2025",
-  //     resources: [
-  //       {
-  //         type: "Video",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: "https://videos.pexels.com/video-files/19843107/19843107-uhd_2560_1440_30fps.mp4",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "4",
-  //     name: "Video mẫu",
-  //     description: "Không có mô tả",
-  //     createdDate: "18:43 6 thg 5, 2025",
-  //     resources: [
-  //       {
-  //         type: "Hình Ảnh",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: null,
-  //       },
-  //       {
-  //         type: "Video",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: "https://videos.pexels.com/video-files/19843107/19843107-uhd_2560_1440_30fps.mp4",
-  //       },
-  //       {
-  //         type: "Hình Ảnh",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: null,
-  //       },
-  //       {
-  //         type: "Video",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: "https://videos.pexels.com/video-files/31988293/31988293-1920_1080_24fps.mp4",
-  //       },
-  //       {
-  //         type: "Video",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: "https://videos.pexels.com/video-files/5428316/5428316-hd_1920_1080_25fps.mp4",
-  //       },
-  //       {
-  //         type: "Hình Ảnh",
-  //         createdDate: "07:15 10 thg 5, 2025",
-  //         url: null,
-  //       },
-  //     ],
-  //   },
-  // ]);
   const [reset, setReset] = useState();
   const [workspaces, setWorkspaces] = useState([]);
   useEffect(() => {
@@ -489,7 +385,7 @@ const WorkspaceManagement = () => {
                             fontWeight: 500,
                           }}
                         >
-                          {workspace.createAt}
+                          {workspace.createdAt.slice(0, 10)}
                         </Typography>
                       </TableCell>
                       <TableCell>

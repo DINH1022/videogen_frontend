@@ -48,6 +48,7 @@ import { useDispatch } from "react-redux";
 import { setSelectedWorkspace } from "../redux/workspaceSlice";
 const ScriptGenerator = ({}) => {
   const workspace = useSelector((state) => state.workspace.selectedWorkspace);
+  console.log("selectedWorkspace: >>", workspace);
   const dispatch = useDispatch();
   const [topic, setTopic] = useState(workspace?.topic || "");
   const [searchResults, setSearchResults] = useState(
@@ -66,6 +67,26 @@ const ScriptGenerator = ({}) => {
   const [fullScript, setFullScript] = useState(workspace?.script || "");
   const [isSaving, setIsSaving] = useState(false);
   const [sources, setSources] = useState([]);
+  // Thêm useEffect để cập nhật state khi workspace thay đổi
+  useEffect(() => {
+    if (workspace) {
+      setTopic(workspace.topic || "");
+      if (workspace.shortScript) {
+        setSearchResults(
+          workspace.shortScript.map((script, index) => ({
+            id: index + 1,
+            summary: script,
+          }))
+        );
+      }
+      setLanguage(workspace.language || "");
+      setStyle(workspace.writingStyle || "");
+      if (workspace.script) {
+        setFullScript(workspace.script);
+        setShowFullScript(true);
+      }
+    }
+  }, [workspace]);
   // New states for full script display
   const [showFullScript, setShowFullScript] = useState(false);
   const [generating, setGenerating] = useState(false);

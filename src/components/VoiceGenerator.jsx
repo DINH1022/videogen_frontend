@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, use } from "react";
 import {
   Box,
   FormControl,
@@ -62,7 +62,13 @@ const VoiceConfigComponent = ({}) => {
   // Ref để quản lý audio element
   const audioRef = useRef(null);
   const progressIntervalRef = useRef(null);
-
+  useEffect(() => {
+    // Mặc định chọn giọng nam đầu tiên
+    if (workspace.audioUrl) {
+      setAudioUrl(workspace.audioUrl);
+      setShowAudioPreview(true);
+    }
+  }, [workspace]);
   const allVoices = [
     "Arista-PlayAI",
     "Atlas-PlayAI",

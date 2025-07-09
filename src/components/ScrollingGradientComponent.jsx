@@ -309,7 +309,7 @@ export default function NightSkyScroll() {
                   fontSize: "0.9rem",
                 }}
               >
-                🌙 Start your journey with Adaline 🌙
+                🌙 Start your journey with My Team 🌙
               </Typography>
             </Box>
           </Box>

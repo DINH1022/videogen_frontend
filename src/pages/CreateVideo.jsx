@@ -77,7 +77,7 @@ const CreateVideo = () => {
                 >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <IconButton
-                      onClick={() => navigate("/homepage")}
+                      onClick={() => navigate("/")}
                       sx={{ mr: 1, p: 0.5 }}
                       size="small"
                     >

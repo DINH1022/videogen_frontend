@@ -48,9 +48,10 @@ const AutoCaptionDialog = ({ open, onClose, script, language }) => {
     );
     const description1 = await generateCaption("CAPTION", script, language);
     setGeneratedCaption({
-      title: title1,
-      description: description1,
+      title: title1.slice(0, -2),
+      description: description1.slice(0, -2),
     });
+
     setIsGenerating(false);
   };
 

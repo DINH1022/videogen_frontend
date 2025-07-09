@@ -10,23 +10,15 @@ import {
 import { Folder, Add } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
-/**
- * WorkspaceCard component displays a workspace as a card with name, description, and creation date.
- * Clicking the card navigates to the workspace detail page.
- *
- * Props:
- * - workspace: (object) Workspace data (id, name, description, dateCreate)
- * - onViewResources: (function) Optional callback to view resources
- * - onCreateNew: (function) Optional callback to create a new workspace
- */
 const WorkspaceCard = ({ workspace, onViewResources, onCreateNew }) => {
+  console.log("ưorkspace: >>", workspace);
   const navigate = useNavigate();
   return (
     <Card
       onClick={() => navigate(`/workspace/${workspace.id}`)}
       sx={{
         width: 458,
-        height: 200,
+        height: 180,
         display: "flex",
         flexDirection: "column",
         borderRadius: 3,
@@ -69,7 +61,7 @@ const WorkspaceCard = ({ workspace, onViewResources, onCreateNew }) => {
           variant="body2"
           sx={{
             color: "#6b7280",
-            mb: 3,
+            mb: 2,
             lineHeight: 1.6,
             display: "-webkit-box",
             WebkitLineClamp: 2,
@@ -86,11 +78,10 @@ const WorkspaceCard = ({ workspace, onViewResources, onCreateNew }) => {
           sx={{
             color: "#9ca3af",
             fontSize: "0.8rem",
-            mb: 3,
             display: "block",
           }}
         >
-          Tạo ngày: {workspace.dateCreate}
+          Tạo ngày: {workspace.createdAt.slice(0, 10)}
         </Typography>
       </CardContent>
     </Card>
