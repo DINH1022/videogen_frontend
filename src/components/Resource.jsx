@@ -41,16 +41,16 @@ const Resource = ({}) => {
   const [imageTimings, setImageTimings] = useState([]);
   const [isGeneratingResources, setIsGeneratingResources] = useState(false);
   const dispatch = useDispatch();
-  // const clipTimings = JSON.parse(audioUrl?.timings);
-  // console.log("1999999");
-  // console.log("audioUrl>>>", clipTimings);
-  // Calculate image timings based on actual audio duration
+  useEffect(() => {
+    if (workspace.imagesSet && workspace.imagesSet.length > 0) {
+      setImages(workspace.imagesSet);
+    }
+  }, [workspace]);
   const handleAudioLoadedMetadata = () => {
     if (audioRef.current) {
       const duration = audioRef.current.duration;
       setAudioDuration(duration);
 
-      // Only calculate timings if we have images
       if (images.length > 0) {
         // Divide audio duration equally among images
         const timePerImage = duration / images.length;
@@ -88,10 +88,10 @@ const Resource = ({}) => {
     // Navigate to editor with state similar to your example
     navigate(`/workspace/${workspace.id}/editor`, {
       state: {
-        resourceList: images, // Pass the images array as resourceList
-        timing: imageTimings, // Pass the calculated timings
-        audioUrl: audioUrl, // Pass the audio URL
-        workspaceId: toString(workspace.id), // Pass the workspace ID
+        resourceList: images,
+        timing: imageTimings,
+        audioUrl: audioUrl,
+        workspaceId: toString(workspace.id),
       },
     });
   };
@@ -101,10 +101,8 @@ const Resource = ({}) => {
       setIsGeneratingResources(true);
       setError(null);
 
-      // Call the API to generate images
       const response = await generateImages(workspace.script);
 
-      // Fallback to mock images if API fails or returns empty
       const mockImages = [
         "https://th.bing.com/th/id/OIP.y7t2x8MCNy1gBCGd7UAqkAHaEK?rs=1&pid=ImgDetMain",
         "https://th.bing.com/th/id/OIP.W2cHfeMBthAIh26hFV_sswHaFj?w=1681&h=1261&rs=1&pid=ImgDetMain",
@@ -113,7 +111,6 @@ const Resource = ({}) => {
         "https://th.bing.com/th/id/OIP.wpiMpWT8tPG7uu2cZW8xDwAAAA?w=474&h=315&rs=1&pid=ImgDetMain",
       ];
 
-      // Use API response if available, otherwise use mock images
       const generatedImages =
         response && response.length > 0 ? response : mockImages;
       setImages(generatedImages);

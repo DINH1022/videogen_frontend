@@ -23,7 +23,12 @@ import {
   CardHeader,
   alpha,
   CircularProgress,
+  Tabs,
+  Tab,
+  Stack,
+  Alert,
 } from "@mui/material";
+
 import {
   PlayArrow,
   Stop,
@@ -34,17 +39,37 @@ import {
   Female,
   Equalizer,
   GraphicEq,
-  VolumeDown,
-  VolumeOff,
   Check,
   StarBorder,
   Star,
+  CloudUpload,
+  AudioFile,
+  SmartToy,
+  Mic,
+  Close,
+  Upload,
+  CheckCircle,
 } from "@mui/icons-material";
 import { createAudio } from "../services/audio";
 import { saveScript } from "../services/script";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedWorkspace } from "../redux/workspaceSlice";
+import { uploadAudio } from "../services/audio";
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
 
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`voice-tabpanel-${index}`}
+      aria-labelledby={`voice-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 const VoiceConfigComponent = ({}) => {
   const theme = useTheme();
   const workspace = useSelector((state) => state.workspace.selectedWorkspace);
@@ -59,9 +84,84 @@ const VoiceConfigComponent = ({}) => {
   const [showAudioPreview, setShowAudioPreview] = useState(false);
   const [audioUrl, setAudioUrl] = useState("");
   const [isCreatingAudio, setIsCreatingAudio] = useState(false); // Thêm state loading
+
+  const [activeTab, setActiveTab] = useState(0);
+  const [selectedVoiceFile, setSelectedVoiceFile] = useState(null);
+  const [uploadedVoiceUrl, setUploadedVoiceUrl] = useState("");
+  const [isUploadingVoice, setIsUploadingVoice] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadVoiceError, setUploadVoiceError] = useState("");
+  const [audioTimestamp, setAudioTimestamp] = useState(Date.now());
+
   // Ref để quản lý audio element
   const audioRef = useRef(null);
   const progressIntervalRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  const handleVoiceFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      console.log("file: ", file);
+      const multipartForm = new FormData();
+      multipartForm.append("video", file);
+      const fileExt = file.name.split(".").pop()?.toLowerCase();
+      if (fileExt === "mp3" || fileExt === "wav" || fileExt === "m4a") {
+        setSelectedVoiceFile(file);
+        setUploadVoiceError(null);
+      } else {
+        alert("Chỉ chấp nhận file .mp3, .wav hoặc .m4a");
+        e.target.value = "";
+      }
+    }
+  };
+
+  const removeSelectedVoiceFile = () => {
+    setSelectedVoiceFile(null);
+    setUploadProgress(0);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleUploadVoiceFile = async () => {
+    if (!selectedVoiceFile) {
+      alert("Vui lòng chọn tệp âm thanh và tạo kịch bản trước");
+      return;
+    }
+
+    setIsUploadingVoice(true);
+    setUploadVoiceError(null);
+    setUploadProgress(0);
+
+    const progressInterval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 99;
+        }
+        return prev + 7;
+      });
+    }, 200);
+
+    try {
+      const audioData = new FormData();
+      audioData.append("audio", selectedVoiceFile);
+      const response = await uploadAudio(audioData);
+      const newWorkspace = await saveScript(
+        { audioUrl: response },
+        workspace.id
+      );
+      dispatch(setSelectedWorkspace(newWorkspace));
+      setUploadedVoiceUrl(response);
+      setIsUploadingVoice(false);
+      setAudioTimestamp(Date.now());
+    } catch (error) {
+      clearInterval(progressInterval);
+      setUploadVoiceError("Đã xảy ra lỗi khi xử lý tệp âm thanh");
+      setIsUploadingVoice(false);
+      setUploadProgress(0);
+    }
+  };
   useEffect(() => {
     // Mặc định chọn giọng nam đầu tiên
     if (workspace?.audioUrl) {
@@ -69,26 +169,6 @@ const VoiceConfigComponent = ({}) => {
       setShowAudioPreview(true);
     }
   }, [workspace]);
-  const allVoices = [
-    "Arista-PlayAI",
-    "Atlas-PlayAI",
-    "Basil-PlayAI",
-    "Briggs-PlayAI",
-    "Calum-PlayAI",
-    "Celeste-PlayAI",
-    "Cheyenne-PlayAI",
-    "Chip-PlayAI",
-    "Cillian-PlayAI",
-    "Deedee-PlayAI",
-    "Fritz-PlayAI",
-    "Gail-PlayAI",
-    "Indigo-PlayAI",
-    "Mason-PlayAI",
-    "Mikail-PlayAI",
-    "Mitch-PlayAI",
-    "Quinn-PlayAI",
-    "Thunder-PlayAI",
-  ];
 
   const maleVoices = [
     "Atlas-PlayAI",
@@ -300,7 +380,9 @@ const VoiceConfigComponent = ({}) => {
       prev.includes(voice) ? prev.filter((v) => v !== voice) : [...prev, voice]
     );
   };
-
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
   const handleCreateAudio = async () => {
     try {
       setIsCreatingAudio(true); // Bắt đầu loading
@@ -355,402 +437,812 @@ const VoiceConfigComponent = ({}) => {
           overflow: "hidden",
         }}
       >
-        {/* Gender Selection với animation */}
-        <Slide direction="up" in={true} timeout={800}>
-          <Box sx={{ mb: 4 }}>
-            <Typography
-              variant="h6"
+        {/* Tabs Header */}
+        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            variant="fullWidth"
+            sx={{
+              bgcolor: "grey.50",
+              "& .MuiTab-root": {
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "0.95rem",
+                py: 2,
+                color: "text.secondary",
+                "&.Mui-selected": {
+                  color: "primary.main",
+                },
+              },
+              "& .MuiTabs-indicator": {
+                height: 3,
+                borderRadius: "3px 3px 0 0",
+              },
+            }}
+          >
+            <Tab
+              icon={<SmartToy sx={{ mb: 0.5 }} />}
+              label="Giọng nói AI"
+              iconPosition="start"
+            />
+            <Tab
+              icon={<Mic sx={{ mb: 0.5 }} />}
+              label="Giọng thu có sẵn"
+              iconPosition="start"
+            />
+          </Tabs>
+        </Box>
+        <TabPanel value={activeTab} index={0}>
+          <Box>
+            <Paper
+              elevation={12}
               sx={{
-                mb: 3,
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                fontWeight: "bold",
+                p: 4,
+                mx: "auto",
+                borderRadius: 2,
+                background: "rgba(255, 255, 255, 0.95)",
+                position: "relative",
+                overflow: "hidden",
               }}
             >
-              <Settings sx={{ color: theme.palette.primary.main }} />
-              Chọn loại giọng nói
-            </Typography>
-            <FormControl component="fieldset">
-              <RadioGroup
-                row
-                value={selectedGender}
-                onChange={handleGenderChange}
-                sx={{ marginLeft: "70px" }}
-              >
-                <FormControlLabel
-                  value="male"
-                  sx={{ marginRight: "40px" }}
-                  control={<Radio sx={{ color: "#2196f3" }} />}
-                  label={
-                    <Paper
-                      elevation={2}
-                      sx={{
-                        marginLeft: "10px",
-                        p: 2,
-                        borderRadius: 3,
-                        background:
-                          selectedGender === "male"
-                            ? alpha("#2196f3", 0.1)
-                            : "white",
-                        border:
-                          selectedGender === "male"
-                            ? "2px solid #2196f3"
-                            : "1px solid #e0e0e0",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          boxShadow: 4,
-                          transform: "translateY(-2px)",
-                        },
-                      }}
+              {/* Gender Selection với animation */}
+              <Slide direction="up" in={true} timeout={800}>
+                <Box sx={{ mb: 4 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      mb: 3,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    <Settings sx={{ color: theme.palette.primary.main }} />
+                    Chọn loại giọng nói
+                  </Typography>
+                  <FormControl component="fieldset">
+                    <RadioGroup
+                      row
+                      value={selectedGender}
+                      onChange={handleGenderChange}
+                      sx={{ marginLeft: "70px" }}
                     >
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
-                        <Male sx={{ color: "#2196f3", fontSize: 28 }} />
-                        <Box sx={{ width: "300px" }}>
-                          <Typography fontWeight="bold">Giọng nam</Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {maleVoices.length} giọng khả dụng
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Paper>
-                  }
-                />
-                <FormControlLabel
-                  value="female"
-                  control={<Radio sx={{ color: "#e91e63" }} />}
-                  label={
-                    <Paper
-                      elevation={2}
-                      sx={{
-                        marginLeft: "10px",
-                        p: 2,
-                        borderRadius: 3,
-                        background:
-                          selectedGender === "female"
-                            ? alpha("#e91e63", 0.1)
-                            : "white",
-                        border:
-                          selectedGender === "female"
-                            ? "2px solid #e91e63"
-                            : "1px solid #e0e0e0",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          boxShadow: 4,
-                          transform: "translateY(-2px)",
-                        },
-                      }}
-                    >
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                      >
-                        <Female sx={{ color: "#e91e63", fontSize: 28 }} />
-                        <Box sx={{ width: "300px" }}>
-                          <Typography fontWeight="bold">Giọng nữ</Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {femaleVoices.length} giọng khả dụng
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Paper>
-                  }
-                />
-              </RadioGroup>
-            </FormControl>
-          </Box>
-        </Slide>
-
-        {/* Voice Preview Grid */}
-        {selectedGender && (
-          <Slide direction="up" in={true} timeout={1000}>
-            <Box sx={{ mb: 4 }}>
-              <Typography
-                variant="h6"
-                sx={{
-                  mb: 3,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  fontWeight: "bold",
-                }}
-              >
-                <VolumeUp sx={{ color: theme.palette.primary.main }} />
-                Nghe thử các giọng nói
-              </Typography>
-              <Grid container spacing={3}>
-                {getAvailableVoices().map((voice, index) => (
-                  <Grid item xs={12} sm={6} md={4} key={voice}>
-                    <Zoom in={true} timeout={500 + index * 100}>
-                      <Card
-                        variant="outlined"
-                        sx={{
-                          cursor: "pointer",
-                          borderRadius: 2,
-                          border: selectedVoice === voice ? 3 : 1,
-                          borderColor:
-                            selectedVoice === voice
-                              ? "primary.main"
-                              : "divider",
-                          background:
-                            selectedVoice === voice
-                              ? alpha(theme.palette.primary.main, 0.05)
-                              : "white",
-                          transition: "all 0.3s ease",
-                          position: "relative",
-                          overflow: "hidden",
-                          "&:hover": {
-                            boxShadow: 3,
-                            transform: "translateY(-4px)",
-                            borderColor: "primary.main",
-                          },
-                          "&::before":
-                            selectedVoice === voice
-                              ? {
-                                  content: '""',
-                                  position: "absolute",
-                                  top: 0,
-                                  left: 0,
-                                  right: 0,
-                                  height: "3px",
-                                  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                                }
-                              : {},
-                        }}
-                        onClick={() => setSelectedVoice(voice)}
-                      >
-                        <CardContent sx={{ p: 2, width: "235px" }}>
-                          <Box
+                      <FormControlLabel
+                        value="male"
+                        sx={{ marginRight: "40px" }}
+                        control={<Radio sx={{ color: "#2196f3" }} />}
+                        label={
+                          <Paper
+                            elevation={2}
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 2,
-                              mb: 2,
+                              marginLeft: "10px",
+                              p: 2,
+                              borderRadius: 3,
+                              background:
+                                selectedGender === "male"
+                                  ? alpha("#2196f3", 0.1)
+                                  : "white",
+                              border:
+                                selectedGender === "male"
+                                  ? "2px solid #2196f3"
+                                  : "1px solid #e0e0e0",
+                              transition: "all 0.3s ease",
+                              "&:hover": {
+                                boxShadow: 4,
+                                transform: "translateY(-2px)",
+                              },
                             }}
                           >
-                            <Avatar
+                            <Box
                               sx={{
-                                width: 40,
-                                height: 40,
-                                bgcolor: getVoiceAvatar(voice, selectedGender),
-                                fontSize: 16,
-                                fontWeight: "bold",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
                               }}
                             >
-                              {voice.charAt(0)}
-                            </Avatar>
-                            <Box sx={{ flexGrow: 1 }}>
-                              <Typography variant="subtitle1" fontWeight="bold">
-                                {voice.replace("-PlayAI", "")}
-                              </Typography>
+                              <Male sx={{ color: "#2196f3", fontSize: 28 }} />
+                              <Box sx={{ width: "300px" }}>
+                                <Typography fontWeight="bold">
+                                  Giọng nam
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  {maleVoices.length} giọng khả dụng
+                                </Typography>
+                              </Box>
                             </Box>
-                            <IconButton
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleFavorite(voice);
-                              }}
-                              sx={{
-                                color: favoriteVoices.includes(voice)
-                                  ? "#ffc107"
-                                  : "grey.400",
-                              }}
-                            >
-                              {favoriteVoices.includes(voice) ? (
-                                <Star />
-                              ) : (
-                                <StarBorder />
-                              )}
-                            </IconButton>
-                          </Box>
-
-                          <Box
+                          </Paper>
+                        }
+                      />
+                      <FormControlLabel
+                        value="female"
+                        control={<Radio sx={{ color: "#e91e63" }} />}
+                        label={
+                          <Paper
+                            elevation={2}
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
+                              marginLeft: "10px",
+                              p: 2,
+                              borderRadius: 3,
+                              background:
+                                selectedGender === "female"
+                                  ? alpha("#e91e63", 0.1)
+                                  : "white",
+                              border:
+                                selectedGender === "female"
+                                  ? "2px solid #e91e63"
+                                  : "1px solid #e0e0e0",
+                              transition: "all 0.3s ease",
+                              "&:hover": {
+                                boxShadow: 4,
+                                transform: "translateY(-2px)",
+                              },
                             }}
                           >
-                            <IconButton
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handlePlayPreview(voice);
-                              }}
+                            <Box
                               sx={{
-                                bgcolor:
-                                  isPlaying && currentPlayingVoice === voice
-                                    ? alpha(theme.palette.error.main, 0.1)
-                                    : alpha(theme.palette.primary.main, 0.1),
-                                color:
-                                  isPlaying && currentPlayingVoice === voice
-                                    ? "error.main"
-                                    : "primary.main",
-                                "&:hover": {
-                                  bgcolor:
-                                    isPlaying && currentPlayingVoice === voice
-                                      ? alpha(theme.palette.error.main, 0.2)
-                                      : alpha(theme.palette.primary.main, 0.2),
-                                },
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
                               }}
                             >
-                              {isPlaying && currentPlayingVoice === voice ? (
-                                <Stop />
-                              ) : (
-                                <PlayArrow />
-                              )}
-                            </IconButton>
+                              <Female sx={{ color: "#e91e63", fontSize: 28 }} />
+                              <Box sx={{ width: "300px" }}>
+                                <Typography fontWeight="bold">
+                                  Giọng nữ
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  {femaleVoices.length} giọng khả dụng
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </Paper>
+                        }
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Box>
+              </Slide>
 
-                            {isPlaying && currentPlayingVoice === voice && (
-                              <Box sx={{ flexGrow: 1 }}>
-                                <LinearProgress
-                                  variant="determinate"
-                                  value={playProgress}
-                                  sx={{
-                                    height: 6,
-                                    borderRadius: 3,
-                                    bgcolor: alpha(
-                                      theme.palette.primary.main,
-                                      0.2
-                                    ),
-                                    "& .MuiLinearProgress-bar": {
-                                      background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                                      borderRadius: 3,
-                                    },
-                                  }}
-                                />
+              {/* Voice Preview Grid */}
+              {selectedGender && (
+                <Slide direction="up" in={true} timeout={1000}>
+                  <Box sx={{ mb: 4 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        mb: 3,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      <VolumeUp sx={{ color: theme.palette.primary.main }} />
+                      Nghe thử các giọng nói
+                    </Typography>
+                    <Grid container spacing={3}>
+                      {getAvailableVoices().map((voice, index) => (
+                        <Grid item xs={12} sm={6} md={4} key={voice}>
+                          <Zoom in={true} timeout={500 + index * 100}>
+                            <Card
+                              variant="outlined"
+                              sx={{
+                                cursor: "pointer",
+                                borderRadius: 2,
+                                border: selectedVoice === voice ? 3 : 1,
+                                borderColor:
+                                  selectedVoice === voice
+                                    ? "primary.main"
+                                    : "divider",
+                                background:
+                                  selectedVoice === voice
+                                    ? alpha(theme.palette.primary.main, 0.05)
+                                    : "white",
+                                transition: "all 0.3s ease",
+                                position: "relative",
+                                overflow: "hidden",
+                                "&:hover": {
+                                  boxShadow: 3,
+                                  transform: "translateY(-4px)",
+                                  borderColor: "primary.main",
+                                },
+                                "&::before":
+                                  selectedVoice === voice
+                                    ? {
+                                        content: '""',
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        height: "3px",
+                                        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                                      }
+                                    : {},
+                              }}
+                              onClick={() => setSelectedVoice(voice)}
+                            >
+                              <CardContent sx={{ p: 2, width: "235px" }}>
                                 <Box
                                   sx={{
                                     display: "flex",
                                     alignItems: "center",
-                                    gap: 0.5,
-                                    mt: 0.5,
+                                    gap: 2,
+                                    mb: 2,
                                   }}
                                 >
-                                  <Equalizer
-                                    sx={{ fontSize: 12, color: "primary.main" }}
-                                  />
-                                  <Typography
-                                    variant="caption"
-                                    color="primary.main"
+                                  <Avatar
+                                    sx={{
+                                      width: 40,
+                                      height: 40,
+                                      bgcolor: getVoiceAvatar(
+                                        voice,
+                                        selectedGender
+                                      ),
+                                      fontSize: 16,
+                                      fontWeight: "bold",
+                                    }}
                                   >
-                                    Đang phát...
-                                  </Typography>
+                                    {voice.charAt(0)}
+                                  </Avatar>
+                                  <Box sx={{ flexGrow: 1 }}>
+                                    <Typography
+                                      variant="subtitle1"
+                                      fontWeight="bold"
+                                    >
+                                      {voice.replace("-PlayAI", "")}
+                                    </Typography>
+                                  </Box>
+                                  <IconButton
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleFavorite(voice);
+                                    }}
+                                    sx={{
+                                      color: favoriteVoices.includes(voice)
+                                        ? "#ffc107"
+                                        : "grey.400",
+                                    }}
+                                  >
+                                    {favoriteVoices.includes(voice) ? (
+                                      <Star />
+                                    ) : (
+                                      <StarBorder />
+                                    )}
+                                  </IconButton>
                                 </Box>
-                              </Box>
-                            )}
-                          </Box>
-                        </CardContent>
-                      </Card>
-                    </Zoom>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-          </Slide>
-        )}
 
-        {/* Apply Button với loading state */}
-        {selectedVoice && (
-          <Fade in={true} timeout={800}>
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-              <Button
-                variant="contained"
-                size="large"
-                onClick={handleCreateAudio}
-                disabled={isCreatingAudio || showAppliedSuccess}
-                sx={{
-                  px: 6,
-                  py: 2,
-                  borderRadius: 4,
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  minWidth: 200,
-                  background: showAppliedSuccess
-                    ? `linear-gradient(45deg, #4caf50, #66bb6a)`
-                    : isCreatingAudio
-                    ? `linear-gradient(45deg, #9e9e9e, #bdbdbd)`
-                    : `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                  boxShadow: 6,
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    boxShadow: isCreatingAudio ? 6 : 12,
-                    transform: isCreatingAudio ? "none" : "translateY(-2px)",
-                  },
-                  "&:disabled": {
-                    color: "white",
-                  },
-                }}
-                startIcon={
-                  isCreatingAudio ? (
-                    <CircularProgress size={20} sx={{ color: "white" }} />
-                  ) : showAppliedSuccess ? (
-                    <Check />
-                  ) : (
-                    <GraphicEq />
-                  )
-                }
-              >
-                {isCreatingAudio
-                  ? "Đang tạo âm thanh..."
-                  : showAppliedSuccess
-                  ? "Đã áp dụng thành công!"
-                  : "Tạo âm thanh"}
-              </Button>
-            </Box>
-          </Fade>
-        )}
-      </Paper>
-      {showAudioPreview && audioUrl && (
-        <Fade in={showAudioPreview}>
-          <Card
-            sx={{
-              bgcolor: "primary.50",
-              border: "1px solid rgba(25, 118, 210, 0.2)",
-              boxShadow: "0 4px 20px rgba(25, 118, 210, 0.1)",
-              marginTop: "40px",
-            }}
-          >
-            <CardHeader
-              avatar={<PlayArrow color="primary" sx={{ fontSize: 28 }} />}
-              title={
-                <Typography variant="h6" fontWeight="600" color="primary.main">
-                  Xem trước âm thanh
-                </Typography>
-              }
-            />
-            <CardContent>
-              <Box
-                sx={{
-                  p: 3,
-                  bgcolor: "white",
-                  borderRadius: 2,
-                  border: "1px solid rgba(25, 118, 210, 0.1)",
-                }}
-              >
-                <audio
-                  // key={`${audioUrl}-${audioTimestamp}`}
-                  key={`${audioUrl}`}
-                  src={audioUrl}
-                  controls
-                  style={{
-                    width: "100%",
-                    height: "54px",
-                    borderRadius: "8px",
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                  }}
+                                >
+                                  <IconButton
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handlePlayPreview(voice);
+                                    }}
+                                    sx={{
+                                      bgcolor:
+                                        isPlaying &&
+                                        currentPlayingVoice === voice
+                                          ? alpha(theme.palette.error.main, 0.1)
+                                          : alpha(
+                                              theme.palette.primary.main,
+                                              0.1
+                                            ),
+                                      color:
+                                        isPlaying &&
+                                        currentPlayingVoice === voice
+                                          ? "error.main"
+                                          : "primary.main",
+                                      "&:hover": {
+                                        bgcolor:
+                                          isPlaying &&
+                                          currentPlayingVoice === voice
+                                            ? alpha(
+                                                theme.palette.error.main,
+                                                0.2
+                                              )
+                                            : alpha(
+                                                theme.palette.primary.main,
+                                                0.2
+                                              ),
+                                      },
+                                    }}
+                                  >
+                                    {isPlaying &&
+                                    currentPlayingVoice === voice ? (
+                                      <Stop />
+                                    ) : (
+                                      <PlayArrow />
+                                    )}
+                                  </IconButton>
+
+                                  {isPlaying &&
+                                    currentPlayingVoice === voice && (
+                                      <Box sx={{ flexGrow: 1 }}>
+                                        <LinearProgress
+                                          variant="determinate"
+                                          value={playProgress}
+                                          sx={{
+                                            height: 6,
+                                            borderRadius: 3,
+                                            bgcolor: alpha(
+                                              theme.palette.primary.main,
+                                              0.2
+                                            ),
+                                            "& .MuiLinearProgress-bar": {
+                                              background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                                              borderRadius: 3,
+                                            },
+                                          }}
+                                        />
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: 0.5,
+                                            mt: 0.5,
+                                          }}
+                                        >
+                                          <Equalizer
+                                            sx={{
+                                              fontSize: 12,
+                                              color: "primary.main",
+                                            }}
+                                          />
+                                          <Typography
+                                            variant="caption"
+                                            color="primary.main"
+                                          >
+                                            Đang phát...
+                                          </Typography>
+                                        </Box>
+                                      </Box>
+                                    )}
+                                </Box>
+                              </CardContent>
+                            </Card>
+                          </Zoom>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Box>
+                </Slide>
+              )}
+
+              {/* Apply Button với loading state */}
+              {selectedVoice && (
+                <Fade in={true} timeout={800}>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", mt: 4 }}
+                  >
+                    <Button
+                      variant="contained"
+                      size="large"
+                      onClick={handleCreateAudio}
+                      disabled={isCreatingAudio || showAppliedSuccess}
+                      sx={{
+                        px: 6,
+                        py: 2,
+                        borderRadius: 4,
+                        fontSize: 16,
+                        fontWeight: "bold",
+                        minWidth: 200,
+                        background: showAppliedSuccess
+                          ? `linear-gradient(45deg, #4caf50, #66bb6a)`
+                          : isCreatingAudio
+                          ? `linear-gradient(45deg, #9e9e9e, #bdbdbd)`
+                          : `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                        boxShadow: 6,
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          boxShadow: isCreatingAudio ? 6 : 12,
+                          transform: isCreatingAudio
+                            ? "none"
+                            : "translateY(-2px)",
+                        },
+                        "&:disabled": {
+                          color: "white",
+                        },
+                      }}
+                      startIcon={
+                        isCreatingAudio ? (
+                          <CircularProgress size={20} sx={{ color: "white" }} />
+                        ) : showAppliedSuccess ? (
+                          <Check />
+                        ) : (
+                          <GraphicEq />
+                        )
+                      }
+                    >
+                      {isCreatingAudio
+                        ? "Đang tạo âm thanh..."
+                        : showAppliedSuccess
+                        ? "Đã áp dụng thành công!"
+                        : "Tạo âm thanh"}
+                    </Button>
+                  </Box>
+                </Fade>
+              )}
+            </Paper>
+            {showAudioPreview && audioUrl && (
+              <Fade in={showAudioPreview}>
+                <Card
+                  sx={{
+                    bgcolor: "primary.50",
+                    border: "1px solid rgba(25, 118, 210, 0.2)",
+                    boxShadow: "0 4px 20px rgba(25, 118, 210, 0.1)",
+                    marginTop: "40px",
                   }}
-                />
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mt: 2, display: "block", textAlign: "center" }}
                 >
-                  🎵 Bạn có thể nghe thử âm thanh được tạo từ kịch bản đã phê
-                  duyệt
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
-        </Fade>
-      )}
+                  <CardHeader
+                    avatar={<PlayArrow color="primary" sx={{ fontSize: 28 }} />}
+                    title={
+                      <Typography
+                        variant="h6"
+                        fontWeight="600"
+                        color="primary.main"
+                      >
+                        Xem trước âm thanh
+                      </Typography>
+                    }
+                  />
+                  <CardContent>
+                    <Box
+                      sx={{
+                        p: 3,
+                        bgcolor: "white",
+                        borderRadius: 2,
+                        border: "1px solid rgba(25, 118, 210, 0.1)",
+                      }}
+                    >
+                      <audio
+                        // key={`${audioUrl}-${audioTimestamp}`}
+                        key={`${audioUrl}`}
+                        src={audioUrl}
+                        controls
+                        style={{
+                          width: "100%",
+                          height: "54px",
+                          borderRadius: "8px",
+                        }}
+                      />
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ mt: 2, display: "block", textAlign: "center" }}
+                      >
+                        🎵 Bạn có thể nghe thử âm thanh được tạo từ kịch bản đã
+                        phê duyệt
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Fade>
+            )}
+          </Box>
+        </TabPanel>
+
+        <TabPanel value={activeTab} index={1}>
+          <Stack spacing={3}>
+            {/* Header */}
+            <Box sx={{ textAlign: "center", py: 2 }}>
+              <Typography
+                variant="h5"
+                fontWeight="700"
+                color="text.primary"
+                sx={{ mb: 1 }}
+              >
+                Tải lên giọng thu sẵn
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Sử dụng file âm thanh của riêng bạn để tạo nội dung
+              </Typography>
+            </Box>
+
+            {/* File Upload Area */}
+            <Card sx={{ overflow: "hidden" }}>
+              <CardContent sx={{ p: 0 }}>
+                <Paper
+                  sx={{
+                    border: selectedVoiceFile ? "2px solid" : "2px dashed",
+                    borderColor: selectedVoiceFile
+                      ? "success.main"
+                      : "grey.300",
+                    bgcolor: selectedVoiceFile ? "success.50" : "grey.50",
+                    p: 4,
+                    textAlign: "center",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      bgcolor: selectedVoiceFile ? "success.100" : "grey.100",
+                      borderColor: selectedVoiceFile
+                        ? "success.dark"
+                        : "grey.400",
+                    },
+                  }}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleVoiceFileChange}
+                    accept=".mp3,.wav,.m4a"
+                    style={{ display: "none" }}
+                  />
+
+                  {!selectedVoiceFile ? (
+                    <Stack spacing={2} alignItems="center">
+                      <CloudUpload
+                        sx={{
+                          fontSize: 64,
+                          color: "primary.main",
+                          opacity: 0.7,
+                        }}
+                      />
+                      <Typography
+                        variant="h6"
+                        fontWeight="600"
+                        color="text.primary"
+                      >
+                        Nhấp để tải lên hoặc kéo và thả
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Hỗ trợ file .mp3, .wav, .m4a
+                      </Typography>
+                      <Chip
+                        label="Kích thước tối đa: 50MB"
+                        size="small"
+                        variant="outlined"
+                        sx={{ bgcolor: "white" }}
+                      />
+                    </Stack>
+                  ) : (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 2,
+                        bgcolor: "white",
+                        p: 2,
+                        borderRadius: 2,
+                        maxWidth: 400,
+                        mx: "auto",
+                      }}
+                    >
+                      <AudioFile sx={{ color: "success.main", fontSize: 28 }} />
+                      <Box sx={{ flex: 1, textAlign: "left" }}>
+                        <Typography
+                          variant="body1"
+                          fontWeight="600"
+                          color="text.primary"
+                        >
+                          {selectedVoiceFile.name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {(selectedVoiceFile.size / (1024 * 1024)).toFixed(2)}{" "}
+                          MB
+                        </Typography>
+                      </Box>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeSelectedVoiceFile();
+                        }}
+                        sx={{
+                          bgcolor: "error.50",
+                          "&:hover": { bgcolor: "error.100" },
+                        }}
+                      >
+                        <Close sx={{ color: "error.main" }} />
+                      </IconButton>
+                    </Box>
+                  )}
+                </Paper>
+
+                {selectedVoiceFile && (
+                  <Box sx={{ p: 3, bgcolor: "grey.50" }}>
+                    {isUploadingVoice && (
+                      <Box sx={{ mb: 2 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            mb: 1,
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            Đang xử lý tệp...
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {uploadProgress}%
+                          </Typography>
+                        </Box>
+                        <LinearProgress
+                          variant="determinate"
+                          value={uploadProgress}
+                          sx={{
+                            height: 6,
+                            borderRadius: 3,
+                            bgcolor: "grey.200",
+                            "& .MuiLinearProgress-bar": {
+                              borderRadius: 3,
+                            },
+                          }}
+                        />
+                      </Box>
+                    )}
+
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      size="large"
+                      onClick={handleUploadVoiceFile}
+                      disabled={isUploadingVoice}
+                      startIcon={
+                        isUploadingVoice ? (
+                          <CircularProgress size={20} color="inherit" />
+                        ) : (
+                          <Upload />
+                        )
+                      }
+                      sx={{
+                        py: 1.5,
+                        textTransform: "none",
+                        fontWeight: 600,
+                        fontSize: "1rem",
+                        borderRadius: 2,
+                        boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
+                        "&:hover": {
+                          boxShadow: "0 6px 16px rgba(25, 118, 210, 0.4)",
+                        },
+                      }}
+                    >
+                      {isUploadingVoice
+                        ? "Đang xử lý tệp..."
+                        : "Tải lên giọng nói"}
+                    </Button>
+
+                    {uploadVoiceError && (
+                      <Alert severity="error" sx={{ mt: 2, borderRadius: 2 }}>
+                        {uploadVoiceError}
+                      </Alert>
+                    )}
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Uploaded Voice Preview */}
+            {uploadedVoiceUrl && (
+              <Fade in={!!uploadedVoiceUrl}>
+                <Card
+                  sx={{
+                    bgcolor: "success.50",
+                    border: "1px solid rgba(76, 175, 80, 0.2)",
+                    boxShadow: "0 4px 20px rgba(76, 175, 80, 0.1)",
+                  }}
+                >
+                  <CardHeader
+                    avatar={
+                      <CheckCircle color="success" sx={{ fontSize: 28 }} />
+                    }
+                    title={
+                      <Typography
+                        variant="h6"
+                        fontWeight="600"
+                        color="success.main"
+                      >
+                        Giọng nói đã tải lên
+                      </Typography>
+                    }
+                    action={
+                      <Chip
+                        label="Sẵn sàng sử dụng"
+                        color="success"
+                        size="small"
+                        sx={{ fontWeight: 500 }}
+                      />
+                    }
+                  />
+                  <CardContent>
+                    <Box
+                      sx={{
+                        p: 3,
+                        bgcolor: "white",
+                        borderRadius: 2,
+                        border: "1px solid rgba(76, 175, 80, 0.1)",
+                      }}
+                    >
+                      <audio
+                        key={`${uploadedVoiceUrl}-${audioTimestamp}`}
+                        src={uploadedVoiceUrl}
+                        controls
+                        style={{
+                          width: "100%",
+                          height: "54px",
+                          borderRadius: "8px",
+                        }}
+                      />
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ mt: 2, display: "block", textAlign: "center" }}
+                      >
+                        ✅ Giọng nói đã tải lên sẽ được sử dụng cho kịch bản của
+                        bạn
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Fade>
+            )}
+
+            {/* Notes */}
+            <Card
+              sx={{
+                bgcolor: "info.50",
+                border: "1px solid rgba(2, 136, 209, 0.2)",
+              }}
+            >
+              <CardHeader
+                avatar={<Settings color="info" />}
+                title={
+                  <Typography variant="h6" fontWeight="600" color="info.main">
+                    Hướng dẫn và lưu ý
+                  </Typography>
+                }
+              />
+              <CardContent>
+                <Stack spacing={2}>
+                  {[
+                    { icon: "🎵", text: "Hỗ trợ định dạng MP3, WAV, M4A" },
+                    { icon: "📏", text: "Kích thước tối đa: 50MB" },
+                    { icon: "⏱️", text: "Thời lượng tối đa: 30 phút" },
+                    {
+                      icon: "💡",
+                      text: "Âm thanh rõ ràng, không nhiễu sẽ cho kết quả tốt nhất",
+                    },
+                  ].map((item, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        p: 2,
+                        bgcolor: "white",
+                        borderRadius: 2,
+                        border: "1px solid rgba(2, 136, 209, 0.1)",
+                      }}
+                    >
+                      <Typography sx={{ fontSize: "1.2rem" }}>
+                        {item.icon}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.text}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              </CardContent>
+            </Card>
+          </Stack>
+        </TabPanel>
+      </Paper>
     </Box>
   );
 };
