@@ -249,6 +249,8 @@ export default function ExportDialog({
       // console.log("tesst2: ", videoUrl);
       setExportedVideoUrl(response);
       setShowPreview(true);
+
+      console.log("Video exported successfully");
     } catch (error) {
       console.error("Error exporting video:", error);
     } finally {
