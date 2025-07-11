@@ -1,16 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import LoadingDemo from "./Loading.jsx";
 
-/**
- * SmoothScrollSequence component displays a scroll-driven image sequence animation,
- * transitioning to a video overlay as the user scrolls. Includes a sticky image sequence,
- * animated text overlay, developer credits, and a video that fades in and plays on demand.
- *
- * - Preloads and displays a sequence of images as the user scrolls.
- * - Fades in a video overlay at a certain scroll position, with play/pause controls.
- * - Shows animated text and developer credits at the top of the sequence.
- */
-
 const SmoothScrollSequence = ({
   className = "",
   style = {},
@@ -668,7 +658,7 @@ const SmoothScrollSequence = ({
         <div className="ssq-video-overlay" ref={videoOverlayRef}>
           <video ref={overlayVideoRef} muted controls>
             <source
-              src="https://res.cloudinary.com/dpystprxq/video/upload/v1750867660/Zoom_Meeting_40-Minutes_2025-06-25_10-29-29_m1ixfy.mp4"
+              src="https://res.cloudinary.com/dpystprxq/video/upload/v1752158087/Vite_React_-_Google_Chrome_2025-07-10_21-22-45_online-video-cutter.com_rsjsuc.mp4"
               type="video/mp4"
             />
             Your browser does not support the video tag.

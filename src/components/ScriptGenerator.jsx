@@ -48,7 +48,6 @@ import { useDispatch } from "react-redux";
 import { setSelectedWorkspace } from "../redux/workspaceSlice";
 const ScriptGenerator = ({}) => {
   const workspace = useSelector((state) => state.workspace.selectedWorkspace);
-  console.log("selectedWorkspace: >>", workspace);
   const dispatch = useDispatch();
   const [topic, setTopic] = useState(workspace?.topic || "");
   const [searchResults, setSearchResults] = useState(
@@ -78,12 +77,17 @@ const ScriptGenerator = ({}) => {
             summary: script,
           }))
         );
+      } else {
+        setSearchResults([]);
       }
       setLanguage(workspace.language || "");
       setStyle(workspace.writingStyle || "");
       if (workspace.script) {
         setFullScript(workspace.script);
         setShowFullScript(true);
+      } else {
+        setFullScript("");
+        setShowFullScript(false);
       }
     }
   }, [workspace]);
@@ -111,8 +115,16 @@ const ScriptGenerator = ({}) => {
       img: "https://4kwallpapers.com/images/wallpapers/anime-girl-dream-2560x2560-9766.jpg",
     },
     {
-      title: "Neonpunk",
-      img: "https://pub-static.fotor.com/assets/aiImageConfig/template/webText2Video/iw5pf432impk.jpg",
+      title: "Dramatic",
+      img: "https://thumbs.dreamstime.com/b/dramatic-shadow-puppet-scene-dynamic-characters-expressive-intense-backlighting-creates-striking-shadows-adding-329129522.jpg",
+    },
+    {
+      title: "Comedic",
+      img: "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/9f9e44121380093.60d7924dd7d71.png",
+    },
+    {
+      title: "Romantic",
+      img: "https://static.vecteezy.com/system/resources/previews/026/904/469/non_2x/ai-generated-ai-generative-lovely-romantic-love-couple-together-with-heart-shape-background-landscape-vacation-wedding-relationship-vibe-graphic-art-photo.jpg",
     },
   ];
 

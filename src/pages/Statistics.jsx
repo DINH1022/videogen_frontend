@@ -1069,7 +1069,48 @@ const Statistics = () => {
                   <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                     🎬 Thẻ Videos
                   </Typography>
-                  <ButtonGroup variant="outlined" sx={{ borderRadius: 2 }}>
+                  <ButtonGroup
+                    variant="outlined"
+                    sx={{
+                      borderRadius: 3,
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                      overflow: "hidden",
+                      "& .MuiButton-root": {
+                        borderColor: "#e5e7eb",
+                        color: "#6b7280",
+                        fontWeight: 500,
+                        fontSize: "0.875rem",
+                        px: 2.5,
+                        py: 1,
+                        textTransform: "none",
+                        minWidth: 80,
+                        transition: "all 0.2s ease-in-out",
+                        "&:hover": {
+                          backgroundColor: "#f8fafc",
+                          borderColor: "#d1d5db",
+                          color: "#374151",
+                        },
+                        "&.Mui-selected, &:first-of-type": {
+                          borderLeftColor: "#e5e7eb",
+                        },
+                        "&:not(:first-of-type)": {
+                          borderLeft: "1px solid #e5e7eb",
+                          marginLeft: "-1px",
+                        },
+                        "&.MuiButton-contained": {
+                          backgroundColor: "#3b82f6",
+                          color: "#ffffff",
+                          borderColor: "#3b82f6",
+                          boxShadow: "0 1px 3px rgba(59, 130, 246, 0.3)",
+                          "&:hover": {
+                            backgroundColor: "#2563eb",
+                            borderColor: "#2563eb",
+                            boxShadow: "0 2px 6px rgba(59, 130, 246, 0.4)",
+                          },
+                        },
+                      },
+                    }}
+                  >
                     <Button
                       variant={
                         videoFilter === "latest" ? "contained" : "outlined"

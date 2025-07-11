@@ -1211,11 +1211,6 @@ const VoiceConfigComponent = ({}) => {
                   {[
                     { icon: "🎵", text: "Hỗ trợ định dạng MP3, WAV, M4A" },
                     { icon: "📏", text: "Kích thước tối đa: 50MB" },
-                    { icon: "⏱️", text: "Thời lượng tối đa: 30 phút" },
-                    {
-                      icon: "💡",
-                      text: "Âm thanh rõ ràng, không nhiễu sẽ cho kết quả tốt nhất",
-                    },
                   ].map((item, index) => (
                     <Box
                       key={index}

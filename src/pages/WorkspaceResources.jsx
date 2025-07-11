@@ -545,7 +545,7 @@ const WorkspaceManagement = () => {
                                               fontSize: "0.85rem",
                                             }}
                                           >
-                                            {workspace.createAt}
+                                            {workspace.createdAt.slice(0, 10)}
                                           </Typography>
                                         </TableCell>
                                         <TableCell>

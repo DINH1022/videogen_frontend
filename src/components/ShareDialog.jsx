@@ -206,6 +206,144 @@ const VideoShareDialog = ({
     youtube: false,
     tiktok: false,
   });
+  // const handleYoutubeUpload = async () => {
+  //   setUploadLoading((prev) => ({ ...prev, youtube: true }));
+  //   try {
+  //     const response = await uploadVideoToYoutube(
+  //       videoSrc,
+  //       formData.youtube.title,
+  //       formData.youtube.description
+  //     );
+  //     alert("Upload successful: " + response);
+  //     showToast("Upload video to Youtube successfull", "success");
+  //   } catch (error) {
+  //     console.error("Upload failed:", error);
+  //   } finally {
+  //     setUploadLoading((prev) => ({ ...prev, youtube: false }));
+  //   }
+  // };
+
+  // // 3. Thêm hàm xử lý upload với loading cho TikTok
+  // const handleTiktokUpload = async () => {
+  //   setUploadLoading((prev) => ({ ...prev, tiktok: true }));
+  //   try {
+  //     await uploadVideoToTiktok(
+  //       videoSrc,
+  //       formData.tiktok.title,
+  //       formData.tiktok.description
+  //     );
+  //     // Có thể thêm thông báo thành công ở đây
+  //     showToast("Upload video to Tiktok successfull", "success");
+  //   } catch (error) {
+  //     console.error("Upload failed:", error);
+  //     // Có thể thêm thông báo lỗi ở đây
+  //   } finally {
+  //     setUploadLoading((prev) => ({ ...prev, tiktok: false }));
+  //   }
+  // };
+  // const handleQuickShare = async () => {
+  //   if (
+  //     !statusAccountSocial.youtube_status &&
+  //     !statusAccountSocial.tiktok_status
+  //   ) {
+  //     showToast(
+  //       "Bạn cần đăng nhập vào ít nhất một tài khoản để chia sẻ video",
+  //       "warning"
+  //     );
+  //     return;
+  //   }
+  //   if (statusAccountSocial.youtube_status) {
+  //     await handleYoutubeUpload();
+  //   }
+  //   if (statusAccountSocial.tiktok_status) {
+  //     await handleTiktokUpload();
+  //   }
+  //   showToast("Chia sẻ video thành công", "success");
+  //   onClose();
+  // };
+  const handleQuickShare = async () => {
+    // Kiểm tra điều kiện ban đầu
+    if (
+      !statusAccountSocial.youtube_status &&
+      !statusAccountSocial.tiktok_status
+    ) {
+      showToast(
+        "Bạn cần đăng nhập vào ít nhất một tài khoản để chia sẻ video",
+        "warning"
+      );
+      return;
+    }
+
+    // Tạo array các promises để xử lý đồng thời
+    const uploadPromises = [];
+
+    if (statusAccountSocial.youtube_status) {
+      uploadPromises.push(
+        handleYoutubeUpload().catch((error) => ({
+          platform: "YouTube",
+          success: false,
+          error: error.message,
+        }))
+      );
+    }
+
+    if (statusAccountSocial.tiktok_status) {
+      uploadPromises.push(
+        handleTiktokUpload().catch((error) => ({
+          platform: "TikTok",
+          success: false,
+          error: error.message,
+        }))
+      );
+    }
+
+    try {
+      // Thực hiện upload đồng thời
+      const results = await Promise.allSettled(uploadPromises);
+
+      // Phân tích kết quả
+      let successCount = 0;
+      let failCount = 0;
+      const failedPlatforms = [];
+
+      results.forEach((result) => {
+        if (result.status === "fulfilled") {
+          if (result.value && result.value.success === false) {
+            failCount++;
+            failedPlatforms.push(result.value.platform);
+          } else {
+            successCount++;
+          }
+        } else {
+          failCount++;
+        }
+      });
+
+      // Hiển thị thông báo phù hợp
+      if (successCount > 0 && failCount === 0) {
+        showToast("Chia sẻ video thành công trên tất cả nền tảng!", "success");
+      } else if (successCount > 0 && failCount > 0) {
+        showToast(
+          `Chia sẻ thành công một phần. Thất bại: ${failedPlatforms.join(
+            ", "
+          )}`,
+          "warning"
+        );
+      } else {
+        showToast("Chia sẻ video thất bại trên tất cả nền tảng", "error");
+      }
+
+      // Đóng dialog nếu có ít nhất một upload thành công
+      if (successCount > 0) {
+        onClose();
+      }
+    } catch (error) {
+      console.error("Unexpected error in quick share:", error);
+      showToast("Có lỗi không mong muốn xảy ra", "error");
+    }
+  };
+
+  // Cũng cần cập nhật các hàm upload để return kết quả
   const handleYoutubeUpload = async () => {
     setUploadLoading((prev) => ({ ...prev, youtube: true }));
     try {
@@ -214,34 +352,37 @@ const VideoShareDialog = ({
         formData.youtube.title,
         formData.youtube.description
       );
-      alert("Upload successful: " + response);
-      showToast("Upload video to Youtube successfull", "success");
+
+      showToast("Upload video to Youtube successful", "success");
+      return { platform: "YouTube", success: true, response };
     } catch (error) {
-      console.error("Upload failed:", error);
+      console.error("YouTube upload failed:", error);
+      showToast("Upload video to Youtube failed", "error");
+      throw error; // Re-throw để Promise.allSettled có thể catch
     } finally {
       setUploadLoading((prev) => ({ ...prev, youtube: false }));
     }
   };
 
-  // 3. Thêm hàm xử lý upload với loading cho TikTok
   const handleTiktokUpload = async () => {
     setUploadLoading((prev) => ({ ...prev, tiktok: true }));
     try {
-      await uploadVideoToTiktok(
+      const response = await uploadVideoToTiktok(
         videoSrc,
         formData.tiktok.title,
         formData.tiktok.description
       );
-      // Có thể thêm thông báo thành công ở đây
-      showToast("Upload video to Tiktok successfull", "success");
+
+      showToast("Upload video to TikTok successful", "success");
+      return { platform: "TikTok", success: true, response };
     } catch (error) {
-      console.error("Upload failed:", error);
-      // Có thể thêm thông báo lỗi ở đây
+      console.error("TikTok upload failed:", error);
+      showToast("Upload video to TikTok failed", "error");
+      throw error; // Re-throw để Promise.allSettled có thể catch
     } finally {
       setUploadLoading((prev) => ({ ...prev, tiktok: false }));
     }
   };
-
   useEffect(() => {
     const fetchData = async () => {
       const response = await checkLoginSocialAccount();
@@ -802,6 +943,7 @@ const VideoShareDialog = ({
             <Button
               variant="contained"
               startIcon={<ShareIcon />}
+              onClick={handleQuickShare}
               sx={{
                 textTransform: "none",
                 flex: 1,
