@@ -40,6 +40,19 @@ import { getAccessToken } from "../utils/localstorage";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedWorkspace } from "../redux/workspaceSlice";
+
+/**
+ * ExportDialog component provides a dialog for exporting a video with configurable settings.
+ * Users can select quality, format, and frame rate, see export progress, and preview/share the exported video.
+ *
+ * Props:
+ * - open: (boolean) Whether the dialog is open
+ * - onClose: (function) Callback to close the dialog
+ * - onExport: (function) Optional callback after export
+ * - mainEngine: (object) Main video engine for export
+ * - workspaceId: (string) Workspace ID for saving/exporting
+ */
+
 // Styled components for enhanced visual appeal
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
@@ -142,6 +155,7 @@ export default function ExportDialog({
   mainEngine,
   workspaceId,
 }) {
+  // State for export settings and progress
   const [quality, setQuality] = useState("1080p");
   const [format, setFormat] = useState("mp4");
   const [fps, setFps] = useState("30");
@@ -149,8 +163,15 @@ export default function ExportDialog({
   const [exportProgress, setExportProgress] = useState(0);
   const [exportedVideoUrl, setExportedVideoUrl] = useState("");
   const [showPreview, setShowPreview] = useState(false);
+
+  // Redux workspace state
   const workspace = useSelector((state) => state.workspace.selectedWorkspace);
   const dispatch = useDispatch();
+
+  /**
+   * handleExport triggers the video export process with selected settings.
+   * Shows progress and preview after export.
+   */
   const handleExport = async () => {
     if (!mainEngine || !workspaceId) return;
 
@@ -192,7 +213,7 @@ export default function ExportDialog({
 
       const width = Math.round((16 / 9) * parseInt(height)) + "";
 
-      // Progress callback
+      // Progress callback for export
       const progressCallback = (renderedFrames, encodedFrames, totalFrames) => {
         const progress = Math.round((renderedFrames / totalFrames) * 100);
         setExportProgress(progress);
@@ -209,6 +230,7 @@ export default function ExportDialog({
         targetHeight: height,
       };
 
+      // Export video using mainEngine
       const videoBlob = await mainEngine.block.exportVideo(
         page,
         `video/${processedFormat}`,
@@ -216,6 +238,7 @@ export default function ExportDialog({
         videoOptions
       );
 
+      // Upload video and save script
       const multipartForm = new FormData();
       multipartForm.append("video", videoBlob);
 
@@ -226,8 +249,6 @@ export default function ExportDialog({
       // console.log("tesst2: ", videoUrl);
       setExportedVideoUrl(response);
       setShowPreview(true);
-
-      console.log("Video exported successfully");
     } catch (error) {
       console.error("Error exporting video:", error);
     } finally {
@@ -235,19 +256,23 @@ export default function ExportDialog({
     }
   };
 
+  /**
+   * handleDownload allows user to download the exported video file.
+   */
   const handleDownload = () => {
     if (exportedVideoUrl) {
       const link = document.createElement("a");
       link.href = exportedVideoUrl;
-      link.download = `video_${
-        workspaceId || "export"
-      }_${Date.now()}.${format}`;
+      link.download = `video_${workspaceId || "export"}_${Date.now()}.${format}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
   };
 
+  /**
+   * handleClose resets dialog state and closes the dialog.
+   */
   const handleClose = () => {
     setShowPreview(false);
     setExportedVideoUrl("");
@@ -286,11 +311,13 @@ export default function ExportDialog({
           </IconButton>
         </StyledDialogTitle>
 
+        {/* Export settings and progress */}
         {!showPreview ? (
           <Fade in={!showPreview}>
             <div>
               <DialogContent sx={{ p: 3 }}>
                 <Stack spacing={3}>
+                  {/* Quality setting */}
                   <SettingCard elevation={0}>
                     <Box display="flex" alignItems="center" gap={1} mb={1}>
                       <HighQuality color="primary" />
@@ -322,6 +349,7 @@ export default function ExportDialog({
                     </StyledFormControl>
                   </SettingCard>
 
+                  {/* Format setting */}
                   <SettingCard elevation={0}>
                     <Box display="flex" alignItems="center" gap={1} mb={1}>
                       <Movie color="primary" />
@@ -348,6 +376,7 @@ export default function ExportDialog({
                     </StyledFormControl>
                   </SettingCard>
 
+                  {/* FPS setting */}
                   <SettingCard elevation={0}>
                     <Box display="flex" alignItems="center" gap={1} mb={1}>
                       <Speed color="primary" />
@@ -379,6 +408,7 @@ export default function ExportDialog({
                     </StyledFormControl>
                   </SettingCard>
 
+                  {/* Export progress bar */}
                   {isExporting && (
                     <Slide direction="up" in={isExporting}>
                       <ProgressContainer>
@@ -428,6 +458,7 @@ export default function ExportDialog({
             </div>
           </Fade>
         ) : (
+          // Preview and share exported video
           <VideoShareDialog
             open={showPreview}
             onClose={() => setShowPreview(false)}
