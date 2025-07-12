@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom"; // Add this import
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Container,
   Card,
@@ -26,10 +26,19 @@ import { generateImages } from "../services/images";
 import { useDispatch, useSelector } from "react-redux";
 import { saveScript } from "../services/script";
 import { setSelectedWorkspace } from "../redux/workspaceSlice";
+
+/**
+ * Resource component displays and manages resources (images, audio) for a workspace.
+ * - Shows audio and images, divides audio duration among images for timeline.
+ * - Allows generating new images, previewing timing, and navigating to video editor.
+ * - Handles loading, error, and debug info.
+ */
 const Resource = ({}) => {
-  const navigate = useNavigate(); // Add this hook
+  const navigate = useNavigate();
   const workspace = useSelector((state) => state.workspace.selectedWorkspace);
   const audioRef = useRef(null);
+
+  // State for images, audio, timings, loading, error
   const [images, setImages] = useState([]);
   const [audioUrl, setAudioUrl] = useState(
     workspace.audioUrl ||
@@ -41,11 +50,15 @@ const Resource = ({}) => {
   const [imageTimings, setImageTimings] = useState([]);
   const [isGeneratingResources, setIsGeneratingResources] = useState(false);
   const dispatch = useDispatch();
+
+  // Load images from workspace on mount/update
   useEffect(() => {
     if (workspace.imagesSet && workspace.imagesSet.length > 0) {
       setImages(workspace.imagesSet);
     }
   }, [workspace]);
+
+  // Calculate timings when audio metadata is loaded
   const handleAudioLoadedMetadata = () => {
     if (audioRef.current) {
       const duration = audioRef.current.duration;
@@ -67,7 +80,7 @@ const Resource = ({}) => {
     }
   };
 
-  // Recalculate timings when images change
+  // Recalculate timings when images or audio duration change
   useEffect(() => {
     if (audioDuration > 0 && images.length > 0) {
       const timePerImage = audioDuration / images.length;
@@ -80,10 +93,12 @@ const Resource = ({}) => {
     }
   }, [images, audioDuration]);
 
+  // Handle navigation back (to homepage or previous page)
   const handleNavigateBack = () => {
     console.log("Navigate back to homepage");
   };
 
+  // Handle navigation to video editor with resources
   const handleGenerateVideo = () => {
     // Navigate to editor with state similar to your example
     navigate(`/workspace/${workspace.id}/editor`, {
@@ -96,6 +111,7 @@ const Resource = ({}) => {
     });
   };
 
+  // Handle generating new images for the workspace
   const handleGenerateResource = async () => {
     try {
       setIsGeneratingResources(true);
@@ -103,6 +119,7 @@ const Resource = ({}) => {
 
       const response = await generateImages(workspace.script);
 
+      // Use mock images if API response is empty
       const mockImages = [
         "https://th.bing.com/th/id/OIP.y7t2x8MCNy1gBCGd7UAqkAHaEK?rs=1&pid=ImgDetMain",
         "https://th.bing.com/th/id/OIP.W2cHfeMBthAIh26hFV_sswHaFj?w=1681&h=1261&rs=1&pid=ImgDetMain",
@@ -115,6 +132,7 @@ const Resource = ({}) => {
         response && response.length > 0 ? response : mockImages;
       setImages(generatedImages);
 
+      // Save images to workspace
       const response2 = await saveScript(
         { imagesSet: generatedImages },
         workspace.id
@@ -128,6 +146,7 @@ const Resource = ({}) => {
     }
   };
 
+  // Loading state
   if (loading) {
     return (
       <Container
@@ -139,6 +158,7 @@ const Resource = ({}) => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <Container maxWidth={false} sx={{ py: 6, px: 2 }}>
@@ -158,6 +178,7 @@ const Resource = ({}) => {
     );
   }
 
+  // Main UI
   return (
     <Box
       sx={{
@@ -234,6 +255,7 @@ const Resource = ({}) => {
           sx={{ pb: 3 }}
         />
         <CardContent sx={{ pt: 0 }}>
+          {/* Audio preview and metadata */}
           {audioUrl && (
             <audio
               ref={audioRef}
@@ -271,6 +293,7 @@ const Resource = ({}) => {
           }
         />
         <CardContent sx={{ p: 2 }}>
+          {/* Generating resources loading */}
           {isGeneratingResources ? (
             <Box
               sx={{
@@ -288,6 +311,7 @@ const Resource = ({}) => {
             </Box>
           ) : images.length > 0 ? (
             <Box sx={{ width: "100%" }}>
+              {/* List images with timing info */}
               {images.map((imageUrl, index) => {
                 const timing = imageTimings[index];
                 return (
@@ -347,7 +371,7 @@ const Resource = ({}) => {
                         />
                       </Box>
 
-                      {/* Info Section - Optimized width */}
+                      {/* Info Section */}
                       <Box
                         sx={{
                           flex: { xs: "1 1 100%", lg: "1 1 40%" },
@@ -482,6 +506,7 @@ const Resource = ({}) => {
               })}
             </Box>
           ) : (
+            // Empty state: no images
             <Box
               sx={{
                 textAlign: "center",
