@@ -1,3 +1,9 @@
+/**
+ * Navigation component renders the main application navigation bar,
+ * including responsive AppBar, navigation buttons, user menu, and mobile drawer.
+ * Handles scroll-based opacity, navigation, login/logout, and workspace creation dialog.
+ */
+
 import React, { useState, useEffect, useRef } from "react";
 import {
   AppBar,
@@ -39,6 +45,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import CreateWorkspaceDialog from "./CreateWorkspaceDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutSuccess } from "../redux/authSlice";
+
 const Navigation = () => {
   const theme = useTheme();
   const accessToken = useSelector((state) => state.auth.login.accessToken);
@@ -58,6 +65,7 @@ const Navigation = () => {
   const isHomePage = location.pathname === "/" || location.pathname === "/home";
   const dispatch = useDispatch();
 
+  // Handle scroll events for AppBar opacity and style
   useEffect(() => {
     const handleScroll = () => {
       if (rafId.current) {
@@ -123,7 +131,7 @@ const Navigation = () => {
       });
     };
 
-    // Throttle scroll event để tăng performance
+    // Throttle scroll event for performance
     let ticking = false;
     const throttledHandleScroll = () => {
       if (!ticking) {
@@ -149,25 +157,31 @@ const Navigation = () => {
     };
   }, [isHomePage]);
 
+  // Toggle mobile drawer
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  // Open user menu
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
+
+  // Logout handler
   const handleLogout = () => {
-    // Xử lý đăng xuất ở đây
     setIsLoggedIn(false);
     localStorage.removeItem("accessToken");
     dispatch(logoutSuccess({ userData: null, accessToken: "" }));
     setAnchorElUser(null);
     navigate("/login");
   };
+
+  // Close user menu
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
 
+  // Navigate to login page
   const handleLogin = () => {
     navigate("/login");
   };
@@ -180,10 +194,12 @@ const Navigation = () => {
     }
   };
 
+  // Open create workspace dialog
   const handleCreateVideoClick = () => {
     setCreateWorkspaceOpen(true);
   };
 
+  // Navigation items for menu and drawer
   const navItems = [
     { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
     { text: "Thống kê", icon: <BarChartIcon />, path: "/statistics" },
@@ -194,6 +210,7 @@ const Navigation = () => {
     },
   ];
 
+  // Get AppBar background based on page
   const getAppBarBackground = () => {
     if (isHomePage) {
       return "transparent";
@@ -201,6 +218,7 @@ const Navigation = () => {
     return "white";
   };
 
+  // Drawer content for mobile navigation
   const drawer = (
     <Box
       sx={{
@@ -211,6 +229,7 @@ const Navigation = () => {
         color: "white",
       }}
     >
+      {/* Drawer header with logo and close button */}
       <Box
         sx={{
           p: 3,
@@ -253,6 +272,7 @@ const Navigation = () => {
         </IconButton>
       </Box>
 
+      {/* Navigation items */}
       <List sx={{ px: 2, mt: 2 }}>
         {navItems.map((item) => (
           <ListItem
@@ -293,6 +313,7 @@ const Navigation = () => {
         ))}
       </List>
 
+      {/* Login or user info section */}
       <Box sx={{ px: 3, mt: 4 }}>
         {!isLoggedIn ? (
           <Button
@@ -352,6 +373,7 @@ const Navigation = () => {
 
   return (
     <>
+      {/* AppBar navigation bar */}
       <AppBar
         ref={navigateRef}
         position="fixed"
@@ -365,7 +387,7 @@ const Navigation = () => {
           borderBottom: "none",
           color: "white",
           opacity: isHomePage ? scrollOpacity : 1,
-          transition: "all 0.3s ease", // ✅ Tăng thời gian transition để mượt hơn
+          transition: "all 0.3s ease",
           visibility: isHomePage && scrollOpacity === 0 ? "hidden" : "visible",
           willChange: isHomePage ? "opacity, visibility" : "auto",
         }}
@@ -579,6 +601,7 @@ const Navigation = () => {
                 </Tooltip>
               )}
 
+              {/* User menu */}
               <Menu
                 sx={{ mt: "50px" }}
                 id="menu-appbar"
@@ -652,7 +675,7 @@ const Navigation = () => {
                   <Typography
                     fontWeight={500}
                     color="#ff6b9d"
-                    onCclick={handleLogout}
+                    onClick={handleLogout}
                   >
                     Đăng xuất
                   </Typography>

@@ -12,17 +12,39 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createWorkspace } from "../services/workspace";
 import { getAccessToken } from "../utils/localstorage";
+
+/**
+ * CreateWorkspaceDialog component displays a dialog for creating a new workspace.
+ * Includes input fields for workspace name and optional note, handles API call to create,
+ * and navigates to the new workspace after successful creation.
+ *
+ * Props:
+ * - open: (boolean) Whether the dialog is open
+ * - setOpen: (function) Function to set dialog open/close state
+ */
 const CreateWorkspaceDialog = ({ open, setOpen }) => {
+  // State for workspace name input
   const [workspaceName, setWorkspaceName] = useState("");
+  // State for workspace note input
   const [workspaceNote, setWorkspaceNote] = useState("");
+  // State for loading indicator during creation
   const [isCreating, setIsCreating] = useState(false);
+
   const navigate = useNavigate();
+
+  /**
+   * handleCloseCreateWorkspace closes the dialog and resets input fields.
+   */
   const handleCloseCreateWorkspace = () => {
     setOpen(false);
     setWorkspaceName("");
     setWorkspaceNote("");
   };
 
+  /**
+   * handleCreateWorkspace triggers workspace creation via API and navigates to the new workspace.
+   * Shows loading indicator while creating.
+   */
   const handleCreateWorkspace = async () => {
     if (!workspaceName.trim()) return;
 
@@ -50,6 +72,7 @@ const CreateWorkspaceDialog = ({ open, setOpen }) => {
     //   throw error;
     // }
 
+    // Call API to create workspace
     const response = await createWorkspace({
       title: workspaceName,
       description: workspaceNote,
@@ -88,6 +111,7 @@ const CreateWorkspaceDialog = ({ open, setOpen }) => {
         Tạo Workspace Mới
       </DialogTitle>
       <DialogContent sx={{ pt: 3, px: 4 }}>
+        {/* Workspace name input */}
         <TextField
           autoFocus
           margin="dense"
@@ -112,6 +136,7 @@ const CreateWorkspaceDialog = ({ open, setOpen }) => {
             },
           }}
         />
+        {/* Workspace note input (optional) */}
         <TextField
           margin="dense"
           label="Ghi chú (tùy chọn)"
@@ -138,6 +163,7 @@ const CreateWorkspaceDialog = ({ open, setOpen }) => {
         />
       </DialogContent>
       <DialogActions sx={{ px: 4, pb: 3, pt: 2, gap: 2 }}>
+        {/* Cancel button */}
         <Button
           onClick={handleCloseCreateWorkspace}
           sx={{
@@ -154,6 +180,7 @@ const CreateWorkspaceDialog = ({ open, setOpen }) => {
         >
           Hủy
         </Button>
+        {/* Create button with loading indicator */}
         <Button
           onClick={handleCreateWorkspace}
           disabled={!workspaceName.trim() || isCreating}
@@ -190,4 +217,5 @@ const CreateWorkspaceDialog = ({ open, setOpen }) => {
     </Dialog>
   );
 };
+
 export default CreateWorkspaceDialog;
