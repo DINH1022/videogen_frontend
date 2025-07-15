@@ -659,6 +659,21 @@ const Navigation = () => {
                   <SettingsIcon sx={{ mr: 2, color: "white" }} />
                   <Typography fontWeight={500}>Kết nối Tiktok</Typography>
                 </MenuItem>
+
+                <MenuItem
+                  onClick={() => handleLoginRedirect("tiktok")}
+                  sx={{
+                    py: 1.5,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      bgcolor: "rgba(255, 255, 255, 0.1)",
+                      transform: "translateX(5px)",
+                    },
+                  }}
+                >
+                  <SettingsIcon sx={{ mr: 2, color: "white" }} />
+                  <Typography fontWeight={500}>Tải dữ liệu Tiktok</Typography>
+                </MenuItem>
                 <Divider sx={{ bgcolor: "rgba(255, 255, 255, 0.2)", my: 1 }} />
                 <MenuItem
                   onClick={handleLogin}

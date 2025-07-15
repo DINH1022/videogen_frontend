@@ -27,12 +27,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { saveScript } from "../services/script";
 import { setSelectedWorkspace } from "../redux/workspaceSlice";
 
-/**
- * Resource component displays and manages resources (images, audio) for a workspace.
- * - Shows audio and images, divides audio duration among images for timeline.
- * - Allows generating new images, previewing timing, and navigating to video editor.
- * - Handles loading, error, and debug info.
- */
 const Resource = ({}) => {
   const navigate = useNavigate();
   const workspace = useSelector((state) => state.workspace.selectedWorkspace);
@@ -74,8 +68,6 @@ const Resource = ({}) => {
         }));
 
         setImageTimings(timings);
-        console.log("Audio duration:", duration);
-        console.log("Image timings:", timings);
       }
     }
   };
@@ -98,9 +90,7 @@ const Resource = ({}) => {
     console.log("Navigate back to homepage");
   };
 
-  // Handle navigation to video editor with resources
   const handleGenerateVideo = () => {
-    // Navigate to editor with state similar to your example
     navigate(`/workspace/${workspace.id}/editor`, {
       state: {
         resourceList: images,
