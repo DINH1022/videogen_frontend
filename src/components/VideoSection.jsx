@@ -540,7 +540,6 @@ const VideoSection = ({ workspaces }) => {
         <>
           <Grid container spacing={2} sx={{ justifyContent: "flex-start" }}>
             {currentVideos.map((video, index) => {
-              // Kiểm tra video object trước khi render
               if (!video || typeof video !== "object") {
                 console.warn("Invalid video object at index:", index, video);
                 return null;
