@@ -27,12 +27,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { saveScript } from "../services/script";
 import { setSelectedWorkspace } from "../redux/workspaceSlice";
 
-const Resource = ({}) => {
+const Resource = ({ setActiveStep }) => {
   const navigate = useNavigate();
   const workspace = useSelector((state) => state.workspace.selectedWorkspace);
   const audioRef = useRef(null);
 
-  // State for images, audio, timings, loading, error
   const [images, setImages] = useState([]);
   const [audioUrl, setAudioUrl] = useState(
     workspace.audioUrl ||
@@ -87,16 +86,16 @@ const Resource = ({}) => {
 
   // Handle navigation back (to homepage or previous page)
   const handleNavigateBack = () => {
-    console.log("Navigate back to homepage");
+    setActiveStep("content");
   };
 
   const handleGenerateVideo = () => {
-    navigate(`/workspace/${workspace.id}/editor`, {
+    navigate(`/workspace/${workspace?.id}/editor`, {
       state: {
         resourceList: images,
         timing: imageTimings,
         audioUrl: audioUrl,
-        workspaceId: toString(workspace.id),
+        workspaceId: toString(workspace?.id),
       },
     });
   };

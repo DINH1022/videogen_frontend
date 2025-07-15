@@ -13,64 +13,23 @@ import { useNavigate } from "react-router-dom";
 import { createWorkspace } from "../services/workspace";
 import { getAccessToken } from "../utils/localstorage";
 
-/**
- * CreateWorkspaceDialog component displays a dialog for creating a new workspace.
- * Includes input fields for workspace name and optional note, handles API call to create,
- * and navigates to the new workspace after successful creation.
- *
- * Props:
- * - open: (boolean) Whether the dialog is open
- * - setOpen: (function) Function to set dialog open/close state
- */
 const CreateWorkspaceDialog = ({ open, setOpen }) => {
-  // State for workspace name input
   const [workspaceName, setWorkspaceName] = useState("");
-  // State for workspace note input
   const [workspaceNote, setWorkspaceNote] = useState("");
-  // State for loading indicator during creation
   const [isCreating, setIsCreating] = useState(false);
 
   const navigate = useNavigate();
 
-  /**
-   * handleCloseCreateWorkspace closes the dialog and resets input fields.
-   */
   const handleCloseCreateWorkspace = () => {
     setOpen(false);
     setWorkspaceName("");
     setWorkspaceNote("");
   };
 
-  /**
-   * handleCreateWorkspace triggers workspace creation via API and navigates to the new workspace.
-   * Shows loading indicator while creating.
-   */
   const handleCreateWorkspace = async () => {
     if (!workspaceName.trim()) return;
 
     setIsCreating(true);
-
-    // Giả lập API call
-    // setTimeout(() => {
-    //   const workspaceId = Math.random().toString(36).substr(2, 9);
-    //   setIsCreating(false);
-    //   handleCloseCreateWorkspace();
-    //   navigate(`/workspace/${workspaceId}`);
-    // }, 2000);
-    // try {
-    //   const response = await fetch("http://localhost:8080/workspace", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${getAccessToken()}`,
-    //     },
-    //     body: JSON.stringify({ title: "example", description: "example" }),
-    //     // …
-    //   });
-    //   console.log("tessst", response.body);
-    // } catch (error) {
-    //   throw error;
-    // }
 
     // Call API to create workspace
     const response = await createWorkspace({

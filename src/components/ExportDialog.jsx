@@ -167,11 +167,6 @@ export default function ExportDialog({
   // Redux workspace state
   const workspace = useSelector((state) => state.workspace.selectedWorkspace);
   const dispatch = useDispatch();
-
-  /**
-   * handleExport triggers the video export process with selected settings.
-   * Shows progress and preview after export.
-   */
   const handleExport = async () => {
     if (!mainEngine || !workspaceId) return;
 
@@ -181,13 +176,6 @@ export default function ExportDialog({
     try {
       const scene = mainEngine.scene.get();
       const page = mainEngine.scene.getCurrentPage();
-
-      console.log("Exporting video with settings:", {
-        height: quality,
-        format: format,
-        fps: fps,
-      });
-
       // Validate and process parameters
       let processedFormat = format.toLowerCase();
       if (processedFormat !== "mp4" && processedFormat !== "mov") {
@@ -245,12 +233,8 @@ export default function ExportDialog({
       const response = await uploadVideo(multipartForm);
       const res = await saveScript({ videoUrl: response }, workspace.id);
       dispatch(setSelectedWorkspace(res));
-      // const videoUrl = URL.createObjectURL(videoBlob);
-      // console.log("tesst2: ", videoUrl);
       setExportedVideoUrl(response);
       setShowPreview(true);
-
-      console.log("Video exported successfully");
     } catch (error) {
       console.error("Error exporting video:", error);
     } finally {
@@ -258,23 +242,19 @@ export default function ExportDialog({
     }
   };
 
-  /**
-   * handleDownload allows user to download the exported video file.
-   */
   const handleDownload = () => {
     if (exportedVideoUrl) {
       const link = document.createElement("a");
       link.href = exportedVideoUrl;
-      link.download = `video_${workspaceId || "export"}_${Date.now()}.${format}`;
+      link.download = `video_${
+        workspaceId || "export"
+      }_${Date.now()}.${format}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
   };
 
-  /**
-   * handleClose resets dialog state and closes the dialog.
-   */
   const handleClose = () => {
     setShowPreview(false);
     setExportedVideoUrl("");
