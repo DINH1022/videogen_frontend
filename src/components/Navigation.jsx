@@ -1,9 +1,3 @@
-/**
- * Navigation component renders the main application navigation bar,
- * including responsive AppBar, navigation buttons, user menu, and mobile drawer.
- * Handles scroll-based opacity, navigation, login/logout, and workspace creation dialog.
- */
-
 import React, { useState, useEffect, useRef } from "react";
 import {
   AppBar,
@@ -45,7 +39,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import CreateWorkspaceDialog from "./CreateWorkspaceDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutSuccess } from "../redux/authSlice";
-
+import { getAllVideosUploadToTiktok } from "../services/tiktok";
 const Navigation = () => {
   const theme = useTheme();
   const accessToken = useSelector((state) => state.auth.login.accessToken);
@@ -193,7 +187,9 @@ const Navigation = () => {
       window.location.href = `http://localhost:8080/connect/tiktok?user-id=${userData.id}`;
     }
   };
-
+  const handleDownloadTiktokData = async () => {
+    const response = await getAllVideosUploadToTiktok();
+  };
   // Open create workspace dialog
   const handleCreateVideoClick = () => {
     setCreateWorkspaceOpen(true);
@@ -661,7 +657,7 @@ const Navigation = () => {
                 </MenuItem>
 
                 <MenuItem
-                  onClick={() => handleLoginRedirect("tiktok")}
+                  onClick={handleDownloadTiktokData}
                   sx={{
                     py: 1.5,
                     transition: "all 0.3s ease",
