@@ -5,7 +5,7 @@ const backendUrl = "http://localhost:8080";
 
 const instance = axios.create({
   baseURL: backendUrl,
-  timeout: 90000,
+  timeout: 400000,
 });
 
 instance.interceptors.request.use(

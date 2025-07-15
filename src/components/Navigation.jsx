@@ -171,6 +171,14 @@ const Navigation = () => {
   const handleLogin = () => {
     navigate("/login");
   };
+  const handleLoginRedirect = async (platform) => {
+    // Redirect to login for specific platform
+    if (platform === "youtube") {
+      window.location.href = `http://localhost:8080/connect/youtube?user-id=${userData.id}`;
+    } else if (platform === "tiktok") {
+      window.location.href = `http://localhost:8080/connect/tiktok?user-id=${userData.id}`;
+    }
+  };
 
   const handleCreateVideoClick = () => {
     setCreateWorkspaceOpen(true);
@@ -601,21 +609,7 @@ const Navigation = () => {
                 }}
               >
                 <MenuItem
-                  onClick={handleCloseUserMenu}
-                  sx={{
-                    py: 1.5,
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      bgcolor: "rgba(255, 255, 255, 0.1)",
-                      transform: "translateX(5px)",
-                    },
-                  }}
-                >
-                  <AccountCircleIcon sx={{ mr: 2, color: "white" }} />
-                  <Typography fontWeight={500}>Hồ sơ</Typography>
-                </MenuItem>
-                <MenuItem
-                  onClick={handleCloseUserMenu}
+                  onClick={() => handleLoginRedirect("youtube")}
                   sx={{
                     py: 1.5,
                     transition: "all 0.3s ease",
@@ -626,7 +620,21 @@ const Navigation = () => {
                   }}
                 >
                   <SettingsIcon sx={{ mr: 2, color: "white" }} />
-                  <Typography fontWeight={500}>Cài đặt</Typography>
+                  <Typography fontWeight={500}>Kết nối Youtube</Typography>
+                </MenuItem>
+                <MenuItem
+                  onClick={() => handleLoginRedirect("tiktok")}
+                  sx={{
+                    py: 1.5,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      bgcolor: "rgba(255, 255, 255, 0.1)",
+                      transform: "translateX(5px)",
+                    },
+                  }}
+                >
+                  <SettingsIcon sx={{ mr: 2, color: "white" }} />
+                  <Typography fontWeight={500}>Kết nối Tiktok</Typography>
                 </MenuItem>
                 <Divider sx={{ bgcolor: "rgba(255, 255, 255, 0.2)", my: 1 }} />
                 <MenuItem

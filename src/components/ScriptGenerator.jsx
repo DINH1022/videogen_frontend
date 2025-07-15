@@ -438,9 +438,9 @@ const ScriptGenerator = ({}) => {
             <Box
               sx={{ display: "flex", gap: 3, overflowX: "auto", pb: 2, pt: 2 }}
             >
-              {searchResults.map((result) => (
+              {searchResults.map((result, index) => (
                 <Card
-                  key={result.id}
+                  key={index}
                   sx={{
                     minWidth: 300,
                     width: 346,

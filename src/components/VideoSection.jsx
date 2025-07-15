@@ -1,40 +1,14 @@
-// // export default VideoSection;
 // import React, { useEffect, useState } from "react";
 // import { Box, Typography, Tabs, Tab, Grid, Chip, Stack } from "@mui/material";
 // import VideoCard from "./VideoCard";
-// import VideoShareDialog from "./ShareDialog";
 // import { getAllVideosUploadToYoutube } from "../services/youtube";
 // import {
 //   getAllVideosUploadToTiktok,
 //   getAllVideosUploadToTiktokStore,
 // } from "../services/tiktok";
 
-// // Sample 2: Video đang xử lý
-// const processingVideos = [
-//   {
-//     id: 4,
-//     topic: "Mẹo ba tư - Video đang được xử lý",
-//     state: "processing",
-//     published: [],
-//     dateCreate: "7 thg 5, 2025",
-//     views: "0 lượt xem",
-//     progress: 65,
-//     thumbnail:
-//       "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=300&h=200&fit=crop",
-//   },
-//   {
-//     id: 5,
-//     topic: "Sa mạc cát",
-//     state: "processing",
-//     published: [],
-//     dateCreate: "8 thg 5, 2025",
-//     views: "0 lượt xem",
-//     progress: 30,
-//   },
-// ];
-
 // const VideoSection = ({ workspaces }) => {
-//   const [activeTab, setActiveTab] = useState(2);
+//   const [activeTab, setActiveTab] = useState(1); // Changed from 2 to 1
 //   const [workspaceVideos, setWorkspaceVideos] = useState([]);
 //   const [publishedVideos, setPublishedVideos] = useState([]);
 //   const [loading, setLoading] = useState(false);
@@ -42,12 +16,12 @@
 //   // Fix function getVideoWorkspace
 //   const getVideoWorkspace = (data) => {
 //     if (!data || !Array.isArray(data)) return [];
-//     console.log("getVideoWorkspace data:", data.size);
+
 //     const videos = data
 //       .map((item, index) => {
 //         if (item?.videoUrl) {
 //           return {
-//             id: index,
+//             id: `workspace_${index}`, // Sử dụng prefix để tránh trùng lặp
 //             url: item.videoUrl,
 //             dateCreate: item.createAt || new Date().toISOString(),
 //             topic: item.title || "Untitled Video",
@@ -75,7 +49,7 @@
 
 //     const videos = data.map((item, index) => {
 //       return {
-//         id: index,
+//         id: `youtube_${index}`, // Sử dụng prefix để tránh trùng lặp
 //         topic: item?.title || "Untitled Video",
 //         url: item?.url || "",
 //         thumbnail:
@@ -83,18 +57,19 @@
 //           "https://as1.ftcdn.net/v2/jpg/02/68/55/60/1000_F_268556011_PlbhKss0alfFmzNuqXdE3L0OfkHQ1rHH.jpg",
 //         dateCreate: item?.published_at || new Date().toISOString(),
 //         views: `${item?.number_of_views || 0} lượt xem`,
-//         state: "complete", // Thêm field này
-//         published: ["youtube"], // Thêm field này
+//         state: "complete",
+//         published: ["youtube"],
 //       };
 //     });
 //     return videos;
 //   };
+
 //   const configVideosPublishedTiktok = (data) => {
 //     if (!data || !Array.isArray(data)) return [];
 
 //     const videos = data.map((item, index) => {
 //       return {
-//         id: index + 10,
+//         id: `tiktok_${index}`,
 //         topic: item?.title || "Untitled Video",
 //         url: item?.url || "",
 //         thumbnail:
@@ -102,12 +77,13 @@
 //           "https://as1.ftcdn.net/v2/jpg/02/68/55/60/1000_F_268556011_PlbhKss0alfFmzNuqXdE3L0OfkHQ1rHH.jpg",
 //         dateCreate: item?.publishedAt || new Date().toISOString(),
 //         views: `${item?.numOfViews || 0} lượt xem`,
-//         state: "complete", // Thêm field này
-//         published: ["tiktok"], // Thêm field này
+//         state: "complete",
+//         published: ["tiktok"],
 //       };
 //     });
 //     return videos;
 //   };
+
 //   // Update workspaceVideos when workspaces prop changes
 //   useEffect(() => {
 //     try {
@@ -156,9 +132,6 @@
 //         console.log("Current workspaceVideos:", workspaceVideos);
 //         return workspaceVideos || [];
 //       case 1:
-//         console.log("Current processingVideos:", processingVideos);
-//         return processingVideos || [];
-//       case 2:
 //         console.log("Current publishedVideos:", publishedVideos);
 //         return publishedVideos || [];
 //       default:
@@ -172,16 +145,12 @@
 //       count: workspaceVideos?.length || 0,
 //     },
 //     {
-//       label: "Video đang xử lý",
-//       count: processingVideos?.length || 0,
-//     },
-//     {
 //       label: "Video đã xuất bản",
 //       count: publishedVideos?.length || 0,
 //     },
 //   ];
 
-//   const isPublishedTab = activeTab === 2;
+//   const isPublishedTab = activeTab === 1; // Changed from 2 to 1
 //   const currentVideos = getFilteredVideos();
 
 //   return (
@@ -317,9 +286,17 @@
 
 // export default VideoSection;
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Tabs, Tab, Grid, Chip, Stack } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Tabs,
+  Tab,
+  Grid,
+  Chip,
+  Stack,
+  Pagination,
+} from "@mui/material";
 import VideoCard from "./VideoCard";
-import VideoShareDialog from "./ShareDialog";
 import { getAllVideosUploadToYoutube } from "../services/youtube";
 import {
   getAllVideosUploadToTiktok,
@@ -331,6 +308,10 @@ const VideoSection = ({ workspaces }) => {
   const [workspaceVideos, setWorkspaceVideos] = useState([]);
   const [publishedVideos, setPublishedVideos] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const VIDEOS_PER_PAGE = 8;
 
   // Fix function getVideoWorkspace
   const getVideoWorkspace = (data) => {
@@ -376,8 +357,8 @@ const VideoSection = ({ workspaces }) => {
           "https://as1.ftcdn.net/v2/jpg/02/68/55/60/1000_F_268556011_PlbhKss0alfFmzNuqXdE3L0OfkHQ1rHH.jpg",
         dateCreate: item?.published_at || new Date().toISOString(),
         views: `${item?.number_of_views || 0} lượt xem`,
-        state: "complete", // Thêm field này
-        published: ["youtube"], // Thêm field này
+        state: "complete",
+        published: ["youtube"],
       };
     });
     return videos;
@@ -388,7 +369,7 @@ const VideoSection = ({ workspaces }) => {
 
     const videos = data.map((item, index) => {
       return {
-        id: `tiktok_${index}`, // Sử dụng prefix để tránh trùng lặp
+        id: `tiktok_${index}`,
         topic: item?.title || "Untitled Video",
         url: item?.url || "",
         thumbnail:
@@ -396,8 +377,8 @@ const VideoSection = ({ workspaces }) => {
           "https://as1.ftcdn.net/v2/jpg/02/68/55/60/1000_F_268556011_PlbhKss0alfFmzNuqXdE3L0OfkHQ1rHH.jpg",
         dateCreate: item?.publishedAt || new Date().toISOString(),
         views: `${item?.numOfViews || 0} lượt xem`,
-        state: "complete", // Thêm field này
-        published: ["tiktok"], // Thêm field này
+        state: "complete",
+        published: ["tiktok"],
       };
     });
     return videos;
@@ -409,6 +390,7 @@ const VideoSection = ({ workspaces }) => {
       const data = getVideoWorkspace(workspaces);
       console.log("Processed workspace videos:", data);
       setWorkspaceVideos(data);
+      setCurrentPage(1); // Reset to first page when data changes
     } catch (error) {
       console.error("Error processing workspace videos:", error);
       setWorkspaceVideos([]);
@@ -430,6 +412,7 @@ const VideoSection = ({ workspaces }) => {
         });
 
         setPublishedVideos(allVideos);
+        setCurrentPage(1); // Reset to first page when data changes
       } catch (error) {
         console.error("Error fetching published videos:", error);
         setPublishedVideos([]);
@@ -443,6 +426,11 @@ const VideoSection = ({ workspaces }) => {
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+    setCurrentPage(1); // Reset to first page when tab changes
+  };
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
   };
 
   const getFilteredVideos = () => {
@@ -458,6 +446,20 @@ const VideoSection = ({ workspaces }) => {
     }
   };
 
+  // Get paginated videos
+  const getPaginatedVideos = () => {
+    const allVideos = getFilteredVideos();
+    const startIndex = (currentPage - 1) * VIDEOS_PER_PAGE;
+    const endIndex = startIndex + VIDEOS_PER_PAGE;
+    return allVideos.slice(startIndex, endIndex);
+  };
+
+  // Calculate total pages
+  const getTotalPages = () => {
+    const allVideos = getFilteredVideos();
+    return Math.ceil(allVideos.length / VIDEOS_PER_PAGE);
+  };
+
   const tabs = [
     {
       label: "Video từ Workspace",
@@ -470,7 +472,9 @@ const VideoSection = ({ workspaces }) => {
   ];
 
   const isPublishedTab = activeTab === 1; // Changed from 2 to 1
-  const currentVideos = getFilteredVideos();
+  const currentVideos = getPaginatedVideos();
+  const totalPages = getTotalPages();
+  const totalVideos = getFilteredVideos().length;
 
   return (
     <Box>
@@ -533,37 +537,76 @@ const VideoSection = ({ workspaces }) => {
 
       {/* Video Grid */}
       {!loading && (
-        <Grid container spacing={2} sx={{ justifyContent: "flex-start" }}>
-          {currentVideos.map((video, index) => {
-            // Kiểm tra video object trước khi render
-            if (!video || typeof video !== "object") {
-              console.warn("Invalid video object at index:", index, video);
-              return null;
-            }
+        <>
+          <Grid container spacing={2} sx={{ justifyContent: "flex-start" }}>
+            {currentVideos.map((video, index) => {
+              // Kiểm tra video object trước khi render
+              if (!video || typeof video !== "object") {
+                console.warn("Invalid video object at index:", index, video);
+                return null;
+              }
 
-            return (
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                md={4}
-                lg={3}
-                xl={3}
-                key={video.id || index}
+              return (
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={3}
+                  xl={3}
+                  key={video.id || index}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  <VideoCard video={video} isPublishedTab={isPublishedTab} />
+                </Grid>
+              );
+            })}
+          </Grid>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                mt: 4,
+                mb: 2,
+                flexDirection: { xs: "column", sm: "row" },
+                gap: 2,
+              }}
+            >
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+                shape="rounded"
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
+                  order: { xs: 1, sm: 2 },
+                  "& .MuiPaginationItem-root": {
+                    fontSize: "0.9rem",
+                    fontWeight: 500,
+                    "&.Mui-selected": {
+                      backgroundColor: "#3b82f6",
+                      color: "#fff",
+                      "&:hover": {
+                        backgroundColor: "#2563eb",
+                      },
+                    },
+                  },
                 }}
-              >
-                <VideoCard video={video} isPublishedTab={isPublishedTab} />
-              </Grid>
-            );
-          })}
-        </Grid>
+              />
+            </Box>
+          )}
+        </>
       )}
 
       {/* Empty state cho videos */}
-      {!loading && currentVideos.length === 0 && (
+      {!loading && totalVideos === 0 && (
         <Box
           sx={{
             display: "flex",

@@ -2,23 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Container, Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-/**
- * ScrollingGradientComponent (NightSkyScroll) displays a multi-section scrollable page
- * with a dynamic background gradient that darkens as the user scrolls, and animated stars
- * that appear and move with parallax effect. The final section features a glowing title,
- * subtitle, and a call-to-action button, all animated based on scroll progress.
- *
- * - Star: Renders a single star with custom style.
- * - StarField: Renders multiple stars with parallax and twinkle animation.
- * - NightSkyScroll: Main component handling scroll, background, and content sections.
- */
 const theme = createTheme({
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
   },
 });
 
-// Component for rendering a single star
 const Star = ({ style }) => (
   <div
     style={{
@@ -32,7 +21,6 @@ const Star = ({ style }) => (
   />
 );
 
-// Component for rendering multiple stars with parallax and twinkle
 const StarField = ({ scrollProgress, opacity, scrollY }) => {
   const stars = [];
   for (let i = 0; i < 80; i++) {
@@ -54,7 +42,7 @@ const StarField = ({ scrollProgress, opacity, scrollY }) => {
           animation: `twinkle ${duration}s infinite ${delay}s`,
           // Parallax movement based on scroll
           transform: `translateY(${scrollY * parallaxSpeed * 0.5}px)`,
-          transition: "transform 0.1s linear", // Smooth transition for parallax
+          transition: "transform 0.1s linear",
         }}
       />
     );
