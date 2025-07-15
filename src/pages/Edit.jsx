@@ -11,13 +11,13 @@ import {
   Toolbar,
   CircularProgress,
 } from "@mui/material";
-import { Image as ImageIcon, Share } from "@mui/icons-material";
+import { Image as ImageIcon, Share, Home } from "@mui/icons-material";
 import { useLocation } from "react-router-dom";
 import ExportDialog from "../components/ExportDialog";
 import ImageGenTab from "../components/ImageGenTab";
 import VideoSearchTab from "../components/VideoSearchTab";
 import { useSelector } from "react-redux";
-
+import Navigation from "../components/Navigation";
 // Fallback sample resources (only used if no data is passed)
 const fallbackImages = [
   "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop",
@@ -623,6 +623,41 @@ export default function CesdkMuiEditor() {
           >
             Tools
           </Typography>
+
+          <Button
+            variant="contained"
+            startIcon={<Home />}
+            onClick={() => (window.location.href = "/")}
+            size="small"
+            sx={{
+              background: "rgba(102, 126, 234, 0.1)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(102, 126, 234, 0.2)",
+              borderRadius: "25px",
+              padding: "8px 20px",
+              color: "#667eea",
+              fontWeight: 500,
+              textTransform: "none",
+              fontSize: "0.875rem",
+              marginRight: "12px",
+              transition: "all 0.3s ease",
+              "&:hover": {
+                background: "rgba(102, 126, 234, 0.15)",
+                transform: "scale(1.02)",
+                boxShadow: "0 4px 16px rgba(102, 126, 234, 0.2)",
+              },
+              "& .MuiButton-startIcon": {
+                marginRight: "8px",
+                transition: "transform 0.3s ease",
+              },
+              "&:hover .MuiButton-startIcon": {
+                transform: "rotate(10deg)",
+              },
+            }}
+          >
+            Home
+          </Button>
+
           <Button
             variant="contained"
             startIcon={<Share />}

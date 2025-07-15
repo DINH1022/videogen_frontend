@@ -40,20 +40,6 @@ import { getAccessToken } from "../utils/localstorage";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedWorkspace } from "../redux/workspaceSlice";
-
-/**
- * ExportDialog component provides a dialog for exporting a video with configurable settings.
- * Users can select quality, format, and frame rate, see export progress, and preview/share the exported video.
- *
- * Props:
- * - open: (boolean) Whether the dialog is open
- * - onClose: (function) Callback to close the dialog
- * - onExport: (function) Optional callback after export
- * - mainEngine: (object) Main video engine for export
- * - workspaceId: (string) Workspace ID for saving/exporting
- */
-
-// Styled components for enhanced visual appeal
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
     borderRadius: 20,
@@ -163,7 +149,7 @@ export default function ExportDialog({
   const [exportProgress, setExportProgress] = useState(0);
   const [exportedVideoUrl, setExportedVideoUrl] = useState("");
   const [showPreview, setShowPreview] = useState(false);
-
+  const { id } = useParams();
   // Redux workspace state
   const workspace = useSelector((state) => state.workspace.selectedWorkspace);
   const dispatch = useDispatch();
@@ -231,7 +217,7 @@ export default function ExportDialog({
       multipartForm.append("video", videoBlob);
 
       const response = await uploadVideo(multipartForm);
-      const res = await saveScript({ videoUrl: response }, workspace.id);
+      const res = await saveScript({ videoUrl: response }, id);
       dispatch(setSelectedWorkspace(res));
       setExportedVideoUrl(response);
       setShowPreview(true);
@@ -347,11 +333,6 @@ export default function ExportDialog({
                         <MenuItem value="mp4">
                           <Box display="flex" alignItems="center" gap={1}>
                             🎞️ MP4 - Tương thích cao
-                          </Box>
-                        </MenuItem>
-                        <MenuItem value="mov">
-                          <Box display="flex" alignItems="center" gap={1}>
-                            🎬 MOV - Chất lượng cao
                           </Box>
                         </MenuItem>
                       </Select>

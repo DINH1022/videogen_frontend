@@ -529,17 +529,6 @@ const Resource = ({ setActiveStep }) => {
           )}
         </CardContent>
       </Card>
-
-      {/* Debug Info */}
-      {audioDuration > 0 && images.length > 0 && (
-        <Box sx={{ mt: 2, p: 2, bgcolor: "#f3f4f6", borderRadius: 1 }}>
-          <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
-            Debug: Audio Duration = {audioDuration.toFixed(2)}s | Images ={" "}
-            {images.length} | Time per image ={" "}
-            {(audioDuration / images.length).toFixed(2)}s
-          </Typography>
-        </Box>
-      )}
     </Box>
   );
 };
