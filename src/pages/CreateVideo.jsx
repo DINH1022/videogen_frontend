@@ -218,28 +218,27 @@ const CreateVideo = () => {
                 </CardContent>
               </Card>
             </Box>
-            {workspace?.audioUrl && (
-              <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  onClick={() => setActiveStep("generate")}
-                  endIcon={<ArrowForward />}
-                  sx={{
-                    bgcolor: "#1976d2",
-                    "&:hover": {
-                      bgcolor: "#1565c0",
-                    },
-                    px: 3,
-                    py: 1.5,
-                    textTransform: "none",
-                    fontWeight: 500,
-                  }}
-                >
-                  Tiếp tục
-                </Button>
-              </Box>
-            )}
+
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={() => setActiveStep("generate")}
+                endIcon={<ArrowForward />}
+                sx={{
+                  bgcolor: "#1976d2",
+                  "&:hover": {
+                    bgcolor: "#1565c0",
+                  },
+                  px: 3,
+                  py: 1.5,
+                  textTransform: "none",
+                  fontWeight: 500,
+                }}
+              >
+                Tiếp tục
+              </Button>
+            </Box>
           </Box>
         </Container>
       )}
