@@ -36,7 +36,7 @@ const VideoSection = ({ workspaces }) => {
           return {
             id: `workspace_${index}`, // Sử dụng prefix để tránh trùng lặp
             url: item.videoUrl,
-            dateCreate: item.createAt || new Date().toISOString(),
+            dateCreate: item.createdAt || new Date().toISOString(),
             topic: item.title || "Untitled Video",
             thumbnail:
               item.imagesSet && item.imagesSet.length > 0

@@ -1,3 +1,539 @@
+// import React, { useEffect, useState, useRef } from "react";
+// import { useLocation, useNavigate } from "react-router-dom";
+// import {
+//   Container,
+//   Card,
+//   CardContent,
+//   CardHeader,
+//   Typography,
+//   Button,
+//   Box,
+//   CircularProgress,
+//   Alert,
+//   Grid,
+//   Paper,
+//   Chip,
+// } from "@mui/material";
+// import {
+//   ArrowBack,
+//   PlayCircle,
+//   Folder,
+//   Description,
+//   Schedule,
+//   Image as ImageIcon,
+// } from "@mui/icons-material";
+// import { generateImages } from "../services/images";
+// import { useDispatch, useSelector } from "react-redux";
+// import { saveScript } from "../services/script";
+// import { setSelectedWorkspace } from "../redux/workspaceSlice";
+
+// const Resource = ({ setActiveStep }) => {
+//   const navigate = useNavigate();
+//   const workspace = useSelector((state) => state.workspace.selectedWorkspace);
+//   const audioRef = useRef(null);
+
+//   const [images, setImages] = useState([]);
+//   const [audioUrl, setAudioUrl] = useState(
+//     workspace.audioUrl ||
+//       "https://res.cloudinary.com/dpystprxq/video/upload/v1749478605/ttsmaker-file-2025-6-9-21-15-49_pfhyut.mp3"
+//   );
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState(null);
+//   const [audioDuration, setAudioDuration] = useState(0);
+//   const [imageTimings, setImageTimings] = useState([]);
+//   const [isGeneratingResources, setIsGeneratingResources] = useState(false);
+//   const dispatch = useDispatch();
+
+//   // Load images from workspace on mount/update
+//   useEffect(() => {
+//     if (workspace.imagesSet && workspace.imagesSet.length > 0) {
+//       setImages(workspace.imagesSet);
+//     }
+//   }, [workspace]);
+
+//   // Calculate timings when audio metadata is loaded
+//   const handleAudioLoadedMetadata = () => {
+//     if (audioRef.current) {
+//       const duration = audioRef.current.duration;
+//       setAudioDuration(duration);
+
+//       if (images.length > 0) {
+//         // Divide audio duration equally among images
+//         const timePerImage = duration / images.length;
+//         const timings = images.map((_, index) => ({
+//           startTime: index * timePerImage,
+//           endTime: (index + 1) * timePerImage,
+//           imageIndex: index,
+//         }));
+
+//         setImageTimings(timings);
+//       }
+//     }
+//   };
+
+//   // Recalculate timings when images or audio duration change
+//   useEffect(() => {
+//     if (audioDuration > 0 && images.length > 0) {
+//       const timePerImage = audioDuration / images.length;
+//       const timings = images.map((_, index) => ({
+//         startTime: index * timePerImage,
+//         endTime: (index + 1) * timePerImage,
+//         imageIndex: index,
+//       }));
+//       setImageTimings(timings);
+//     }
+//   }, [images, audioDuration]);
+
+//   // Handle navigation back (to homepage or previous page)
+//   const handleNavigateBack = () => {
+//     setActiveStep("content");
+//   };
+
+//   const handleGenerateVideo = () => {
+//     navigate(`/workspace/${workspace?.id}/editor`, {
+//       state: {
+//         resourceList: images,
+//         timing: imageTimings,
+//         audioUrl: audioUrl,
+//         workspaceId: toString(workspace?.id),
+//       },
+//     });
+//   };
+
+//   // Handle generating new images for the workspace
+//   const handleGenerateResource = async () => {
+//     try {
+//       setIsGeneratingResources(true);
+//       setError(null);
+
+//       const response = await generateImages(workspace.script);
+
+//       // Use mock images if API response is empty
+//       const mockImages = [
+//         "https://th.bing.com/th/id/OIP.y7t2x8MCNy1gBCGd7UAqkAHaEK?rs=1&pid=ImgDetMain",
+//         "https://th.bing.com/th/id/OIP.W2cHfeMBthAIh26hFV_sswHaFj?w=1681&h=1261&rs=1&pid=ImgDetMain",
+//         "https://th.bing.com/th/id/R.1b53fdf36f8bd376916821e3cce7528d?rik=5BBNceKgjdNNuw&pid=ImgRaw&r=0",
+//         "https://th.bing.com/th/id/OIP.DRstJ2S75KhAniwDSRFh8AHaFj?w=1920&h=1440&rs=1&pid=ImgDetMain",
+//         "https://th.bing.com/th/id/OIP.wpiMpWT8tPG7uu2cZW8xDwAAAA?w=474&h=315&rs=1&pid=ImgDetMain",
+//       ];
+
+//       const generatedImages =
+//         response && response.length > 0 ? response : mockImages;
+//       setImages(generatedImages);
+
+//       // Save images to workspace
+//       const response2 = await saveScript(
+//         { imagesSet: generatedImages },
+//         workspace.id
+//       );
+//       dispatch(setSelectedWorkspace(response2));
+//     } catch (err) {
+//       setError(err.message);
+//       console.error("Error generating resources:", err);
+//     } finally {
+//       setIsGeneratingResources(false);
+//     }
+//   };
+
+//   // Loading state
+//   if (loading) {
+//     return (
+//       <Container
+//         maxWidth={false}
+//         sx={{ py: 6, display: "flex", justifyContent: "center", px: 2 }}
+//       >
+//         <CircularProgress size={48} sx={{ color: "#7c3aed" }} />
+//       </Container>
+//     );
+//   }
+
+//   // Error state
+//   if (error) {
+//     return (
+//       <Container maxWidth={false} sx={{ py: 6, px: 2 }}>
+//         <Alert severity="error" sx={{ mb: 2 }}>
+//           <Typography variant="h6">Error</Typography>
+//           <Typography>{error}</Typography>
+//         </Alert>
+//         <Button
+//           variant="contained"
+//           startIcon={<ArrowBack />}
+//           onClick={handleNavigateBack}
+//           sx={{ mt: 2 }}
+//         >
+//           Go Back
+//         </Button>
+//       </Container>
+//     );
+//   }
+
+//   // Main UI
+//   return (
+//     <Box
+//       sx={{
+//         minHeight: "100vh",
+//         py: 3,
+//         mt: 4,
+//         px: 3,
+//         width: "100%",
+//       }}
+//     >
+//       {/* Header Card */}
+//       <Card
+//         sx={{
+//           background: "linear-gradient(to right, #dbeafe, #f3e8ff)",
+//           border: "1px solid #93c5fd",
+//           mb: 5,
+//           width: "100%",
+//           maxWidth: "none",
+//         }}
+//       >
+//         <CardHeader
+//           title={
+//             <Box
+//               sx={{
+//                 display: "flex",
+//                 alignItems: "center",
+//                 justifyContent: "space-between",
+//                 flexWrap: "wrap",
+//                 gap: 2,
+//               }}
+//             >
+//               <Box sx={{ display: "flex", alignItems: "center" }}>
+//                 <Button
+//                   variant="text"
+//                   onClick={handleNavigateBack}
+//                   sx={{ mr: 1, minWidth: "auto", p: 0.5 }}
+//                 >
+//                   <ArrowBack />
+//                 </Button>
+//                 <Box>
+//                   <Typography
+//                     variant="h5"
+//                     sx={{ display: "flex", alignItems: "center", gap: 1 }}
+//                   >
+//                     <Folder sx={{ color: "#7c3aed" }} />
+//                     Quản lý tài nguyên
+//                   </Typography>
+//                   <Typography variant="body2" color="text.secondary">
+//                     Xem và chỉnh sửa tài nguyên cho video này
+//                   </Typography>
+//                 </Box>
+//               </Box>
+//               <Button
+//                 variant="contained"
+//                 startIcon={<PlayCircle />}
+//                 onClick={handleGenerateVideo}
+//                 disabled={images.length === 0}
+//                 sx={{
+//                   bgcolor: "#2563eb",
+//                   "&:hover": { bgcolor: "#1d4ed8" },
+//                   "&:disabled": {
+//                     bgcolor: "#9ca3af",
+//                     color: "#ffffff",
+//                   },
+//                   display: "flex",
+//                   alignItems: "center",
+//                   gap: 1,
+//                 }}
+//               >
+//                 Generate video
+//               </Button>
+//             </Box>
+//           }
+//           sx={{ pb: 3 }}
+//         />
+//         <CardContent sx={{ pt: 0 }}>
+//           {/* Audio preview and metadata */}
+//           {audioUrl && (
+//             <audio
+//               ref={audioRef}
+//               controls
+//               style={{ width: "100%" }}
+//               onLoadedMetadata={handleAudioLoadedMetadata}
+//             >
+//               <source src={audioUrl} type="audio/mpeg" />
+//               Your browser does not support the audio tag.
+//             </audio>
+//           )}
+//         </CardContent>
+//       </Card>
+
+//       {/* Main Content Card */}
+//       <Card sx={{ width: "100%", maxWidth: "none" }}>
+//         <CardHeader
+//           title="Danh sách tài nguyên"
+//           subheader={
+//             <Box
+//               sx={{
+//                 display: "flex",
+//                 alignItems: "center",
+//                 justifyContent: "space-between",
+//                 flexWrap: "wrap",
+//                 gap: 2,
+//               }}
+//             >
+//               <Typography variant="body2" color="text.secondary">
+//                 {images.length > 0
+//                   ? "Xem các hình ảnh được chia theo timeline của audio"
+//                   : "Chưa có tài nguyên nào. Nhấn 'Generate resource' để tạo hình ảnh"}
+//               </Typography>
+//             </Box>
+//           }
+//         />
+//         <CardContent sx={{ p: 2 }}>
+//           {/* Generating resources loading */}
+//           {isGeneratingResources ? (
+//             <Box
+//               sx={{
+//                 textAlign: "center",
+//                 py: 12,
+//               }}
+//             >
+//               <CircularProgress size={48} sx={{ color: "#7c3aed", mb: 2 }} />
+//               <Typography variant="h6" sx={{ mb: 1 }}>
+//                 Đang tạo tài nguyên...
+//               </Typography>
+//               <Typography color="text.secondary">
+//                 Vui lòng đợi trong giây lát
+//               </Typography>
+//             </Box>
+//           ) : images.length > 0 ? (
+//             <Box sx={{ width: "100%" }}>
+//               {/* List images with timing info */}
+//               {images.map((imageUrl, index) => {
+//                 const timing = imageTimings[index];
+//                 return (
+//                   <Paper
+//                     key={index}
+//                     elevation={2}
+//                     sx={{
+//                       p: 4,
+//                       mb: 10,
+//                       width: "100%",
+//                       overflow: "hidden",
+//                     }}
+//                   >
+//                     <Box
+//                       sx={{
+//                         display: "flex",
+//                         alignItems: "stretch",
+//                         gap: 7,
+//                         width: "100%",
+//                         flexDirection: { xs: "column", lg: "row" },
+//                       }}
+//                     >
+//                       {/* Image Section - Larger and more prominent */}
+//                       <Box
+//                         sx={{
+//                           flex: { xs: "1 1 100%", lg: "1 1 60%" },
+//                           display: "flex",
+//                           justifyContent: "center",
+//                           alignItems: "center",
+//                           minHeight: { xs: "300px", md: "500px" },
+//                           maxHeight: "600px",
+//                           overflow: "hidden",
+//                           borderRadius: 2,
+//                           border: "2px solid #e5e7eb",
+//                           bgcolor: "#f8fafc",
+//                         }}
+//                       >
+//                         <Box
+//                           component="img"
+//                           src={imageUrl}
+//                           alt={`Image ${index + 1}`}
+//                           sx={{
+//                             width: "100%",
+//                             height: "100%",
+//                             borderRadius: 1,
+//                             objectFit: "cover",
+//                             cursor: "pointer",
+//                             transition: "transform 0.3s ease",
+//                             "&:hover": {
+//                               transform: "scale(1.02)",
+//                             },
+//                           }}
+//                           onError={(e) => {
+//                             console.error(`Failed to load image ${index + 1}`);
+//                             e.target.style.display = "none";
+//                           }}
+//                         />
+//                       </Box>
+
+//                       {/* Info Section */}
+//                       <Box
+//                         sx={{
+//                           flex: { xs: "1 1 100%", lg: "1 1 40%" },
+//                           display: "flex",
+//                           flexDirection: "column",
+//                           justifyContent: "center",
+//                           minHeight: { xs: "auto", lg: "500px" },
+//                           width: "100%",
+//                         }}
+//                       >
+//                         {/* Image Title */}
+//                         <Box
+//                           sx={{
+//                             mb: 4,
+//                             width: "100%",
+//                             display: "flex",
+//                             flexDirection: "column",
+//                             alignItems: "center",
+//                           }}
+//                         >
+//                           <Typography
+//                             variant="h4"
+//                             sx={{
+//                               display: "flex",
+//                               alignItems: "center",
+//                               gap: 1,
+//                               mb: 2,
+//                               color: "#1976d2",
+//                               fontWeight: "bold",
+//                             }}
+//                           >
+//                             <ImageIcon sx={{ fontSize: 32 }} />
+//                             Hình ảnh {index + 1}
+//                           </Typography>
+//                           <Chip
+//                             label={`Slide ${index + 1}/${images.length}`}
+//                             size="large"
+//                             color="primary"
+//                             variant="outlined"
+//                             sx={{ fontSize: "1rem", px: 2, py: 1 }}
+//                           />
+//                         </Box>
+
+//                         {/* Timeline Section */}
+//                         {audioDuration > 0 && timing && (
+//                           <Box
+//                             sx={{
+//                               p: 3,
+//                               bgcolor: "#f8fafc",
+//                               borderRadius: 3,
+//                               border: "2px solid #e2e8f0",
+//                               boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+//                               width: "100%",
+//                             }}
+//                           >
+//                             <Typography
+//                               variant="h5"
+//                               sx={{
+//                                 display: "flex",
+//                                 alignItems: "center",
+//                                 gap: 1,
+//                                 mb: 4,
+//                                 color: "#475569",
+//                                 fontWeight: 600,
+//                               }}
+//                             >
+//                               <Schedule fontSize="large" />
+//                               Timeline
+//                             </Typography>
+
+//                             <Box sx={{ mb: 3 }}>
+//                               <Typography
+//                                 variant="h6"
+//                                 color="text.secondary"
+//                                 sx={{ mb: 1, fontWeight: 500 }}
+//                               >
+//                                 Thời gian bắt đầu:
+//                               </Typography>
+//                               <Typography
+//                                 variant="h4"
+//                                 sx={{ fontWeight: 700, color: "#059669" }}
+//                               >
+//                                 {timing.startTime.toFixed(1)}s
+//                               </Typography>
+//                             </Box>
+
+//                             <Box sx={{ mb: 3 }}>
+//                               <Typography
+//                                 variant="h6"
+//                                 color="text.secondary"
+//                                 sx={{ mb: 1, fontWeight: 500 }}
+//                               >
+//                                 Thời gian kết thúc:
+//                               </Typography>
+//                               <Typography
+//                                 variant="h4"
+//                                 sx={{ fontWeight: 700, color: "#dc2626" }}
+//                               >
+//                                 {timing.endTime.toFixed(1)}s
+//                               </Typography>
+//                             </Box>
+
+//                             <Box
+//                               sx={{
+//                                 p: 2,
+//                                 bgcolor: "#dbeafe",
+//                                 borderRadius: 2,
+//                                 border: "2px solid #93c5fd",
+//                               }}
+//                             >
+//                               <Typography
+//                                 variant="h6"
+//                                 color="text.secondary"
+//                                 sx={{ mb: 1, fontWeight: 500 }}
+//                               >
+//                                 Thời lượng hiển thị:
+//                               </Typography>
+//                               <Typography
+//                                 variant="h3"
+//                                 sx={{ fontWeight: 700, color: "#1976d2" }}
+//                               >
+//                                 {(timing.endTime - timing.startTime).toFixed(1)}
+//                                 s
+//                               </Typography>
+//                             </Box>
+//                           </Box>
+//                         )}
+//                       </Box>
+//                     </Box>
+//                   </Paper>
+//                 );
+//               })}
+//             </Box>
+//           ) : (
+//             // Empty state: no images
+//             <Box
+//               sx={{
+//                 textAlign: "center",
+//                 py: 12,
+//                 border: "2px dashed #d1d5db",
+//                 borderRadius: 2,
+//               }}
+//             >
+//               <Folder sx={{ fontSize: 48, color: "#9ca3af", mb: 2 }} />
+//               <Typography variant="h6" sx={{ mb: 1 }}>
+//                 Không tìm thấy tài nguyên
+//               </Typography>
+//               <Typography color="text.secondary" sx={{ mb: 3 }}>
+//                 Hãy nhấn "Generate resource" để tạo hình ảnh cho video
+//               </Typography>
+//               <Button
+//                 variant="contained"
+//                 startIcon={<Description />}
+//                 onClick={handleGenerateResource}
+//                 disabled={isGeneratingResources}
+//                 sx={{
+//                   bgcolor: "#7c3aed",
+//                   "&:hover": { bgcolor: "#6d28d9" },
+//                   mb: 2,
+//                 }}
+//               >
+//                 {isGeneratingResources ? "Generating..." : "Generate resource"}
+//               </Button>
+//               <br />
+//             </Box>
+//           )}
+//         </CardContent>
+//       </Card>
+//     </Box>
+//   );
+// };
+
+// export default Resource;
 import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -21,6 +557,8 @@ import {
   Description,
   Schedule,
   Image as ImageIcon,
+  VolumeOff,
+  EditNote,
 } from "@mui/icons-material";
 import { generateImages } from "../services/images";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,10 +571,7 @@ const Resource = ({ setActiveStep }) => {
   const audioRef = useRef(null);
 
   const [images, setImages] = useState([]);
-  const [audioUrl, setAudioUrl] = useState(
-    workspace.audioUrl ||
-      "https://res.cloudinary.com/dpystprxq/video/upload/v1749478605/ttsmaker-file-2025-6-9-21-15-49_pfhyut.mp3"
-  );
+  const [audioUrl, setAudioUrl] = useState(workspace.audioUrl || null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [audioDuration, setAudioDuration] = useState(0);
@@ -135,6 +670,12 @@ const Resource = ({ setActiveStep }) => {
     }
   };
 
+  // Check if audio exists
+  const hasAudio = workspace.audioUrl && workspace.audioUrl.trim() !== "";
+
+  // Check if script exists
+  const hasScript = workspace.script && workspace.script.trim() !== "";
+
   // Loading state
   if (loading) {
     return (
@@ -224,7 +765,7 @@ const Resource = ({ setActiveStep }) => {
                 variant="contained"
                 startIcon={<PlayCircle />}
                 onClick={handleGenerateVideo}
-                disabled={images.length === 0}
+                disabled={images.length === 0 || !hasAudio}
                 sx={{
                   bgcolor: "#2563eb",
                   "&:hover": { bgcolor: "#1d4ed8" },
@@ -245,7 +786,7 @@ const Resource = ({ setActiveStep }) => {
         />
         <CardContent sx={{ pt: 0 }}>
           {/* Audio preview and metadata */}
-          {audioUrl && (
+          {hasAudio ? (
             <audio
               ref={audioRef}
               controls
@@ -255,6 +796,24 @@ const Resource = ({ setActiveStep }) => {
               <source src={audioUrl} type="audio/mpeg" />
               Your browser does not support the audio tag.
             </audio>
+          ) : (
+            <Box
+              sx={{
+                textAlign: "center",
+                py: 4,
+                border: "2px dashed #d1d5db",
+                borderRadius: 2,
+                bgcolor: "#f9fafb",
+              }}
+            >
+              <VolumeOff sx={{ fontSize: 48, color: "#9ca3af", mb: 2 }} />
+              <Typography variant="h6" sx={{ mb: 1, color: "#374151" }}>
+                Vui lòng tạo audio
+              </Typography>
+              <Typography color="text.secondary">
+                Bạn cần tạo audio trước khi có thể quản lý tài nguyên
+              </Typography>
+            </Box>
           )}
         </CardContent>
       </Card>
@@ -274,7 +833,9 @@ const Resource = ({ setActiveStep }) => {
               }}
             >
               <Typography variant="body2" color="text.secondary">
-                {images.length > 0
+                {!hasScript
+                  ? "Bạn chưa lưu thông tin kịch bản"
+                  : images.length > 0
                   ? "Xem các hình ảnh được chia theo timeline của audio"
                   : "Chưa có tài nguyên nào. Nhấn 'Generate resource' để tạo hình ảnh"}
               </Typography>
@@ -282,250 +843,293 @@ const Resource = ({ setActiveStep }) => {
           }
         />
         <CardContent sx={{ p: 2 }}>
-          {/* Generating resources loading */}
-          {isGeneratingResources ? (
-            <Box
-              sx={{
-                textAlign: "center",
-                py: 12,
-              }}
-            >
-              <CircularProgress size={48} sx={{ color: "#7c3aed", mb: 2 }} />
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                Đang tạo tài nguyên...
-              </Typography>
-              <Typography color="text.secondary">
-                Vui lòng đợi trong giây lát
-              </Typography>
-            </Box>
-          ) : images.length > 0 ? (
-            <Box sx={{ width: "100%" }}>
-              {/* List images with timing info */}
-              {images.map((imageUrl, index) => {
-                const timing = imageTimings[index];
-                return (
-                  <Paper
-                    key={index}
-                    elevation={2}
-                    sx={{
-                      p: 4,
-                      mb: 10,
-                      width: "100%",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "stretch",
-                        gap: 7,
-                        width: "100%",
-                        flexDirection: { xs: "column", lg: "row" },
-                      }}
-                    >
-                      {/* Image Section - Larger and more prominent */}
-                      <Box
-                        sx={{
-                          flex: { xs: "1 1 100%", lg: "1 1 60%" },
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          minHeight: { xs: "300px", md: "500px" },
-                          maxHeight: "600px",
-                          overflow: "hidden",
-                          borderRadius: 2,
-                          border: "2px solid #e5e7eb",
-                          bgcolor: "#f8fafc",
-                        }}
-                      >
-                        <Box
-                          component="img"
-                          src={imageUrl}
-                          alt={`Image ${index + 1}`}
-                          sx={{
-                            width: "100%",
-                            height: "100%",
-                            borderRadius: 1,
-                            objectFit: "cover",
-                            cursor: "pointer",
-                            transition: "transform 0.3s ease",
-                            "&:hover": {
-                              transform: "scale(1.02)",
-                            },
-                          }}
-                          onError={(e) => {
-                            console.error(`Failed to load image ${index + 1}`);
-                            e.target.style.display = "none";
-                          }}
-                        />
-                      </Box>
-
-                      {/* Info Section */}
-                      <Box
-                        sx={{
-                          flex: { xs: "1 1 100%", lg: "1 1 40%" },
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "center",
-                          minHeight: { xs: "auto", lg: "500px" },
-                          width: "100%",
-                        }}
-                      >
-                        {/* Image Title */}
-                        <Box
-                          sx={{
-                            mb: 4,
-                            width: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Typography
-                            variant="h4"
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                              mb: 2,
-                              color: "#1976d2",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            <ImageIcon sx={{ fontSize: 32 }} />
-                            Hình ảnh {index + 1}
-                          </Typography>
-                          <Chip
-                            label={`Slide ${index + 1}/${images.length}`}
-                            size="large"
-                            color="primary"
-                            variant="outlined"
-                            sx={{ fontSize: "1rem", px: 2, py: 1 }}
-                          />
-                        </Box>
-
-                        {/* Timeline Section */}
-                        {audioDuration > 0 && timing && (
-                          <Box
-                            sx={{
-                              p: 3,
-                              bgcolor: "#f8fafc",
-                              borderRadius: 3,
-                              border: "2px solid #e2e8f0",
-                              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                              width: "100%",
-                            }}
-                          >
-                            <Typography
-                              variant="h5"
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
-                                mb: 4,
-                                color: "#475569",
-                                fontWeight: 600,
-                              }}
-                            >
-                              <Schedule fontSize="large" />
-                              Timeline
-                            </Typography>
-
-                            <Box sx={{ mb: 3 }}>
-                              <Typography
-                                variant="h6"
-                                color="text.secondary"
-                                sx={{ mb: 1, fontWeight: 500 }}
-                              >
-                                Thời gian bắt đầu:
-                              </Typography>
-                              <Typography
-                                variant="h4"
-                                sx={{ fontWeight: 700, color: "#059669" }}
-                              >
-                                {timing.startTime.toFixed(1)}s
-                              </Typography>
-                            </Box>
-
-                            <Box sx={{ mb: 3 }}>
-                              <Typography
-                                variant="h6"
-                                color="text.secondary"
-                                sx={{ mb: 1, fontWeight: 500 }}
-                              >
-                                Thời gian kết thúc:
-                              </Typography>
-                              <Typography
-                                variant="h4"
-                                sx={{ fontWeight: 700, color: "#dc2626" }}
-                              >
-                                {timing.endTime.toFixed(1)}s
-                              </Typography>
-                            </Box>
-
-                            <Box
-                              sx={{
-                                p: 2,
-                                bgcolor: "#dbeafe",
-                                borderRadius: 2,
-                                border: "2px solid #93c5fd",
-                              }}
-                            >
-                              <Typography
-                                variant="h6"
-                                color="text.secondary"
-                                sx={{ mb: 1, fontWeight: 500 }}
-                              >
-                                Thời lượng hiển thị:
-                              </Typography>
-                              <Typography
-                                variant="h3"
-                                sx={{ fontWeight: 700, color: "#1976d2" }}
-                              >
-                                {(timing.endTime - timing.startTime).toFixed(1)}
-                                s
-                              </Typography>
-                            </Box>
-                          </Box>
-                        )}
-                      </Box>
-                    </Box>
-                  </Paper>
-                );
-              })}
-            </Box>
-          ) : (
-            // Empty state: no images
+          {/* No script state */}
+          {!hasScript ? (
             <Box
               sx={{
                 textAlign: "center",
                 py: 12,
                 border: "2px dashed #d1d5db",
                 borderRadius: 2,
+                bgcolor: "#f9fafb",
               }}
             >
-              <Folder sx={{ fontSize: 48, color: "#9ca3af", mb: 2 }} />
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                Không tìm thấy tài nguyên
+              <EditNote sx={{ fontSize: 48, color: "#9ca3af", mb: 2 }} />
+              <Typography variant="h6" sx={{ mb: 1, color: "#374151" }}>
+                Bạn chưa lưu thông tin kịch bản
               </Typography>
               <Typography color="text.secondary" sx={{ mb: 3 }}>
-                Hãy nhấn "Generate resource" để tạo hình ảnh cho video
+                Vui lòng tạo và lưu kịch bản trước khi tạo tài nguyên
               </Typography>
               <Button
                 variant="contained"
-                startIcon={<Description />}
-                onClick={handleGenerateResource}
-                disabled={isGeneratingResources}
+                startIcon={<ArrowBack />}
+                onClick={handleNavigateBack}
                 sx={{
                   bgcolor: "#7c3aed",
                   "&:hover": { bgcolor: "#6d28d9" },
-                  mb: 2,
                 }}
               >
-                {isGeneratingResources ? "Generating..." : "Generate resource"}
+                Quay lại
               </Button>
-              <br />
             </Box>
+          ) : (
+            <>
+              {/* Generating resources loading */}
+              {isGeneratingResources ? (
+                <Box
+                  sx={{
+                    textAlign: "center",
+                    py: 12,
+                  }}
+                >
+                  <CircularProgress
+                    size={48}
+                    sx={{ color: "#7c3aed", mb: 2 }}
+                  />
+                  <Typography variant="h6" sx={{ mb: 1 }}>
+                    Đang tạo tài nguyên...
+                  </Typography>
+                  <Typography color="text.secondary">
+                    Vui lòng đợi trong giây lát
+                  </Typography>
+                </Box>
+              ) : images.length > 0 ? (
+                <Box sx={{ width: "100%" }}>
+                  {/* List images with timing info */}
+                  {images.map((imageUrl, index) => {
+                    const timing = imageTimings[index];
+                    return (
+                      <Paper
+                        key={index}
+                        elevation={2}
+                        sx={{
+                          p: 4,
+                          mb: 10,
+                          width: "100%",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "stretch",
+                            gap: 7,
+                            width: "100%",
+                            flexDirection: { xs: "column", lg: "row" },
+                          }}
+                        >
+                          {/* Image Section - Larger and more prominent */}
+                          <Box
+                            sx={{
+                              flex: { xs: "1 1 100%", lg: "1 1 60%" },
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              minHeight: { xs: "300px", md: "500px" },
+                              maxHeight: "600px",
+                              overflow: "hidden",
+                              borderRadius: 2,
+                              border: "2px solid #e5e7eb",
+                              bgcolor: "#f8fafc",
+                            }}
+                          >
+                            <Box
+                              component="img"
+                              src={imageUrl}
+                              alt={`Image ${index + 1}`}
+                              sx={{
+                                width: "100%",
+                                height: "100%",
+                                borderRadius: 1,
+                                objectFit: "cover",
+                                cursor: "pointer",
+                                transition: "transform 0.3s ease",
+                                "&:hover": {
+                                  transform: "scale(1.02)",
+                                },
+                              }}
+                              onError={(e) => {
+                                console.error(
+                                  `Failed to load image ${index + 1}`
+                                );
+                                e.target.style.display = "none";
+                              }}
+                            />
+                          </Box>
+
+                          {/* Info Section */}
+                          <Box
+                            sx={{
+                              flex: { xs: "1 1 100%", lg: "1 1 40%" },
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "center",
+                              minHeight: { xs: "auto", lg: "500px" },
+                              width: "100%",
+                            }}
+                          >
+                            {/* Image Title */}
+                            <Box
+                              sx={{
+                                mb: 4,
+                                width: "100%",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Typography
+                                variant="h4"
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1,
+                                  mb: 2,
+                                  color: "#1976d2",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                <ImageIcon sx={{ fontSize: 32 }} />
+                                Hình ảnh {index + 1}
+                              </Typography>
+                              <Chip
+                                label={`Slide ${index + 1}/${images.length}`}
+                                size="large"
+                                color="primary"
+                                variant="outlined"
+                                sx={{ fontSize: "1rem", px: 2, py: 1 }}
+                              />
+                            </Box>
+
+                            {/* Timeline Section */}
+                            {audioDuration > 0 && timing && (
+                              <Box
+                                sx={{
+                                  p: 3,
+                                  bgcolor: "#f8fafc",
+                                  borderRadius: 3,
+                                  border: "2px solid #e2e8f0",
+                                  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                                  width: "100%",
+                                }}
+                              >
+                                <Typography
+                                  variant="h5"
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                    mb: 4,
+                                    color: "#475569",
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  <Schedule fontSize="large" />
+                                  Timeline
+                                </Typography>
+
+                                <Box sx={{ mb: 3 }}>
+                                  <Typography
+                                    variant="h6"
+                                    color="text.secondary"
+                                    sx={{ mb: 1, fontWeight: 500 }}
+                                  >
+                                    Thời gian bắt đầu:
+                                  </Typography>
+                                  <Typography
+                                    variant="h4"
+                                    sx={{ fontWeight: 700, color: "#059669" }}
+                                  >
+                                    {timing.startTime.toFixed(1)}s
+                                  </Typography>
+                                </Box>
+
+                                <Box sx={{ mb: 3 }}>
+                                  <Typography
+                                    variant="h6"
+                                    color="text.secondary"
+                                    sx={{ mb: 1, fontWeight: 500 }}
+                                  >
+                                    Thời gian kết thúc:
+                                  </Typography>
+                                  <Typography
+                                    variant="h4"
+                                    sx={{ fontWeight: 700, color: "#dc2626" }}
+                                  >
+                                    {timing.endTime.toFixed(1)}s
+                                  </Typography>
+                                </Box>
+
+                                <Box
+                                  sx={{
+                                    p: 2,
+                                    bgcolor: "#dbeafe",
+                                    borderRadius: 2,
+                                    border: "2px solid #93c5fd",
+                                  }}
+                                >
+                                  <Typography
+                                    variant="h6"
+                                    color="text.secondary"
+                                    sx={{ mb: 1, fontWeight: 500 }}
+                                  >
+                                    Thời lượng hiển thị:
+                                  </Typography>
+                                  <Typography
+                                    variant="h3"
+                                    sx={{ fontWeight: 700, color: "#1976d2" }}
+                                  >
+                                    {(
+                                      timing.endTime - timing.startTime
+                                    ).toFixed(1)}
+                                    s
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            )}
+                          </Box>
+                        </Box>
+                      </Paper>
+                    );
+                  })}
+                </Box>
+              ) : (
+                // Empty state: no images but has script
+                <Box
+                  sx={{
+                    textAlign: "center",
+                    py: 12,
+                    border: "2px dashed #d1d5db",
+                    borderRadius: 2,
+                  }}
+                >
+                  <Folder sx={{ fontSize: 48, color: "#9ca3af", mb: 2 }} />
+                  <Typography variant="h6" sx={{ mb: 1 }}>
+                    Không tìm thấy tài nguyên
+                  </Typography>
+                  <Typography color="text.secondary" sx={{ mb: 3 }}>
+                    Hãy nhấn "Generate resource" để tạo hình ảnh cho video
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    startIcon={<Description />}
+                    onClick={handleGenerateResource}
+                    disabled={isGeneratingResources}
+                    sx={{
+                      bgcolor: "#7c3aed",
+                      "&:hover": { bgcolor: "#6d28d9" },
+                      mb: 2,
+                    }}
+                  >
+                    {isGeneratingResources
+                      ? "Generating..."
+                      : "Generate resource"}
+                  </Button>
+                  <br />
+                </Box>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

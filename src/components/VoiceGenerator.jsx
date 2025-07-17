@@ -55,6 +55,7 @@ import { saveScript } from "../services/script";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedWorkspace } from "../redux/workspaceSlice";
 import { uploadAudio } from "../services/audio";
+import showToast from "./ShowToast";
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -386,7 +387,13 @@ const VoiceConfigComponent = ({}) => {
   const handleCreateAudio = async () => {
     try {
       setIsCreatingAudio(true); // Bắt đầu loading
-
+      if (workspace.script == null || workspace.script == "") {
+        showToast(
+          "Vui lòng tạo kịch bản và lưu trước khi tạo âm thanh",
+          "error"
+        );
+        return;
+      }
       const response = await createAudio(workspace.script, selectedVoice);
       const response2 = await saveScript({ audioUrl: response }, workspace.id);
 
@@ -669,7 +676,7 @@ const VoiceConfigComponent = ({}) => {
                               }}
                               onClick={() => setSelectedVoice(voice)}
                             >
-                              <CardContent sx={{ p: 2, width: "235px" }}>
+                              <CardContent sx={{ p: 2, width: "215px" }}>
                                 <Box
                                   sx={{
                                     display: "flex",

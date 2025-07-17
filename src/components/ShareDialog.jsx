@@ -681,7 +681,7 @@ const VideoShareDialog = ({
                           T
                         </Avatar>
                         <Typography variant="body2" sx={{ fontWeight: "600" }}>
-                          Ty Nguyen Chanel
+                          Youtube Chanel
                         </Typography>
                       </Box>
                     </Box>
@@ -797,8 +797,8 @@ const VideoShareDialog = ({
                         >
                           <TikTokIcon />
                         </Avatar>
-                        <Typography variant="body2">
-                          cr7 (cristiano ronaldo)
+                        <Typography variant="body2" sx={{ fontWeight: "600" }}>
+                          Tiktok Chanel
                         </Typography>
                       </Box>
                     </Box>
